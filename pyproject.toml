@@ -1,0 +1,44 @@
+[project]
+name = "lucro-admin"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Otavio Santos Inacio",email = "otaviosantosinacio@gmail.com"}
+]
+readme = "README.md"
+
+dependencies = [
+    "taskipy (>=1.14.1,<2.0.0)",
+    "pytest (>=9.0.3,<10.0.0)",
+    "ruff (>=0.15.12,<0.16.0)",
+    "typos (>=1.46.0,<2.0.0)",
+    "requests (>=2.33.1,<3.0.0)",
+    "fastapi (>=0.136.1,<0.137.0)",
+    "psycopg2 (>=2.9.12,<3.0.0)",
+    "dotenv (>=0.9.9,<0.10.0)",
+    "rich (>=15.0.0,<16.0.0)"
+]
+
+[tool.poetry.dependencies]
+python = ">=3.12, <4.0"
+
+
+[tool.ruff]
+line-length = 79
+extend-exclude = ['migrations']
+
+[tool.ruff.lint]
+preview = true
+select = ['I', 'F', 'E', 'W', 'PL', 'PT']
+
+[tool.ruff.format]
+preview = true
+quote-style = 'single'
+
+[tool.pytest]
+pythonpath = ['.']
+addopts = ['-p', 'no:warnings']
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
