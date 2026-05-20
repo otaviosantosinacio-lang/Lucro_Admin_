@@ -1,0 +1,48 @@
+MER -> Lucro Admin
+Usuário
+	id_usuário(PK)
+	nome
+	email
+	senha
+
+Pedido
+	id_pedido (PK)
+	id_bling
+	num_bling
+	situacao
+	id_nf
+	id_marketplace(FK)
+	id_pedido_marketplace
+	data_venda
+	custo_total
+	valor_pedido
+	lucro
+	
+Nota_Fiscal
+	id_nf(PK)
+	id_nf_bling(UNIQUE)
+	id_pedido(FK, UNIQUE)
+	numero_nf
+	serie
+	chave_acesso
+	data_emissao
+	valor_nf
+	
+Nota_Fiscal_Imposto
+	id_nf_imposto(PK)
+	id_nf(FK)
+	tipo_imposto
+	valor_imposto
+	origem_calculo
+	
+Produto_Pedido
+	id_produto_pedido
+	id_pedido_bling
+	id_situacao
+	sku
+	quantidade
+	preco_produto
+	frete
+	comissão
+	
+Situação_Bling

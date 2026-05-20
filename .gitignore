@@ -33,7 +33,7 @@ dist/
 *.egg-info/
 
 # Text
-*.txt
+anotações.txt
 
 # Ruff Cache
 .ruff_cache

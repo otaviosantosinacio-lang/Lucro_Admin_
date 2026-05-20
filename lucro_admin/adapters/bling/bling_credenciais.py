@@ -13,7 +13,7 @@ class Code:
 
     """
 
-    base_url: str = 'https://www.api.bling.com.br/Api/v3'
+    base_url: str = 'https://www.bling.com.br/Api/v3'
 
     def code_request(self, url, headers, data):
         """
@@ -62,10 +62,11 @@ class Code:
         )
 
         # Montagem de headers e data para envio request
-        headers: dict[str, str] = {
+        headers: dict[str, str | int] = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/json',
             'Authorization': f'Basic {credenciaisbase64}',
+            'enable-jwt' : 1
         }
         data: str = f'grant_type=authorization_code&code={code}'
 
@@ -79,6 +80,9 @@ class Code:
             lambda: self.code_request(url, headers, data)
         )
 
+        logger.info(response.text)
+
+        breakpoint()
         # Verificando o retorno
         if response.status_code == 200:
             logger.info(
