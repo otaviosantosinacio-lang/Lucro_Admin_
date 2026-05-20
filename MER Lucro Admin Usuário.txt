@@ -1,27 +1,30 @@
 MER -> Lucro Admin
 Usuário
-	id_usuário(PK)
+	id_usuário (PK)
 	nome
-	email
-	senha
+	email (UNIQUE)
+	senha_hash
+	created_at
+	updated_at
 
 Pedido
 	id_pedido (PK)
-	id_bling
-	num_bling
+	id_bling (UNIQUE)
+	num_bling (UNIQUE)
 	id_situacao (FK)
-	id_nf
-	id_marketplace(FK)
-	id_pedido_marketplace
+	id_nf_bling
+	id_marketplace (FK)
+	id_pedido_marketplace (UNIQUE)
 	data_venda
 	valor_pedido
 	created_at
 	updated_at
 	
 Nota_Fiscal
-	id_nf(PK)
-	id_nf_bling(UNIQUE)
-	id_pedido(FK, UNIQUE)
+	id_nf (PK)
+	id_nf_bling
+	id_pedido (FK, UNIQUE)
+	url_xml
 	numero_nf
 	serie
 	chave_acesso
@@ -30,23 +33,25 @@ Nota_Fiscal
 	created_at
 	updated_at
 
-Nota_Fiscal_Imposto
-	id_nf_imposto(PK)
-	id_nf(FK)
-	tipo_imposto
-	
-Produto_Pedido
-	id_produto_pedido
-	id_pedido_bling
-	id_situacao (FK)
-	sku
-	quantidade
-	preco_produto
-	frete
-	comissão
-	tipo_imposto
+Pedido_Produto_Imposto
+	id_pedido_produto_imposto (PK)
+	id_produto_pedido (FK)
+	UNIQUE (tipo_imposto, id_produto_pedido)
 	valor_imposto
 	origem_calculo
+	created_at
+	updated_at
+
+Produto_Pedido
+	id_produto_pedido (PK)
+	id_pedido (FK)
+	id_situacao (FK)
+	id_produto (FK)
+	quantidade
+	preco_custo_produto
+	preco_venda
+	frete
+	comissão
 	created_at
 	updated_at
 	
@@ -55,3 +60,23 @@ Situação_Bling_Pedido
 	id_situacao_bling (UNIQUE)
 	nome_situacao
 	cor_situacao
+	status
+	created_at
+	updated_at
+
+Produto
+	id_produto (PK)
+	id_produto_bling (UNIQUE)
+	sku (UNIQUE)
+	descricao_produto
+	fornecedor
+	preco_custo
+	created_at
+	updated_at
+
+Marketplace
+	id_marketplace (PK)
+	nome_marketplace (UNIQUE)
+	status
+	created_at
+	updated_at
