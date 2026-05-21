@@ -18,8 +18,10 @@ Pedido
 	data_venda
 	valor_pedido
 	created_at
+	created_user (FK)
 	updated_at
-	
+	updated_user
+
 Nota_Fiscal
 	id_nf (PK)
 	id_nf_bling
