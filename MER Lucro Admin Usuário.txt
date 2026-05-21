@@ -1,13 +1,15 @@
 MER -> Lucro Admin
-Usuário
+Usuário (OK)
 	id_usuário (PK)
-	nome
+	nome_usuario
 	email (UNIQUE)
 	senha_hash
+	status_usuario
 	created_at
 	updated_at
 
-Pedido
+
+Pedido(OK)
 	id_pedido (PK)
 	id_bling (UNIQUE)
 	num_bling (UNIQUE)
@@ -18,11 +20,11 @@ Pedido
 	data_venda
 	valor_pedido
 	created_at
-	created_user (FK)
+	created_user_id (FK)
 	updated_at
-	updated_user (FK)
+	updated_user_id (FK)
 
-Nota_Fiscal
+Nota_Fiscal(OK)
 	id_nf (PK)
 	id_nf_bling
 	id_pedido (FK, UNIQUE)
@@ -33,18 +35,22 @@ Nota_Fiscal
 	data_emissao
 	valor_nf
 	created_at
+	created_user_id (FK)
 	updated_at
+	updated_user_id (FK)
 
-Pedido_Produto_Imposto
+Produto_Pedido_Imposto
 	id_pedido_produto_imposto (PK)
 	id_produto_pedido (FK)
 	UNIQUE (tipo_imposto, id_produto_pedido)
 	valor_imposto
 	origem_calculo
 	created_at
+	created_user_id (FK)
 	updated_at
+	updated_user_id (FK)
 
-Produto_Pedido
+Produto_Pedido(OK)
 	id_produto_pedido (PK)
 	id_pedido (FK)
 	id_situacao (FK)
@@ -55,7 +61,9 @@ Produto_Pedido
 	frete
 	comissão
 	created_at
+	created_user_id (FK)
 	updated_at
+	updated_user_id (FK)
 	
 Situação_Bling_Pedido
 	id_situacao (PK)
