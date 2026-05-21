@@ -20,7 +20,7 @@ Pedido
 	created_at
 	created_user (FK)
 	updated_at
-	updated_user
+	updated_user (FK)
 
 Nota_Fiscal
 	id_nf (PK)
