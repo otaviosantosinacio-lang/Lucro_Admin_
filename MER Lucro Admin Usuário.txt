@@ -8,6 +8,14 @@ Usuário (OK)
 	created_at
 	updated_at
 	
+	Relacionamentos Usuario
+		Usuario 1:N Pedido
+		Usuario 1:N Nota_Fiscal
+		Usuario 1:N Produto_Pedido_Imposto
+		Usuario 1:N Produto_Pedido
+		Usuario 1:N Produto
+		Usuario 1:N Marketplace
+
 Pedido(OK)
 	id_pedido (PK)
 	id_bling (UNIQUE)
@@ -22,6 +30,9 @@ Pedido(OK)
 	created_user_id (FK)
 	updated_at
 	updated_user_id (FK)
+
+	Relacionamentos Pedido
+		Pedido 1:1 Nota_Fiscal
 
 Nota_Fiscal(OK)
 	id_nf (PK)
