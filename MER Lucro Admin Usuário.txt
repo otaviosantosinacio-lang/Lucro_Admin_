@@ -7,8 +7,7 @@ Usuário (OK)
 	status_usuario
 	created_at
 	updated_at
-
-
+	
 Pedido(OK)
 	id_pedido (PK)
 	id_bling (UNIQUE)
@@ -42,7 +41,8 @@ Nota_Fiscal(OK)
 Produto_Pedido_Imposto
 	id_pedido_produto_imposto (PK)
 	id_produto_pedido (FK)
-	UNIQUE (tipo_imposto, id_produto_pedido)
+	id_produto_pedido (UNIQUE)
+	tipo_imposto (UNIQUE)
 	valor_imposto
 	origem_calculo
 	created_at
@@ -56,10 +56,10 @@ Produto_Pedido(OK)
 	id_situacao (FK)
 	id_produto (FK)
 	quantidade
-	preco_custo_produto
-	preco_venda
-	frete
-	comissão
+	preco_custo_unitario_produto
+	preco_venda_unitario
+	frete_item
+	comissão_item
 	created_at
 	created_user_id (FK)
 	updated_at
@@ -82,11 +82,19 @@ Produto
 	fornecedor
 	preco_custo
 	created_at
+	created_user_id (FK)
 	updated_at
+	updated_user_id (FK)
 
 Marketplace
 	id_marketplace (PK)
 	nome_marketplace (UNIQUE)
-	status
+	status	
 	created_at
+	created_user_id (FK)
 	updated_at
+	updated_user_id (FK)
+
+
+
+
