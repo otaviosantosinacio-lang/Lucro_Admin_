@@ -49,7 +49,7 @@ Nota_Fiscal(OK)
 	updated_at
 	updated_user_id (FK)
 
-Produto_Pedido_Imposto
+Produto_Pedido_Imposto (OK)
 	id_pedido_produto_imposto (PK)
 	id_produto_pedido (FK)
 	id_produto_pedido (UNIQUE)
@@ -76,7 +76,7 @@ Produto_Pedido(OK)
 	updated_at
 	updated_user_id (FK)
 	
-Situação_Bling_Pedido
+Situação_Bling_Pedido (OK)
 	id_situacao (PK)
 	id_situacao_bling (UNIQUE)
 	nome_situacao
@@ -85,7 +85,7 @@ Situação_Bling_Pedido
 	created_at
 	updated_at
 
-Produto
+Produto(OK)
 	id_produto (PK)
 	id_produto_bling (UNIQUE)
 	sku (UNIQUE)
