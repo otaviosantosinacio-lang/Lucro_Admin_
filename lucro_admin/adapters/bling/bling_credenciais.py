@@ -66,7 +66,7 @@ class Code:
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/json',
             'Authorization': f'Basic {credenciaisbase64}',
-            'enable-jwt' : 1
+            'enable-jwt': 1,
         }
         data: str = f'grant_type=authorization_code&code={code}'
 
