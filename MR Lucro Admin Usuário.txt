@@ -1,0 +1,108 @@
+MR -> Lucro Admin
+Usuario (
+	id_usuario PK,
+	nome_usuario,
+	email UNIQUE,
+	senha_hash,
+	status_usuario,
+	created_at,
+	updated_at
+	)
+	
+Pedido(
+	id_pedido PK,
+	id_bling UNIQUE,
+	num_bling UNIQUE,
+	id_situacao FK -> Situação_Bling_Pedido(id_situacao),
+	id_nf_bling,
+	id_marketplace FK Marketplace(id_marketplace),
+	id_pedido_marketplace UNIQUE,
+	data_venda,
+	valor_pedido,
+	created_at,
+	created_user_id FK -> Usuario(id_usuario),
+	updated_at,
+	updated_user_id FK -> Usuario(id_usuario),
+)
+
+
+Nota_Fiscal(
+	id_nf PK,
+	id_nf_bling,
+	id_pedido FK UNIQUE -> Pedido(id_pedido),
+	url_xml,
+	numero_nf,
+	serie,
+	chave_acesso UNIQUE,
+	data_emissao,
+	valor_nf,
+	created_at,
+	created_user_id FK -> Usuario(id_usuario),
+	updated_at,
+	updated_user_id FK -> Usuario(id_usuario)
+	)
+
+Item_Pedido_Imposto (
+	id_item_pedido_imposto PK,
+	id_item_pedido FK -> Item_Pedido(id_item_pedido),
+	tipo_imposto,
+	valor_imposto,
+	origem_calculo,
+	created_at,
+	created_user_id FK -> Usuario(id_usuario),
+	updated_at,
+	updated_user_id FK -> Usuario(id_usuario)
+	UNIQUE(id_item_pedido, tipo_imposto)
+	)
+
+Item_Pedido(
+	id_item_pedido PK,
+	id_pedido FK -> Pedido(id_pedido),
+	id_situacao FK -> Situação_Bling_Pedido(id_situacao),
+	id_produto FK -> Produto(id_produto),
+	quantidade,
+	preco_custo_unitario_produto,
+	preco_venda_unitario,
+	frete_item,
+	comissao_item,
+	created_at,
+	created_user_id FK -> Usuario(id_usuario),
+	updated_at,
+	updated_user_id FK -> Usuario(id_usuario),
+	)
+	
+Situacaoo_Bling_Pedido (
+	id_situacao PK,
+	id_situacao_bling UNIQUE,
+	nome_situacao,
+	cor_situacao,
+	status,
+	created_at,
+	updated_at,
+	)
+
+Produto(
+	id_produto PK,
+	id_produto_bling UNIQUE,
+	sku UNIQUE,
+	descricao_produto,
+	fornecedor,
+	preco_custo,
+	created_at,
+	created_user_id FK -> Usuario(id_usuario),
+	updated_at,
+	updated_user_id FK -> Usuario(id_usuario)
+	)
+
+Marketplace(
+	id_marketplace PK,
+	nome_marketplace UNIQUE,
+	status,
+	created_at,
+	created_user_id FK -> Usuario(id_usuario),
+	updated_at,
+	updated_user_id FK -> Usuario(id_usuario)
+	)
+
+
+
