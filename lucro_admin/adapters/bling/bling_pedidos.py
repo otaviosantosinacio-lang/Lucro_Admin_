@@ -52,6 +52,7 @@ class GetBling:
         headers: dict[str, str] = {
             'Authorization': f'Bearer {access_token}',
             'Accept': 'application/json',
+            'enable_jwt': '1',
         }
 
         request = Request()

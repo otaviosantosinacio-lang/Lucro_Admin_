@@ -66,7 +66,7 @@ class Code:
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/json',
             'Authorization': f'Basic {credenciaisbase64}',
-            'enable-jwt': 1,
+            'enable-jwt': '1',
         }
         data: str = f'grant_type=authorization_code&code={code}'
 
@@ -80,9 +80,6 @@ class Code:
             lambda: self.code_request(url, headers, data)
         )
 
-        logger.info(response.text)
-
-        breakpoint()
         # Verificando o retorno
         if response.status_code == 200:
             logger.info(
@@ -180,6 +177,7 @@ class Refresh:
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/json',
             'Authorization': f'Basic {credenciaisbase64}',
+            'enable_jwt': '1',
         }
 
         data: str = f'grant_type=refresh_token&refresh_token={refresh_token}'
