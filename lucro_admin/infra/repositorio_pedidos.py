@@ -1,4 +1,4 @@
-from infra.executa_database import executa_insert_pedidos
+from lucro_admin.infra.executa_database import executa_insert_pedidos
 import logging
 from datetime import datetime, date
 import typing

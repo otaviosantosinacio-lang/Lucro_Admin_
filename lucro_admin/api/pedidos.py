@@ -1,5 +1,5 @@
 from fastapi import FastAPI, APIRouter
-from infra import repositorio_api
+from lucro_admin.infra import repositorio_api
 
 router = APIRouter()
 

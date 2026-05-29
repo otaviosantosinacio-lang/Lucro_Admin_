@@ -1,6 +1,6 @@
 import psycopg2
 import logging
-from infra.conexao_DB import conecta_DB
+from lucro_admin.infra.conexao_DB import conecta_DB
 from typing import Any
 from psycopg2.extras import execute_values
 

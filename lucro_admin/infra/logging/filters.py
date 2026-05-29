@@ -1,5 +1,5 @@
 import logging
-from infra.logging.contexto import correlation_id
+from lucro_admin.infra.logging.contexto import correlation_id
 
 
 class CorrelationIdFilter(logging.Filter):

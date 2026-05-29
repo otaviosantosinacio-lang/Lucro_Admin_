@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from utils.time import somandosecs
+from lucro_admin.utils.time import somandosecs
 import logging
 
 

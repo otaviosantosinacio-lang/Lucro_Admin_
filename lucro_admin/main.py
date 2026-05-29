@@ -42,7 +42,7 @@ from lucro_admin.infra.repositorioMercadoLivre.repositorio_mercadolivre import (
 from lucro_admin.infra.repositorio_pedidos import InsertPedidos
 from lucro_admin.infra.repositorio_produtos_pedido import InsertPedidosProdutos
 
-from api import pedidos
+from lucro_admin.api import pedidos
 
 
 def main():

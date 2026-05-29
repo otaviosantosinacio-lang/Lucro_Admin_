@@ -1,13 +1,13 @@
-from core.imposto.regras_fiscais import icms_aliq, uf_sem_fcp
-from core.imposto.entities_imposto import (
+from lucro_admin.core.imposto.regras_fiscais import icms_aliq, uf_sem_fcp
+from lucro_admin.core.imposto.entities_imposto import (
     ProdutoComImposto,
     ImpostosDaVenda,
     RetornoImpostos,
     ItemPedido,
 )
-from core.entities_produtos import ConfigSku
+from lucro_admin.core.entities_produtos import ConfigSku
 from decimal import Decimal
-from infra.repositorio_produtos import Produtos
+from lucro_admin.infra.repositorio_produtos import Produtos
 import logging
 
 logger = logging.getLogger('lucroadmin.core.calculadoraimpostos')

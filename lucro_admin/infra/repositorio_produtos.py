@@ -1,4 +1,4 @@
-from infra.executa_database import consultadb_com_parametros, consultageral
+from lucro_admin.infra.executa_database import consultadb_com_parametros, consultageral
 import logging
 
 logger = logging.getLogger('lucroadmin.infra.produtos')

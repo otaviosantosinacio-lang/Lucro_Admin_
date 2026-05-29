@@ -6,7 +6,7 @@ from lucro_admin.infra.repositorio_produtos import Produtos
 
 logger = logging.getLogger('lucroadmin.services.blingprodutos')
 
-class Produtos:
+class ProdutosRequest:
     
     def __init__(self, access_token, adapt_bling, ):
         self.access_token = access_token

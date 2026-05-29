@@ -1,4 +1,4 @@
-from infra.executa_database import (
+from lucro_admin.infra.executa_database import (
     consultadb,
     consultadb_com_parametros,
     updatecredentdb,

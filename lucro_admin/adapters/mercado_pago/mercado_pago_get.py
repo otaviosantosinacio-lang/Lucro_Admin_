@@ -2,7 +2,7 @@ import requests
 import logging
 
 
-from infra.http.retry import RetryPolicy
+from lucro_admin.infra.http.retry import RetryPolicy
 
 retry_policy = RetryPolicy()
 logger = logging.getLogger('lucroadmin.adapters.mercadolivre')
