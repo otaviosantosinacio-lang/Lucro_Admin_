@@ -1,4 +1,3 @@
-from decimal import Decimal
 import logging
 
 logger = logging.getLogger('lucroadmin.core.regrasfiscais')

@@ -1,5 +1,5 @@
-from contextvars import ContextVar
 import uuid
+from contextvars import ContextVar
 
 correlation_id: ContextVar[str] = ContextVar('correlation_id', default='-')
 

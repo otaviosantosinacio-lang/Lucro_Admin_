@@ -1,6 +1,8 @@
-from requests import get
-import requests
 import logging
+
+import requests
+from requests import get
+
 from lucro_admin.infra.http.retry import RetryPolicy
 
 retry_policy = RetryPolicy()

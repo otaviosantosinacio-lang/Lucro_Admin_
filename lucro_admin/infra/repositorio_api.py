@@ -1,13 +1,8 @@
+import logging
+
 from lucro_admin.infra.executa_database import (
-    consultadb,
-    consultadb_com_parametros,
-    updatecredentdb,
-    consultageral,
     consultadb_multiplos_retornos,
 )
-import logging
-from datetime import datetime, date
-import typing
 
 logger = logging.getLogger('lucroadmin.infra.api')
 

@@ -1,7 +1,6 @@
-import time
 import logging
-from functools import wraps
-from typing import Callable, Iterable, Any
+import time
+from typing import Any, Callable, Iterable
 
 logger = logging.getLogger('lucroadmin.infra.retry')
 

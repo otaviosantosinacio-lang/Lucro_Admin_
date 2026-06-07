@@ -1,4 +1,5 @@
 import logging
+
 from lucro_admin.infra.logging.contexto import correlation_id
 
 

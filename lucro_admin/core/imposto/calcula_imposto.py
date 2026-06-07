@@ -1,14 +1,14 @@
-from lucro_admin.core.imposto.regras_fiscais import icms_aliq, uf_sem_fcp
-from lucro_admin.core.imposto.entities_imposto import (
-    ProdutoComImposto,
-    ImpostosDaVenda,
-    RetornoImpostos,
-    ItemPedido,
-)
-from lucro_admin.core.entities_produtos import ConfigSku
-from decimal import Decimal
-from lucro_admin.infra.repositorio_produtos import Produtos
 import logging
+
+from lucro_admin.core.entities_produtos import ConfigSku
+from lucro_admin.core.imposto.entities_imposto import (
+    ImpostosDaVenda,
+    ItemPedido,
+    ProdutoComImposto,
+    RetornoImpostos,
+)
+from lucro_admin.core.imposto.regras_fiscais import icms_aliq, uf_sem_fcp
+from lucro_admin.infra.repositorio_produtos import Produtos
 
 logger = logging.getLogger('lucroadmin.core.calculadoraimpostos')
 
@@ -70,35 +70,34 @@ class CalculadoraDeImposto:
                 icms = item_pedido.valor * (18 / 100)
                 pis = (item_pedido.valor - icms) * aliq_pis
                 cofins = (item_pedido.valor - icms) * aliq_cofins
-            else:
-                # Se for interestadual devemos validar se o estado destino faz cobrança do fundo de combate a pobreza ou não.
-                if sem_fcp:
-                    logger.info(
-                        'Calculadora de Tributos | UF de origem SP e UF destino %s -> Caracteriza operação interestadual, mas a UF não tem cobrança do FCP',
-                        uf_dest,
-                    )
-                    aliq_dest_total = icms_aliq(uf_dest) / 100
-                    aliq_orig = 4 / 100
-                    aliq_dest = aliq_dest_total - aliq_orig
-                    icms = item_pedido.valor * aliq_orig
-                    difal = item_pedido.valor * aliq_dest
-                    pis = (item_pedido.valor - (icms + difal)) * aliq_pis
-                    cofins = (item_pedido.valor - (icms + difal)) * aliq_cofins
+            # Se for interestadual devemos validar se o estado destino faz cobrança do fundo de combate a pobreza ou não.
+            elif sem_fcp:
+                logger.info(
+                    'Calculadora de Tributos | UF de origem SP e UF destino %s -> Caracteriza operação interestadual, mas a UF não tem cobrança do FCP',
+                    uf_dest,
+                )
+                aliq_dest_total = icms_aliq(uf_dest) / 100
+                aliq_orig = 4 / 100
+                aliq_dest = aliq_dest_total - aliq_orig
+                icms = item_pedido.valor * aliq_orig
+                difal = item_pedido.valor * aliq_dest
+                pis = (item_pedido.valor - (icms + difal)) * aliq_pis
+                cofins = (item_pedido.valor - (icms + difal)) * aliq_cofins
 
-                else:
-                    logger.info(
-                        'Calculadora de Tributos | UF de origem SP e UF destino %s -> Caracteriza operação interestadual, mas a UF tem cobrança do FCP',
-                        uf_dest,
-                    )
-                    aliq_dest_total = icms_aliq(uf_dest) / 100
-                    aliq_orig = 4 / 100
-                    aliq_fcp = 2 / 100
-                    aliq_dest = aliq_dest_total - aliq_orig
-                    icms = item_pedido.valor * aliq_orig
-                    difal = item_pedido.valor * aliq_dest
-                    pis = (item_pedido.valor - (icms + difal)) * aliq_pis
-                    cofins = (item_pedido.valor - (icms + difal)) * aliq_cofins
-                    fcp = item_pedido.valor * aliq_fcp
+            else:
+                logger.info(
+                    'Calculadora de Tributos | UF de origem SP e UF destino %s -> Caracteriza operação interestadual, mas a UF tem cobrança do FCP',
+                    uf_dest,
+                )
+                aliq_dest_total = icms_aliq(uf_dest) / 100
+                aliq_orig = 4 / 100
+                aliq_fcp = 2 / 100
+                aliq_dest = aliq_dest_total - aliq_orig
+                icms = item_pedido.valor * aliq_orig
+                difal = item_pedido.valor * aliq_dest
+                pis = (item_pedido.valor - (icms + difal)) * aliq_pis
+                cofins = (item_pedido.valor - (icms + difal)) * aliq_cofins
+                fcp = item_pedido.valor * aliq_fcp
 
             total = icms + pis + cofins + difal + fcp
 

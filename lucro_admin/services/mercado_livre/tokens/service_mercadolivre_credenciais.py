@@ -1,11 +1,11 @@
+import logging
 import os
 import subprocess
-import logging
 
-from lucro_admin.utils.cript_state import cript_state
-from lucro_admin.utils.code_state import code_string
-from lucro_admin.core.entities_credenciais import Credencial
 from lucro_admin.adapters.mercado_livre.mercado_livre_credenciais import Code
+from lucro_admin.core.entities_credenciais import Credencial
+from lucro_admin.utils.code_state import code_string
+from lucro_admin.utils.cript_state import cript_state
 
 logger = logging.getLogger('lucroadmin.services.mercadolivre')
 
@@ -25,7 +25,7 @@ class oAuthCodeMercadoLivre:
         :rtype: bool
         """
         caminho_edge: str = (
-            'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
+            r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
         )
         if os.path.exists(caminho_edge):
             comando = [caminho_edge, url]

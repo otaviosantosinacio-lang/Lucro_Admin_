@@ -1,6 +1,5 @@
-from typing import Any
-
 from pathlib import Path
+from typing import Any
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 LOG_DIR = BASE_DIR / 'logs'

@@ -1,6 +1,8 @@
-from base64 import b64encode
-import requests
 import logging
+from base64 import b64encode
+
+import requests
+
 from lucro_admin.infra.http.retry import RetryPolicy
 
 logger = logging.getLogger('lucroadmin.adapters.bling')
@@ -9,7 +11,8 @@ retry_policy = RetryPolicy()
 
 class Code:
     """
-    Class para trocarmos o code por Tokens de maior duração como Access Token e Refresh Token
+    Class para trocarmos o code por Tokens de maior duração como Access Token
+    e Refresh Token
 
     """
 
@@ -72,7 +75,7 @@ class Code:
 
         url: str = f'{self.base_url}/oauth/token'
         logger.info(
-            f'Bling oAuth Code | Enviando requisição para o endpoint %s', url
+            'Bling oAuth Code | Enviando requisição para o endpoint %s', url
         )
 
         # Enviando requisição para o endpoint

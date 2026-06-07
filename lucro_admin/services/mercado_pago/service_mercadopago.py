@@ -1,8 +1,8 @@
 import logging
-from typing import Any
-from dotenv import load_dotenv
 import os
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 from lucro_admin.adapters.mercado_pago.mercado_pago_get import GetMercadoPago
 from lucro_admin.services.mercado_pago.service_mercadopago_base import (

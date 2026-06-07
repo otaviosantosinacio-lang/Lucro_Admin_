@@ -1,7 +1,6 @@
-from lucro_admin.infra.executa_database import executa_insert_pedidos
 import logging
-from datetime import datetime, date
-import typing
+
+from lucro_admin.infra.executa_database import executa_insert_pedidos
 
 logger = logging.getLogger('lucroadmin.infra.pedidos')
 

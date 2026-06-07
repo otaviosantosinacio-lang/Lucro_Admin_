@@ -1,20 +1,20 @@
 import logging
 
+from lucro_admin.core.entities_pedidos import (
+    Dados_Pedido_imposto,
+    PedidoseImpostos,
+    ResultadoGetDetalhes,
+    ResultadoGetPaginas,
+)
+from lucro_admin.core.imposto.calcula_imposto import CalculadoraDeImposto
+from lucro_admin.services.bling.pedidos.parse_xml import ParseXML
+from lucro_admin.services.bling.pedidos.provider.provider import (
+    PedidosProvider,
+)
 from lucro_admin.services.bling.pedidos.service_bling_pedidos import (
     Atendidos,
     ProcessaId,
 )
-from lucro_admin.core.entities_pedidos import (
-    ResultadoGetPaginas,
-    ResultadoGetDetalhes,
-    PedidoseImpostos,
-    Dados_Pedido_imposto,
-)
-from lucro_admin.services.bling.pedidos.provider.provider import (
-    PedidosProvider,
-)
-from lucro_admin.services.bling.pedidos.parse_xml import ParseXML
-from lucro_admin.core.imposto.calcula_imposto import CalculadoraDeImposto
 
 logger = logging.getLogger('lucroadmin.services')
 

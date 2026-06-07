@@ -1,9 +1,10 @@
 import logging
-from lucro_admin.services.providers.provider import TokenProvider
 from datetime import datetime
+
 from lucro_admin.services.bling.credenciais.service_bling_credenciais import (
     oAuthRefreshBling,
 )
+from lucro_admin.services.providers.provider import TokenProvider
 
 logger = logging.getLogger('lucroadmin.services.provider')
 

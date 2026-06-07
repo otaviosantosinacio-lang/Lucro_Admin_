@@ -1,6 +1,6 @@
+import logging
 from dataclasses import dataclass
 from datetime import datetime
-import logging
 from typing import Any, Literal
 
 logger = logging.getLogger('lucroadmin.core.entities')

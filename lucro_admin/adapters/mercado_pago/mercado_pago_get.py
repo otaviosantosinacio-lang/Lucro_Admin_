@@ -1,6 +1,6 @@
-import requests
 import logging
 
+import requests
 
 from lucro_admin.infra.http.retry import RetryPolicy
 

@@ -1,10 +1,10 @@
 def cript_state():
-    import secrets
     import hashlib
+    import logging
+    import secrets
     from base64 import b64encode
     from datetime import datetime
     from urllib.parse import quote
-    import logging
 
     logger = logging.getLogger('lucroadmin.utils.cript_state')
     time = datetime.now()

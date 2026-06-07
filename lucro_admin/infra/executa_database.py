@@ -1,8 +1,9 @@
-import psycopg2
 import logging
-from lucro_admin.infra.conexao_DB import conecta_DB
 from typing import Any
+
 from psycopg2.extras import execute_values
+
+from lucro_admin.infra.conexao_DB import conecta_DB
 
 logger = logging.getLogger('lucroadmin.infra.executa_database')
 
@@ -31,7 +32,7 @@ def consultadb(execute: str) -> Any:
                         execute,
                     )
                     return None
-    except Exception as e:
+    except Exception:
         logger.exception(
             'Executa Data Base | Erro na consulta usando SELECT | Query -> %s',
             execute,
@@ -65,7 +66,7 @@ def consultadb_com_parametros(
                         execute,
                     )
                     return None
-    except Exception as e:
+    except Exception:
         logger.exception(
             'Executa Data Base | Erro na consulta usando SELECT | Query -> %s',
             execute,
@@ -96,7 +97,7 @@ def consultageral(execute: str):
                         execute,
                     )
                     return None
-    except Exception as e:
+    except Exception:
         logger.exception(
             'Executa Data Base | Erro na consulta usando SELECT | Query -> %s',
             execute,
@@ -140,7 +141,7 @@ def executa_insert_pedidos(execute: str, params):
                     'Executa Data Base | Insert finalizado com sucesso'
                 )
                 return True
-    except Exception as e:
+    except Exception:
         logger.exception(
             'Executa Data Base | Erro no INSERT | Query -> %s', execute
         )
@@ -173,7 +174,7 @@ def consultadb_multiplos_retornos(
                         execute,
                     )
                     return None
-    except Exception as e:
+    except Exception:
         logger.exception(
             'Executa Data Base | Erro na consulta usando SELECT | Query -> %s',
             execute,

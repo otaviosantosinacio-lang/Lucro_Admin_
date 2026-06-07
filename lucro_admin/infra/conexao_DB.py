@@ -1,8 +1,9 @@
-from pathlib import Path
+import logging
 import os
+from pathlib import Path
+
 import psycopg2
 from dotenv import load_dotenv
-import logging
 
 logger = logging.getLogger('lucroadmin.infra.DataBase')
 

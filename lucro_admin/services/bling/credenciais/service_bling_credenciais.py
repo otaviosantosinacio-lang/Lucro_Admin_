@@ -1,11 +1,10 @@
-import webbrowser
 import logging
+import webbrowser
 
 from lucro_admin.adapters.bling.bling_credenciais import Code
-from lucro_admin.utils.cript_state import cript_state
-from lucro_admin.utils.code_state import code_string
 from lucro_admin.core.entities_credenciais import Credencial
-
+from lucro_admin.utils.code_state import code_string
+from lucro_admin.utils.cript_state import cript_state
 
 logger = logging.getLogger('lucroadmin.services.bling')
 

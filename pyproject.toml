@@ -17,7 +17,8 @@ dependencies = [
     "psycopg2 (>=2.9.12,<3.0.0)",
     "dotenv (>=0.9.9,<0.10.0)",
     "rich (>=15.0.0,<16.0.0)",
-    "sqlalchemy (>=2.0.50,<3.0.0)"
+    "sqlalchemy (>=2.0.50,<3.0.0)",
+    "coverage (>=7.14.1,<8.0.0)"
 ]
 
 [tool.poetry.dependencies]
@@ -36,9 +37,18 @@ select = ['I', 'F', 'E', 'W', 'PL', 'PT']
 preview = true
 quote-style = 'single'
 
-[tool.pytest]
+[tool.pytest.ini_options]
 pythonpath = ['.']
 addopts = ['-p', 'no:warnings']
+
+[tool.taskipy.tasks]
+run = 'fastapi dev lucro_admin/main.py'
+pre_test = 'task lint'
+test = 'pytest -s -x --cov=lucro_admin -vv'
+post_test = 'coverage html'
+lint = 'ruff check .; ruff check  . --diff'
+format = 'ruff check . --fix ; ruff format .'
+
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

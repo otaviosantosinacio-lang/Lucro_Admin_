@@ -1,17 +1,17 @@
-from datetime import date, datetime
 import logging
+from datetime import date, datetime
 
+from lucro_admin.core.entities_pedidos import (
+    DadosPedidos,
+    ErrorHTTP,
+    ResultadoGetDetalhes,
+    ResultadoGetPaginas,
+    SituacaoBling,
+)
+from lucro_admin.core.marketplace import nome_marketplace
 from lucro_admin.services.bling.pedidos.service_bling_base_pedidos import (
     BaseHTTPBling,
 )
-from lucro_admin.core.entities_pedidos import (
-    ResultadoGetDetalhes,
-    SituacaoBling,
-    ResultadoGetPaginas,
-    DadosPedidos,
-    ErrorHTTP,
-)
-from lucro_admin.core.marketplace import nome_marketplace
 
 base_url = 'https://api.bling.com.br/Api/v3'
 logger = logging.getLogger('lucroadmin.services.blingpedidos')

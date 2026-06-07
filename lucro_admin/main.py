@@ -1,48 +1,43 @@
 import logging
 from logging.config import dictConfig
 from pathlib import Path
-from xml.etree.ElementInclude import include
+
 from fastapi import FastAPI
 
-from lucro_admin.infra.logging.config import Logging_Config
-from lucro_admin.infra.logging.contexto import (
-    generate_correlation_id,
-    correlation_id,
-)
-
-from lucro_admin.services.token_service import TokenService
-
-from lucro_admin.services.bling.credenciais.tokens.providers.bling_provider import (
-    BlingProvider,
-)
-from lucro_admin.services.bling.pedidos.provider.provider_pedidos import (
-    PedidosProviderBling,
-)
 from lucro_admin.adapters.bling.bling_credenciais import Refresh
 from lucro_admin.adapters.bling.bling_pedidos import GetBling
-from lucro_admin.infra.repositorio_bling import (
-    CredenciaisDB_bling,
-    DadosGerais,
-)
-
-from lucro_admin.services.mercado_livre.tokens.ml_provider import MLProvider
-from lucro_admin.services.mercado_livre.pedidos.service_mercadolivre_pedidos import (
-    ExtraiCustoMercadoLivre,
-)
 from lucro_admin.adapters.mercado_livre.mercado_livre_credenciais import (
     RefreshML,
 )
 from lucro_admin.adapters.mercado_livre.mercado_livre_pedidos import (
     GetMercadoLivre,
 )
+from lucro_admin.api import pedidos
+from lucro_admin.infra.logging.config import Logging_Config
+from lucro_admin.infra.logging.contexto import (
+    correlation_id,
+    generate_correlation_id,
+)
+from lucro_admin.infra.repositorio_bling import (
+    CredenciaisDB_bling,
+    DadosGerais,
+)
+from lucro_admin.infra.repositorio_pedidos import InsertPedidos
+from lucro_admin.infra.repositorio_produtos_pedido import InsertPedidosProdutos
 from lucro_admin.infra.repositorioMercadoLivre.repositorio_mercadolivre import (
     CredenciaisMercadoLivre,
 )
-
-from lucro_admin.infra.repositorio_pedidos import InsertPedidos
-from lucro_admin.infra.repositorio_produtos_pedido import InsertPedidosProdutos
-
-from lucro_admin.api import pedidos
+from lucro_admin.services.bling.credenciais.tokens.providers.bling_provider import (
+    BlingProvider,
+)
+from lucro_admin.services.bling.pedidos.provider.provider_pedidos import (
+    PedidosProviderBling,
+)
+from lucro_admin.services.mercado_livre.pedidos.service_mercadolivre_pedidos import (
+    ExtraiCustoMercadoLivre,
+)
+from lucro_admin.services.mercado_livre.tokens.ml_provider import MLProvider
+from lucro_admin.services.token_service import TokenService
 
 
 def main():

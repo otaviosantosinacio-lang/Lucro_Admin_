@@ -1,8 +1,8 @@
+import logging
 from dataclasses import dataclass
 from datetime import datetime
-from lucro_admin.utils.time import somandosecs
-import logging
 
+from lucro_admin.utils.time import somandosecs
 
 logger = logging.getLogger('lucroadmin.core.entities')
 

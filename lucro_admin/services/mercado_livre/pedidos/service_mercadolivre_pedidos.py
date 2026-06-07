@@ -1,16 +1,15 @@
 import logging
-from typing import Any, Literal
 
-from lucro_admin.services.mercado_livre.pedidos.service_mercadolivre_base import (
-    BaseHTTPMercadoLivre,
-)
 from lucro_admin.core.entities_pedidos import (
-    ResultadoPagina,
     ComissaoFrete,
     IdsPedidoML,
     PedidoCompleto,
-    ProdutoCompleto,
     PedidoseProdutosCompletos,
+    ProdutoCompleto,
+    ResultadoPagina,
+)
+from lucro_admin.services.mercado_livre.pedidos.service_mercadolivre_base import (
+    BaseHTTPMercadoLivre,
 )
 from lucro_admin.services.mercado_pago.service_mercadopago import (
     MercadoPagoCustos,

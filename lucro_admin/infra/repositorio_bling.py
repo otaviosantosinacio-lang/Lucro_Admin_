@@ -1,7 +1,12 @@
-from lucro_admin.infra.executa_database import consultadb, updatecredentdb, consultageral
 import logging
-from datetime import datetime, date
 import typing
+from datetime import datetime
+
+from lucro_admin.infra.executa_database import (
+    consultadb,
+    consultageral,
+    updatecredentdb,
+)
 
 logger = logging.getLogger('lucroadmin.infra.credenciais_bling')
 

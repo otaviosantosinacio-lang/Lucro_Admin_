@@ -1,5 +1,9 @@
-from lucro_admin.infra.executa_database import consultadb_com_parametros, consultageral
 import logging
+
+from lucro_admin.infra.executa_database import (
+    consultadb_com_parametros,
+    consultageral,
+)
 
 logger = logging.getLogger('lucroadmin.infra.produtos')
 

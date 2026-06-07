@@ -1,24 +1,24 @@
+import logging
+import xml.etree.ElementTree as ET
+from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from typing import Any
-import xml.etree.ElementTree as ET
-import logging
-from datetime import datetime
 
-from lucro_admin.core.imposto.calcula_imposto import CalculadoraDeImposto
-from lucro_admin.core.imposto.regras_fiscais import uf_sem_fcp
-from lucro_admin.core.entities_pedidos import ErrorHTTP, ResultadoPagina
-from lucro_admin.core.imposto.entities_imposto import (
-    ProdutoComImposto,
-    ImpostosDaVenda,
-    RetornoImpostos,
-    ErrorParse,
-)
-from lucro_admin.core.entities_produtos import ConfigSku
 from lucro_admin.adapters.bling.bling_pedidos import GetUrlXML
+from lucro_admin.core.entities_pedidos import ErrorHTTP, ResultadoPagina
+from lucro_admin.core.entities_produtos import ConfigSku
+from lucro_admin.core.imposto.calcula_imposto import CalculadoraDeImposto
+from lucro_admin.core.imposto.entities_imposto import (
+    ErrorParse,
+    ImpostosDaVenda,
+    ProdutoComImposto,
+    RetornoImpostos,
+)
+from lucro_admin.core.imposto.regras_fiscais import uf_sem_fcp
+from lucro_admin.infra.repositorio_produtos import Produtos
 from lucro_admin.services.bling.pedidos.service_bling_base_pedidos import (
     BaseHTTPBling,
 )
-from lucro_admin.infra.repositorio_produtos import Produtos
 
 logger = logging.getLogger('lucroadmin.services.blingpedidos')
 base_url = 'https://api.bling.com.br/Api/v3'
