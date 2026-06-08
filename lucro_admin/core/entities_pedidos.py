@@ -9,7 +9,8 @@ logger = logging.getLogger('lucroadmin.core.entities')
 @dataclass
 class SituacaoBling:
     """
-    SituacaoBling -> Formatação padronizada para situações do pedido dentro do bling.
+    SituacaoBling -> Formatação padronizada para situações do pedido dentro do
+    bling.
 
     Attributes:
         cod_sit: Código da situação
@@ -28,7 +29,7 @@ class ResultadoPagina:
     ResultadoPagina -> Padronizando retorno dos requets para endpoints Bling.
 
     Attributes:
-        status: status do retorno da requisição. (Ex: ok = 200, rated_limit = 429)
+        status: status do retorno da requisição. (Ex: ok= 200, rated_limit= 429)
         :type status: Literal [ok, rated_limit, error]
         data: Dados da requisição.
         :type data: Any | None = None
@@ -44,14 +45,20 @@ class ResultadoPagina:
 @dataclass
 class ErrorHTTP:
     """
-    ErrorHTTP -> Padronização de erros http, para tratarmos o fallback após execuções ativas
+    ErrorHTTP -> Padronização de erros http, para tratarmos o fallback após
+    execuções ativas
 
     Attributes:
-        status: Utilizamos por padrão o mesmo status da Class ResultadoPagina (ok, rated_limit, error). Para ter mais assertividade recomendo setar já o status obtido no resultado pagina (Ex: status = response.error['status'])
+        status -> Utilizamos por padrão o mesmo status da Class 
+        ResultadoPagina(ok, rated_limit, error). Para ter mais 
+        assertividade recomendo setar já o status obtido no
+        resultado pagina(Ex:status= response.error['status'])
         :type status: Literal ['rated_limit', 'error']
-        error: É o mesmo error já configurado na Class RasultadoPagina, ou seja, é o body de retorno da requisição.
+        error: É o mesmo error já configurado na Class RasultadoPagina,
+        ou seja, é o body de retorno da requisição.
         :type error: Any
-        metodo: É o metodo utilizado, ou seja, a def executada que recebeu o erro.
+        metodo: É o metodo utilizado, ou seja, a def executada que 
+        recebeu o erro.
         :type metodo: str
         classe: A class ao qual pertence o método
         :type classe: str
@@ -80,9 +87,11 @@ class ResultadoGetPaginas:
     Attributes:
         vendas_id: Lista com todos Id bling único por venda
         :type vendas_id: list[int]
-        endpointerror: Lista com especificações da endpoint em que tivemos retorno de erro. Type ErrorHTTP
+        endpointerror: Lista com especificações da endpoint em que tivemos
+        retorno de erro. Type ErrorHTTP
         :type endpointerror: list[ErrorHTTP]
-        situacao: Nome da situação em que os pedidos obtidos estão (Ex: Cancelados)
+        situacao: Nome da situação em que os pedidos obtidos estão 
+        (Ex: Cancelados)
         :type situacao: str
     """
 
@@ -99,9 +108,11 @@ class ResultadoGetDetalhes:
     Attributes:
         pedidos: Lista com todos pedidos consultados. Type DadosPedidos
         :type pedidos: list[DadosPedidos]
-        endpointerror: Lista com especificações da endpoint em que tivemos retorno de erro. Type ErrorHTTP
+        endpointerror: Lista com especificações da endpoint em que tivemos 
+        retorno de erro. Type ErrorHTTP
         :type endpointerror: list[ErrorHTTP]
-        situacao: Nome da situação em que os pedidos obtidos estão (Ex: Cancelados)
+        situacao: Nome da situação em que os pedidos obtidos estão 
+        (Ex: Cancelados)
         :type situacao: str
     """
 

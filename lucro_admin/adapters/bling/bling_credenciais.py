@@ -1,6 +1,6 @@
 import logging
 from base64 import b64encode
-
+from http import HTTPStatus
 import requests
 
 from lucro_admin.infra.http.retry import RetryPolicy
@@ -22,7 +22,8 @@ class Code:
         """
         code_request
             Request para obtenção das credenciais bling.
-            No retorno teremos as credênciais Access Token, Refresh Token e Expire
+            No retorno teremos as credênciais Access Token, Refresh Token e 
+            Expire
 
         :param self:
         :param url: Endpoint Bling
@@ -34,14 +35,17 @@ class Code:
     def gerando_url_request(self, client_id: str, state: str) -> str:
         """
         gerando_url_request
-        Montagem correta e formatada da url onde será enviada a requisição para obtenção dos tokens.
+        Montagem correta e formatada da url onde será enviada a requisição
+        para obtenção dos tokens.
 
         :param self:
         :param client_id: Credencial do aplicativo Bling
         :param state: State aleátorio para validação do retorno
         :return: URL (end point)para obtenção das credenciais
         """
-        url: str = f'{self.base_url}/oauth/authorize?response_type=code&client_id={client_id}&state={state}'
+        url: str = (f'{self.base_url}/oauth/authorize?response_type=code&'
+                    f'client_id={client_id}&state={state}'
+                    )
         logger.info('Bling oAuth Code | URL de requisição do code montada')
         return url
 
@@ -50,7 +54,8 @@ class Code:
     ):  # pyright: ignore[reportReturnType]
         """
         troca_code_por_tokens
-        Utilizada para através do code obtido trocarmos por credênciais de maior tempo de expiração.
+        Utilizada para através do code obtido trocarmos por credênciais de
+        maior tempo de expiração.
 
         :param self:
         :param client_id: Credencial do aplicativo Bling
@@ -59,7 +64,8 @@ class Code:
         """
 
         para64: str = f'{client_id}:{client_secret}'
-        # Configurando credênciais conforme documentação da api bling, codificadas em base64 separadas por ":".
+        # Configurando credênciais conforme documentação da api bling,
+        # codificadas em base64 separadas por ":".
         credenciaisbase64: str = b64encode(para64.encode('utf-8')).decode(
             'utf-8'
         )
@@ -84,7 +90,7 @@ class Code:
         )
 
         # Verificando o retorno
-        if response.status_code == 200:
+        if response.status_code == HTTPStatus.OK:
             logger.info(
                 'Bling oAuth Code | Retorno %s da requisição com CODE',
                 response.status_code,
@@ -102,7 +108,7 @@ class Code:
             return credencial
 
         # Tratanto erro temporário
-        elif response.status_code == 429:
+        elif response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
             logger.warning('Bling oAuth Code | Limite que requisições (429)')
             credenciais = {
                 'response_status_code': response.status_code,
@@ -111,7 +117,8 @@ class Code:
                 'expire': 100,
             }
             return credenciais
-        # Erro crítico na requisição como credênciais expiradas ou request inválido
+        # Erro crítico na requisição como credênciais expiradas ou
+        # request inválido
         else:
             logger.critical(
                 'Bling oAuth Code | HOUVE UM ERRO NA REQUISIÇÃO (%s) -> (%s)',
@@ -156,21 +163,24 @@ class Refresh:
         """
         usando_refresh_token
 
-        Configurando headers e data para trocar o Refresh Token por um novo Access Token.
+        Configurando headers e data para trocar o Refresh Token por 
+        um novo Access Token.
 
         :param self:
         :param client_id: Credecial do aplicativo Bling
         :type client_id: str
         :param client_secret: Credencial do aplicativo Bling
         :type client_secret: str
-        :param refresh_token: Credencial obtida atráves de request e pode ser trocada por um novo access token quando o mesmo expira
+        :param refresh_token: Credencial obtida atráves de request e 
+        pode ser trocada por um novo access token quando o mesmo expira.
         :type refresh_token: str
         """
 
         logger.info('Bling oAuth Refresh | Configurando as credenciais')
         url: str = 'https://www.bling.com.br/Api/v3/oauth/token'
         para64: str = f'{client_id}:{client_secret}'
-        # Configurando credênciais conforme documentção da API Bling, codificadas em base64 e separadas por ":"
+        # Configurando credênciais conforme documentção da API Bling, 
+        # codificadas em base64 e separadas por ":"
         credenciaisbase64: str = b64encode(para64.encode('utf-8')).decode(
             'utf-8'
         )
@@ -186,7 +196,8 @@ class Refresh:
         data: str = f'grant_type=refresh_token&refresh_token={refresh_token}'
 
         logger.info(
-            'Bling oAuth Refresh | Headers e Body montado, enviando requisição para o endpoint %s',
+            'Bling oAuth Refresh | Headers e Body montado, enviando requisição' \
+            ' para o endpoint %s',
             url,
         )
 
@@ -194,10 +205,12 @@ class Refresh:
             lambda: self.refresh_request(url=url, headers=headers, data=data)
         )
 
-        # Retorno sendo sucesso configuramos ele conforme dataclass estabelecido
-        if response.status_code == 200:
+        # Retorno sendo sucesso configuramos ele conforme dataclass
+        #  estabelecido
+        if response.status_code == HTTPStatus.OK:
             logger.info(
-                'Bling oAuth Refresh | Retorno %s para a requisição com o Refresh',
+                'Bling oAuth Refresh | Retorno %s para a requisição ' \
+                'com o Refresh',
                 response.status_code,
             )
             response_json = response.json()
@@ -212,8 +225,9 @@ class Refresh:
             }
             logger.info('Bling oAuth Refresh | Request finalizado')
             return credenciais
+        
         # Sendo um retorno também configrado para tratarmos ele
-        elif response.status_code == 429:
+        elif response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
             logging.warning(
                 'Bling oAuth Refresh | Limite de requisições retorno %s',
                 response.status_code,
@@ -229,7 +243,8 @@ class Refresh:
         # Erro critico de falha na configuração do request ou até credênciais
         else:
             logger.critical(
-                'Bling oAuth Refresh | Houve um erro critico na requisição retorno %s -> %s',
+                'Bling oAuth Refresh | Houve um erro critico na requisição' \
+                ' retorno %s -> %s',
                 response.status_code,
                 response.text,
             )

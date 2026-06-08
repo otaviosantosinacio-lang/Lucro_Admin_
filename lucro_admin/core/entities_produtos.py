@@ -18,7 +18,8 @@ class ConfigSku:
     @classmethod
     def configsku(cls, sku) -> 'ConfigSku':
         """
-        configsku -> Configuração do SKU para ficar padronizado, FBA Classic e DBA da Amazon fazem alterações no SKU.
+        configsku -> Configuração do SKU para ficar padronizado,
+        FBA Classic e DBA da Amazon fazem alterações no SKU.
 
         Attributes:&nome=%20
             sku: Código de identificação do produto.

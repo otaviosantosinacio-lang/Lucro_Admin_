@@ -28,19 +28,22 @@ class CalculadoraDeImposto:
         """
         calculadora_de_tributos
 
-        Calculando de forma precisa os tributos de um venda, e retornando-os de forma ordenada e formatada
+        Calculando de forma precisa os tributos de um venda, e retornando-os 
+        de forma ordenada e formatada
 
         :param self:
         :param itens: Produtos do Pedido
         :param id_bling: Id único da venda, esse id é gerado pelo bling
         :param sit: Situação do pedido dentro do Bling
         :param uf_dest: Unidade Federativa de destino da venda
-        :return: Retorno individualizado por produto e também totalizado pela venda
+        :return: Retorno individualizado por produto e também totalizado 
+        pela venda
         :rtype: RetornoImpostos
         """
 
         logger.info(
-            'Calculadora de Tributos | Iniciando calculo de tributos dos itens do pedido'
+            'Calculadora de Tributos | Iniciando calculo de tributos dos ' \
+            'itens do pedido'
         )
 
         produtos = Produtos()
@@ -57,23 +60,28 @@ class CalculadoraDeImposto:
                 quantidade=item['quantidade'],
                 valor=item['valor'],
             )
-            # Configurando o SKU pois alguns veem com SKU não formatado corretamente.
+            # Configurando o SKU pois alguns veem com SKU não formatado
+            # corretamente.
             sku = ConfigSku.configsku(item_pedido.codigo)
             icms = pis = cofins = difal = fcp = 0.0
 
             # Validando ser a venda é uma operação local ou interestadual
             if uf_dest == 'SP':
                 logger.info(
-                    'Calculadora de Tributos | UF de origem SP e UF destino %s -> Caracteriza operação interna',
+                    'Calculadora de Tributos | UF de origem SP e UF destino %s' \
+                    ' -> Caracteriza operação interna',
                     uf_dest,
                 )
                 icms = item_pedido.valor * (18 / 100)
                 pis = (item_pedido.valor - icms) * aliq_pis
                 cofins = (item_pedido.valor - icms) * aliq_cofins
-            # Se for interestadual devemos validar se o estado destino faz cobrança do fundo de combate a pobreza ou não.
+            # Se for interestadual devemos validar se o estado destino faz
+            # cobrança do fundo de combate a pobreza ou não.
             elif sem_fcp:
                 logger.info(
-                    'Calculadora de Tributos | UF de origem SP e UF destino %s -> Caracteriza operação interestadual, mas a UF não tem cobrança do FCP',
+                    'Calculadora de Tributos | UF de origem SP e UF destino %s' \
+                    ' -> Caracteriza operação interestadual, mas a UF não tem' \
+                    ' cobrança do FCP',
                     uf_dest,
                 )
                 aliq_dest_total = icms_aliq(uf_dest) / 100
@@ -86,7 +94,9 @@ class CalculadoraDeImposto:
 
             else:
                 logger.info(
-                    'Calculadora de Tributos | UF de origem SP e UF destino %s -> Caracteriza operação interestadual, mas a UF tem cobrança do FCP',
+                    'Calculadora de Tributos | UF de origem SP e UF destino %s' \
+                    ' -> Caracteriza operação interestadual, mas a UF tem' \
+                    ' cobrança do FCP',
                     uf_dest,
                 )
                 aliq_dest_total = icms_aliq(uf_dest) / 100
@@ -119,17 +129,20 @@ class CalculadoraDeImposto:
                 total=total,
             )
             logger.info(
-                'Calculadora de Tributos | Tributo do produto calculado -> %s\nMateus 22:21',
+                'Calculadora de Tributos | Tributo do produto calculado ->'
+                ' %s\nMateus 22:21',
                 imposto_produto,
             )
             produtos_com_imposto.append(imposto_produto)
 
-        # Somando todos os impostos dos itens para totalizarmos os impostos da venda.
+        # Somando todos os impostos dos itens para totalizarmos os impostos 
+        # da venda.
         impostos_venda = ImpostosDaVenda.soma_impostos(
             produtos_com_imposto, id_bling=id_bling
         )
         logger.info(
-            'Calculadora de Tributos | Tributo da venda calculado -> %s\nMateus 22:21',
+            'Calculadora de Tributos | Tributo da venda calculado ->'
+            ' %s\nMateus 22:21',
             impostos_venda,
         )
         return RetornoImpostos(

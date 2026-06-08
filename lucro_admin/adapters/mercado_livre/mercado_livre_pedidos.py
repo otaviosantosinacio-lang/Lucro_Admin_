@@ -1,5 +1,5 @@
 import logging
-
+from http import HTTPStatus
 import requests
 
 from lucro_admin.infra.http.retry import RetryPolicy
@@ -28,7 +28,8 @@ class GetMercadoLivre:
         :param url: Endpoint Mercado Livre
         :type url: String
 
-        Headers e request para endpoint Mercado Livre para retornar ao service o json.
+        Headers e request para endpoint Mercado Livre para retornar ao 
+        service o json.
         """
         logger.info(
             'Mercado Livre get_endpoints_mercadolivre | Iniciando o Request'

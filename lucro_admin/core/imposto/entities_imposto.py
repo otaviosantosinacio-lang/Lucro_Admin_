@@ -58,10 +58,12 @@ class ImpostosDaVenda:
 
     @classmethod
     def soma_impostos(cls, produtos_imposto, id_bling) -> 'ImpostosDaVenda':
-        """Soma de impostos dos produtos para gerar total de impostos para a venda
+        """Soma de impostos dos produtos para gerar total de impostos 
+        para a venda
 
         :param cls:
-        :param produtos_imposto: Lista com produtos individualizados com impostos
+        :param produtos_imposto: Lista com produtos individualizados com
+          impostos
         :param id_bling: Id único gerado pelo Bling
         :return: Retorno formatado para impostos da venda
         :rtype: ImpostosDaVenda
@@ -84,7 +86,8 @@ class RetornoImpostos:
     RetornoImpostos
 
     Attributes:
-        produto_imposto: É uma lista com produtos individualizado com impostos pagos.
+        produto_imposto: É uma lista com produtos individualizado com 
+        impostos pagos.
         venda_imposto: São os impostos totais da venda.
 
     """
@@ -96,7 +99,7 @@ class RetornoImpostos:
 @dataclass
 class ItemPedido:
     """
-    ItemPedido66666666
+    ItemPedido
 
     Attributes:
         codigo: SKU do produto

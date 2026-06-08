@@ -28,7 +28,8 @@ class GetMercadoPago:
         :param url: Endpoint Mercado Livre
         :type url: String
 
-        Headers e request para endpoint Mercado Livre para retornar ao service o json.
+        Headers e request para endpoint Mercado Livre para retornar ao 
+        service o json.
         """
         logger.info(
             'Mercado Pago get_endpoints_mercadopago | Iniciando o Request'
