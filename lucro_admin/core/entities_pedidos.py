@@ -49,15 +49,15 @@ class ErrorHTTP:
     execuções ativas
 
     Attributes:
-        status -> Utilizamos por padrão o mesmo status da Class 
-        ResultadoPagina(ok, rated_limit, error). Para ter mais 
+        status -> Utilizamos por padrão o mesmo status da Class
+        ResultadoPagina(ok, rated_limit, error). Para ter mais
         assertividade recomendo setar já o status obtido no
         resultado pagina(Ex:status= response.error['status'])
         :type status: Literal ['rated_limit', 'error']
         error: É o mesmo error já configurado na Class RasultadoPagina,
         ou seja, é o body de retorno da requisição.
         :type error: Any
-        metodo: É o metodo utilizado, ou seja, a def executada que 
+        metodo: É o metodo utilizado, ou seja, a def executada que
         recebeu o erro.
         :type metodo: str
         classe: A class ao qual pertence o método
@@ -90,7 +90,7 @@ class ResultadoGetPaginas:
         endpointerror: Lista com especificações da endpoint em que tivemos
         retorno de erro. Type ErrorHTTP
         :type endpointerror: list[ErrorHTTP]
-        situacao: Nome da situação em que os pedidos obtidos estão 
+        situacao: Nome da situação em que os pedidos obtidos estão
         (Ex: Cancelados)
         :type situacao: str
     """
@@ -108,10 +108,10 @@ class ResultadoGetDetalhes:
     Attributes:
         pedidos: Lista com todos pedidos consultados. Type DadosPedidos
         :type pedidos: list[DadosPedidos]
-        endpointerror: Lista com especificações da endpoint em que tivemos 
+        endpointerror: Lista com especificações da endpoint em que tivemos
         retorno de erro. Type ErrorHTTP
         :type endpointerror: list[ErrorHTTP]
-        situacao: Nome da situação em que os pedidos obtidos estão 
+        situacao: Nome da situação em que os pedidos obtidos estão
         (Ex: Cancelados)
         :type situacao: str
     """

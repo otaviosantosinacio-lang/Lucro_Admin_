@@ -34,6 +34,8 @@ dist/
 
 # Text
 anotações.txt
+ruff_report.txt
+
 
 # Ruff Cache
 .ruff_cache

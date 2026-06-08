@@ -28,7 +28,7 @@ class CalculadoraDeImposto:
         """
         calculadora_de_tributos
 
-        Calculando de forma precisa os tributos de um venda, e retornando-os 
+        Calculando de forma precisa os tributos de um venda, e retornando-os
         de forma ordenada e formatada
 
         :param self:
@@ -36,13 +36,13 @@ class CalculadoraDeImposto:
         :param id_bling: Id único da venda, esse id é gerado pelo bling
         :param sit: Situação do pedido dentro do Bling
         :param uf_dest: Unidade Federativa de destino da venda
-        :return: Retorno individualizado por produto e também totalizado 
+        :return: Retorno individualizado por produto e também totalizado
         pela venda
         :rtype: RetornoImpostos
         """
 
         logger.info(
-            'Calculadora de Tributos | Iniciando calculo de tributos dos ' \
+            'Calculadora de Tributos | Iniciando calculo de tributos dos '
             'itens do pedido'
         )
 
@@ -68,7 +68,7 @@ class CalculadoraDeImposto:
             # Validando ser a venda é uma operação local ou interestadual
             if uf_dest == 'SP':
                 logger.info(
-                    'Calculadora de Tributos | UF de origem SP e UF destino %s' \
+                    'Calculadora de Tributos | UF de origem SP e UF destino %s'
                     ' -> Caracteriza operação interna',
                     uf_dest,
                 )
@@ -79,8 +79,8 @@ class CalculadoraDeImposto:
             # cobrança do fundo de combate a pobreza ou não.
             elif sem_fcp:
                 logger.info(
-                    'Calculadora de Tributos | UF de origem SP e UF destino %s' \
-                    ' -> Caracteriza operação interestadual, mas a UF não tem' \
+                    'Calculadora de Tributos | UF de origem SP e UF destino %s'
+                    ' -> Caracteriza operação interestadual, mas a UF não tem'
                     ' cobrança do FCP',
                     uf_dest,
                 )
@@ -94,8 +94,8 @@ class CalculadoraDeImposto:
 
             else:
                 logger.info(
-                    'Calculadora de Tributos | UF de origem SP e UF destino %s' \
-                    ' -> Caracteriza operação interestadual, mas a UF tem' \
+                    'Calculadora de Tributos | UF de origem SP e UF destino %s'
+                    ' -> Caracteriza operação interestadual, mas a UF tem'
                     ' cobrança do FCP',
                     uf_dest,
                 )
@@ -135,7 +135,7 @@ class CalculadoraDeImposto:
             )
             produtos_com_imposto.append(imposto_produto)
 
-        # Somando todos os impostos dos itens para totalizarmos os impostos 
+        # Somando todos os impostos dos itens para totalizarmos os impostos
         # da venda.
         impostos_venda = ImpostosDaVenda.soma_impostos(
             produtos_com_imposto, id_bling=id_bling

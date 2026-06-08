@@ -23,3 +23,4 @@ def conecta_DB():
         return psycopg2.connect(conn_string)
     except:
         logger.exception('Data Base | ERRO: Conexão mal sucedida')
+        return

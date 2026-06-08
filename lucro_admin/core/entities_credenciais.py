@@ -14,7 +14,7 @@ class Credencial:
 
     Attributes:
         access_token: Token de acesso atual (Bearer)
-        refresh_token: Token com expiração maior para obter o próximo 
+        refresh_token: Token com expiração maior para obter o próximo
         access token quando expirado
         expire: Data/hora/segundos de quando o access token expira
         response_status_code: Status HTTP para controle de erros

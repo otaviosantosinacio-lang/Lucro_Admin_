@@ -10,7 +10,8 @@ logger = logging.getLogger('lucroadmin.infra.executa_database')
 
 def consultadb(execute: str) -> Any:
     """
-    consultadb -> Consulta no banco de dados para dados especificos mediante a Query informada
+    consultadb -> Consulta no banco de dados para dados especificos mediante
+    a Query informada
 
     :param execute: Query para consulta no banco de dados.
     :type execute: str
@@ -28,7 +29,8 @@ def consultadb(execute: str) -> Any:
                     return param
                 else:
                     logger.critical(
-                        'Executa Data Base | Erro o SELECT não retornou nada | Query -> %s',
+                        'Executa Data Base | Erro o SELECT não retornou nada |'
+                        ' Query -> %s',
                         execute,
                     )
                     return None
@@ -44,7 +46,8 @@ def consultadb_com_parametros(
     execute: str, params: tuple | None = None
 ) -> Any:
     """
-    consultadb -> Consulta no banco de dados para dados especificos mediante a Query informada
+    consultadb -> Consulta no banco de dados para dados especificos mediante
+    a Query informada
 
     :param execute: Query para consulta no banco de dados.
     :type execute: str
@@ -62,7 +65,8 @@ def consultadb_com_parametros(
                     return param
                 else:
                     logger.critical(
-                        'Executa Data Base | Erro o SELECT não retornou nada | Query -> %s',
+                        'Executa Data Base | Erro o SELECT não retornou nada |'
+                        ' Query -> %s',
                         execute,
                     )
                     return None
@@ -78,7 +82,8 @@ def consultageral(execute: str):
     """
     consultageral
 
-    :param execute: Query para retornar diversos dados na consulta ao banco de dados
+    :param execute: Query para retornar diversos dados na consulta ao banco
+      de dados
     :type execute: str
     """
     try:
@@ -93,7 +98,8 @@ def consultageral(execute: str):
                     return param
                 else:
                     logger.critical(
-                        'Executa Data Base | Erro o SELECT não retornou nada | Query -> %s',
+                        'Executa Data Base | Erro o SELECT não retornou nada '
+                        '| Query -> %s',
                         execute,
                     )
                     return None
@@ -152,7 +158,8 @@ def consultadb_multiplos_retornos(
     execute: str, params: tuple | None = None
 ) -> Any:
     """
-    consultadb -> Consulta no banco de dados para dados especificos mediante a Query informada
+    consultadb -> Consulta no banco de dados para dados especificos mediante
+      a Query informada
 
     :param execute: Query para consulta no banco de dados.
     :type execute: str
@@ -170,7 +177,8 @@ def consultadb_multiplos_retornos(
                     return param
                 else:
                     logger.critical(
-                        'Executa Data Base | Erro o SELECT não retornou nada | Query -> %s',
+                        'Executa Data Base | Erro o SELECT não retornou nada'
+                        ' | Query -> %s',
                         execute,
                     )
                     return None

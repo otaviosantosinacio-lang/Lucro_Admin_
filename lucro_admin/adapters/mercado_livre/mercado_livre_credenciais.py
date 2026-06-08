@@ -24,7 +24,7 @@ class Code:
     ):
 
         logger.info(
-            'Mercado Livre oAuth Code | Iniciando montagem de ' \
+            'Mercado Livre oAuth Code | Iniciando montagem de '
             'cabeçalhos e body'
         )
         headers: dict[str, str] = {
@@ -41,7 +41,7 @@ class Code:
         )
 
         logger.info(
-            'Mercado Livre oAuth Code | Enviando requisição para ' \
+            'Mercado Livre oAuth Code | Enviando requisição para '
             'o endpoint %s',
             base_url,
         )
@@ -80,7 +80,7 @@ class Code:
             }
             return credenciais
 
-        # Erro crítico na requisição como credênciais expiradas ou request 
+        # Erro crítico na requisição como credênciais expiradas ou request
         # inválido
         else:
             logger.critical(
@@ -126,7 +126,7 @@ class RefreshML:
         )
 
         logger.info(
-            'Mercado Livre oAuth Refresh | Headers e Body montado, enviando ' \
+            'Mercado Livre oAuth Refresh | Headers e Body montado, enviando '
             'requisição para o endpoint %s',
             base_url,
         )
@@ -139,7 +139,7 @@ class RefreshML:
 
         if response.status_code == HTTPStatus.OK:
             logger.info(
-                'Mercado Livre  oAuth Refresh | Retorno %s para a requisição' \
+                'Mercado Livre  oAuth Refresh | Retorno %s para a requisição'
                 ' com o Refresh',
                 response.status_code,
             )
@@ -155,12 +155,11 @@ class RefreshML:
             }
             logger.info('Mercado Livre oAuth Refresh | Request finalizado')
             return credenciais
-        
         # Sendo um retorno também configrado para tratarmos ele
 
-        elif response.status_code == HTTPStatus.TOO_MANY_REQUESTS
+        elif response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
             logging.warning(
-                'Mercado Livre oAuth Refresh | Limite de requisições ' \
+                'Mercado Livre oAuth Refresh | Limite de requisições '
                 'retorno %s',
                 response.status_code,
             )
@@ -175,7 +174,7 @@ class RefreshML:
         # Erro critico de falha na configuração do request ou até credênciais
         else:
             logger.critical(
-                'Mercado Livre oAuth Refresh | Houve um erro critico na' \
+                'Mercado Livre oAuth Refresh | Houve um erro critico na'
                 ' requisição retorno %s -> %s',
                 response.status_code,
                 response.text,
