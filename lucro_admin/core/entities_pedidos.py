@@ -29,7 +29,7 @@ class ResultadoPagina:
     ResultadoPagina -> Padronizando retorno dos requets para endpoints Bling.
 
     Attributes:
-        status: status do retorno da requisição. (Ex: ok= 200, rated_limit= 429)
+        status: status do retorno da requisição.
         :type status: Literal [ok, rated_limit, error]
         data: Dados da requisição.
         :type data: Any | None = None

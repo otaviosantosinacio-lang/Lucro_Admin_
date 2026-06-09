@@ -1,10 +1,9 @@
-from asyncio import Handle
-import logging
 from http import HTTPStatus
+import logging
+from lucro_admin.infra.http.retry import RetryPolicy
 
 import requests
 
-from lucro_admin.infra.http.retry import RetryPolicy
 
 logger = logging.getLogger('lucroadmin.adapters.mercadolivre')
 retry_policy = RetryPolicy()

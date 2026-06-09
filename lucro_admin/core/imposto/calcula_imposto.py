@@ -22,6 +22,10 @@ class CalculadoraDeImposto:
 
     """
 
+    def __init__(self):
+        self.aliq_pis = 1.65/100
+        self.aliq_cofins = 7.6/100
+
     def calculadora_de_tributos(
         self, itens, id_bling, sit, uf_dest
     ) -> RetornoImpostos:
@@ -50,8 +54,6 @@ class CalculadoraDeImposto:
         # Validando FCP e aliquotas pis e cofins
         sem_fcp = uf_sem_fcp(uf_dest)
         produtos_com_imposto = []
-        aliq_pis = 1.65 / 100
-        aliq_cofins = 7.6 / 100
 
         # Looping para passarmos por todos os itens da venda
         for item in itens:
@@ -73,8 +75,8 @@ class CalculadoraDeImposto:
                     uf_dest,
                 )
                 icms = item_pedido.valor * (18 / 100)
-                pis = (item_pedido.valor - icms) * aliq_pis
-                cofins = (item_pedido.valor - icms) * aliq_cofins
+                pis = (item_pedido.valor - icms) * self.aliq_pis
+                cofins = (item_pedido.valor - icms) * self.aliq_cofins
             # Se for interestadual devemos validar se o estado destino faz
             # cobrança do fundo de combate a pobreza ou não.
             elif sem_fcp:
@@ -89,8 +91,8 @@ class CalculadoraDeImposto:
                 aliq_dest = aliq_dest_total - aliq_orig
                 icms = item_pedido.valor * aliq_orig
                 difal = item_pedido.valor * aliq_dest
-                pis = (item_pedido.valor - (icms + difal)) * aliq_pis
-                cofins = (item_pedido.valor - (icms + difal)) * aliq_cofins
+                pis = (item_pedido.valor - (icms + difal)) * self.aliq_pis
+                cofins = (item_pedido.valor - (icms + difal)) * self.aliq_cofins
 
             else:
                 logger.info(
@@ -105,8 +107,8 @@ class CalculadoraDeImposto:
                 aliq_dest = aliq_dest_total - aliq_orig
                 icms = item_pedido.valor * aliq_orig
                 difal = item_pedido.valor * aliq_dest
-                pis = (item_pedido.valor - (icms + difal)) * aliq_pis
-                cofins = (item_pedido.valor - (icms + difal)) * aliq_cofins
+                pis = (item_pedido.valor - (icms + difal)) * self.aliq_pis
+                cofins = (item_pedido.valor - (icms + difal)) * self.aliq_cofins
                 fcp = item_pedido.valor * aliq_fcp
 
             total = icms + pis + cofins + difal + fcp
@@ -148,3 +150,4 @@ class CalculadoraDeImposto:
         return RetornoImpostos(
             produto_imposto=produtos_com_imposto, venda_imposto=impostos_venda
         )
+    

@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from lucro_admin.models import registro_tabela
+from lucro_admin.infra.models.usuario import registro_tabela
 
 
 @pytest.fixture

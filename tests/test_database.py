@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from lucro_admin.models import Situacao_Pedido_Bling, Usuario
+from lucro_admin.infra.models.usuario import Situacao_Pedido_Bling, Usuario
 
 
 def teste_criar_usuario(session):
