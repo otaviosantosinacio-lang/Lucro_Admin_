@@ -42,3 +42,6 @@ ruff_report.txt
 
 # BackUp drawio
 .$DER Lucro_Admin.drawio.bkp
+
+#database
+database.db

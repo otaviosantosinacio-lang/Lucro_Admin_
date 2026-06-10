@@ -12,4 +12,4 @@ class Pedido:
     id_pedido: Mapped[int] = mapped_column(init=False, primary_key=True)
     id_bling: Mapped[int] = mapped_column(unique=True)
     num_bling: Mapped[int] = mapped_column(unique=True)
-    id_situacao: Mapped[int] = mapped_column(ForeignKey=True)
+    id_situacao: Mapped[int]
