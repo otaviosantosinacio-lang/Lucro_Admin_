@@ -4,6 +4,7 @@ from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, registry
 
 from lucro_admin.infra.models.situacao_pedidos_bling import Situacao_Pedido_Bling
+from lucro_admin.infra.models.marketplace import Marketplace
 registro_tabela = registry()
 
 @registro_tabela.mapped_as_dataclass
@@ -16,4 +17,8 @@ class Pedido:
     id_situacao: Mapped[int] = mapped_column(
         ForeignKey(Situacao_Pedido_Bling.id_situacao),
         nullable=False   
+    )
+    id_nf_bling: Mapped[int] = mapped_column(default= 0)
+    id_marketplace: Mapped[int] = mapped_column(
+        ForeignKey(Marketplace.id_marketplace)
     )
