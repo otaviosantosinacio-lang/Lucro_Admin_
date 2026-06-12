@@ -18,7 +18,7 @@ class Pedido:
         ForeignKey(Situacao_Pedido_Bling.id_situacao),
         nullable=False   
     )
-    id_nf_bling: Mapped[int] = mapped_column(default= 0)
+    id_nf_bling: Mapped[int] = mapped_column(nullable=True)
     id_marketplace: Mapped[int] = mapped_column(
         ForeignKey(Marketplace.id_marketplace)
     )
