@@ -16,7 +16,7 @@ Pedido(
 	id_situacao FK -> Situação_Bling_Pedido(id_situacao),
 	id_nf_bling,
 	id_marketplace FK Marketplace(id_marketplace),
-	id_pedido_marketplace UNIQUE,
+	id_pedido_marketplace,
 	data_venda,
 	valor_pedido,
 	created_at,

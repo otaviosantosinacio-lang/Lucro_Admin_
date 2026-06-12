@@ -6,7 +6,7 @@ from sqlalchemy import pool
 from alembic import context
 
 from lucro_admin.settings import Settings
-from lucro_admin.infra.models.usuario import registro_tabela
+from lucro_admin.infra.models.base import registro_tabela
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
