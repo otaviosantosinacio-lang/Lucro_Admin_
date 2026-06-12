@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from datetime import datetime
 from decimal import Decimal
 from sqlalchemy import ForeignKey, func
-from sqlalchemy.orm import Mapped, mapped_column, registry, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from lucro_admin.infra.models.base import registro_tabela
 
 if TYPE_CHECKING:
@@ -41,7 +41,7 @@ class Pedido:
     )
     
     id_marketplace: Mapped[int]= mapped_column(
-        ForeignKey('marketplace.id_marketplace'),
+        ForeignKey('marketplaces.id_marketplace'),
         nullable=False
     )
     

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 @registro_tabela.mapped_as_dataclass
 class Marketplace:
 
-    __tablename__ = 'marketplace'
+    __tablename__ = 'marketplaces'
 
     id_marketplace: Mapped[int] = mapped_column(
         primary_key=True, 
