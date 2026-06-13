@@ -19,14 +19,21 @@ class NotaFiscal:
         primary_key=True
     )
 
-    id_nf_bling: Mapped[int | None]= mapped_column(
-        nullable=True
-    )
-
     id_pedido: Mapped[int]= mapped_column(
         ForeignKey('pedidos.id_pedido'),
         nullable=False,
         unique=True
+    )
+
+    created_user_id: Mapped[int]= mapped_column(
+        ForeignKey('usuarios.id_usuario'),
+        nullable=False
+    )
+
+
+    updated_user_id: Mapped[int]= mapped_column(
+        ForeignKey('usuarios.id_usuario'),
+        nullable=False
     )
 
     url_xml: Mapped[str | None]= mapped_column(
@@ -50,14 +57,13 @@ class NotaFiscal:
         nullable=True
     )
 
+    id_nf_bling: Mapped[int | None]= mapped_column(
+        nullable=True
+    )
+
     created_at: Mapped[datetime]= mapped_column(
         init=False,
         server_default=func.now()
-    )
-
-    created_user_id: Mapped[int]= mapped_column(
-        ForeignKey('usuarios.id_usuario'),
-        nullable=False
     )
 
     updated_at: Mapped[datetime]= mapped_column(
@@ -66,22 +72,17 @@ class NotaFiscal:
         onupdate=func.now()
     )
 
-    updated_user_id: Mapped[int]= mapped_column(
-        ForeignKey('usuarios.id_usuario'),
-        nullable=False
-    )
-
     nota_fiscal_pedido: Mapped['Pedido']= relationship(
-        foreign_keys= id_pedido,
+        foreign_keys= [id_pedido],
         init=False
     )
 
     created_user: Mapped['Usuario']= relationship(
-        foreign_keys= created_user_id,
+        foreign_keys= [created_user_id],
         init=False
     )
 
     updated_user: Mapped['Usuario']= relationship(
-        foreign_keys= updated_user_id,
+        foreign_keys= [updated_user_id],
         init=False
     )
