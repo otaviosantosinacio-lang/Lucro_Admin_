@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from lucro_admin.infra.models.pedido import Pedidos
     from lucro_admin.infra.modes.situacao_pedido_bling import (
         SituacaoPedidoBling)
-    from lucro_admin.infra.models.produto import Produtos
+    from lucro_admin.infra.models.produto import Produto
     from lucro_admin.infra.models.usuario import Usuario
 
 @registro_tabela.mapped_as_dataclass
@@ -89,7 +89,7 @@ class ItemPedido:
         init=False
     )
     
-    produto_item_pedido: Mapped['Produtos']= relationship(
+    produto_item_pedido: Mapped['Produto']= relationship(
         foreign_keys=[id.produto],
         init=False
     )
