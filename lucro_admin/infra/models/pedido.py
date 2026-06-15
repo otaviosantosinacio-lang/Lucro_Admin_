@@ -8,7 +8,7 @@ from lucro_admin.infra.models.base import registro_tabela
 
 if TYPE_CHECKING:
     from lucro_admin.infra.models.situacao_pedidos_bling import (
-        Situacao_Pedido_Bling)
+        SituacaoPedidoBling)
     from lucro_admin.infra.models.marketplace import Marketplace
     from lucro_admin.infra.models.usuario import Usuario
 
