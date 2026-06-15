@@ -6,6 +6,10 @@ from sqlalchemy import ForeignKey, func
 from lucro_admin.infra.models.base import registro_tabela
 from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+  from lucro_admin.infra.models.item_pedido import ItemPedido
+  from lucro_admin.infra.models.usuario import Usuario
+  
 @registro_tabela.mapped_as_dataclass
 class ItemPedidoImposto:
   __tablename__= 'itens_pedido_imposto'
@@ -45,5 +49,20 @@ class ItemPedidoImposto:
   )
 
   updated_user_id: Mapped[int]= mapped_column(
-    ForeignKey('usarios.id_usuario)
+    ForeignKey('usuarios.id_usuario')
+  )
+    
+  item_pedido: Mapped['ItemPedido']= relationship(
+    foreign_keys=[id_item_pedido],
+    init=False
+  )
+
+  creted_user: Mapped['Usuario']= relationship(
+    foreign_keys=[created_user_id],
+    init=False
+  )
+
+  updated_user: Mapped['Usuario']= relationship(
+    foreign_keys=[updated_user_id],
+    init=False
   )

@@ -42,7 +42,7 @@ class Marketplace:
     )
     
     updated_user_id: Mapped[int]= mapped_column(
-        ForeingKey=('usuarios.id_usuario'),
+        ForeignKey('usuarios.id_usuario'),
         nullable=False
     )
 

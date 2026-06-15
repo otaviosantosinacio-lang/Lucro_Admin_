@@ -7,8 +7,8 @@ from lucro_admin.infra.models.base import registro_tabela
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from lucro_admin.infra.models.pedido import Pedidos
-    from lucro_admin.infra.modes.situacao_pedido_bling import (
+    from lucro_admin.infra.models.pedido import Pedido
+    from lucro_admin.infra.models.situacao_pedidos_bling import (
         SituacaoPedidoBling)
     from lucro_admin.infra.models.produto import Produto
     from lucro_admin.infra.models.usuario import Usuario
@@ -71,26 +71,26 @@ class ItemPedido:
     updated_at: Mapped[datetime]= mapped_column(
         init=False,
         server_default=func.now(),
-        onupgrade=func.now()
+        onupdate=func.now()
     )
     
     updated_user_id: Mapped[int]= mapped_column(
-        ForeignKey('usuario.id_usuario'),
+        ForeignKey('usuarios.id_usuario'),
         nullable=False
     )
     
-    pedido_do_item: Mapped['Pedidos']= relationship(
+    pedido_do_item: Mapped['Pedido']= relationship(
         foreign_keys=[id_pedido],
         init=False
     )
     
     situacao_pedido: Mapped['SituacaoPedidoBling']= relationship(
-        foreign_keys=[id.situacao],
+        foreign_keys=[id_situacao],
         init=False
     )
     
     produto_item_pedido: Mapped['Produto']= relationship(
-        foreign_keys=[id.produto],
+        foreign_keys=[id_produto],
         init=False
     )
     
