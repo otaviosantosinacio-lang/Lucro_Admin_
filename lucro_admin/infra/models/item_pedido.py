@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from lucro_admin.infra.modes.situacao_pedido_bling import (
         SituacaoPedidoBling)
     from lucro_admin.infra.models.produto import Produtos
+    from lucro_admin.infra.models.usuario import Usuario
 
 @registro_tabela.mapped_as_dataclass
 class ItemPedido:
@@ -78,5 +79,28 @@ class ItemPedido:
         nullable=False
     )
     
+    pedido_do_item: Mapped['Pedidos']= relationship(
+        foreign_keys=[id_pedido],
+        init=False
+    )
     
+    situacao_pedido: Mapped['SituacaoPedidoBling']= relationship(
+        foreign_keys=[id.situacao],
+        init=False
+    )
+    
+    produto_item_pedido: Mapped['Produtos']= relationship(
+        foreign_keys=[id.produto],
+        init=False
+    )
+    
+    created_user: Mapped['Usuario']= relationship(
+        foreign_keys=[created_user_id],
+        init=False
+    )
+    
+    update_user: Mapped['Usuario']= relationship(
+        foreign_keys=[updated_user_id],
+        init=False
+    )
     
