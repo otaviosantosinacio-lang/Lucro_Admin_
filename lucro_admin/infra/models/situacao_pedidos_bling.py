@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from lucro_admin.infra.models.base import registro_tabela
 
 @registro_tabela.mapped_as_dataclass
-class Situacao_Pedido_Bling:
+class SituacaoPedidoBling:
     __tablename__ = 'situacoes_pedidos_bling'
 
     id_situacao: Mapped[int] = mapped_column(
