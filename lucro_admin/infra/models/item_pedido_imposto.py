@@ -1,0 +1,49 @@
+from __future__ import annotations
+from decimal import Decimal
+from datetime import datetime
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey, func
+from lucro_admin.infra.models.base import registro_tabela
+from typing import TYPE_CHECKING
+
+@registro_tabela.mapped_as_dataclass
+class ItemPedidoImposto:
+  __tablename__= 'itens_pedido_imposto'
+
+  id_item_pedido_imposto: Mapped[int]= mapped_column(
+    primary_key=True,
+    init=False
+  )
+
+  id_item_pedido: Mapped[int]= mapped_column(
+    ForeignKey('item_pedido.id_item_pedido'),
+    nullable=False
+  )
+
+  tipo_imposto: Mapped[str]= mapped_column(
+    nullable=False
+  )
+
+  valor_imposto: Mapped[Decimal]
+
+  origem_calculo: Mapped[str]
+
+  created_at: Mapped[datetime]= mapped_column(
+    init=False,
+    server_default=func.now()
+  )
+
+  created_user_id: Mapped[int]= mapped_column(
+    ForeignKey('usuarios.id_usuario'),
+    nullable=False
+  )
+
+  updated_at: Mapped[datetime]= mapped_column(
+    init=False,
+    server_default=func.now(),
+    onupdate=func.now()
+  )
+
+  updated_user_id: Mapped[int]= mapped_column(
+    ForeignKey('usarios.id_usuario)
+  )
