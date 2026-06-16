@@ -21,4 +21,18 @@ def teste_criar_usuario(session):
     assert resultado.nome_usuario == 'otavio123'
 
 
+def teste_criar_situacao_pedido_bling(session):
+    situacao_pedido = SituacaoPedidoBling(9, 'Atendido', 'Azul')
+
+    session.add(situacao_pedido)
+    session.commit()
+
+    resultado = session.scalar(
+        select(SituacaoPedidoBling).where(
+            SituacaoPedidoBling.id_situacao_bling == 9
+        )
+    )
+
+    assert resultado.nome_situacao == 'Atendido'
+
 
