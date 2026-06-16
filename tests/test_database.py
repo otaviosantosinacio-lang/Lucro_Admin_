@@ -9,6 +9,7 @@ from lucro_admin.infra.models.marketplace import Marketplace
 from lucro_admin.infra.models.pedido import Pedido
 from lucro_admin.infra.models.item_pedido import ItemPedido
 from lucro_admin.infra.models.item_pedido_imposto import ItemPedidoImposto
+from lucro_admin.infra.models.nota_fiscal import NotaFiscal
 
 def teste_criar_usuario(session):
 
@@ -302,7 +303,7 @@ def teste_criando_item_pedido_imposto(session):
     item_pedido_imposto= ItemPedidoImposto(
         id_item_pedido=1,
         tipo_imposto='ICMS',
-        valor_imposto=Decima('10.00'),
+        valor_imposto=Decimal('10.00'),
         origem_calculo='Calculo Manual',
         created_user_id=1,
         updated_user_id=1
@@ -319,3 +320,78 @@ def teste_criando_item_pedido_imposto(session):
 
     assert resultado.id_item_pedido_imposto == 1
     
+def test_criando_nota_fiscal(session):
+    usuario= Usuario(
+        nome_usuario='otavio123',
+        email='otavio@lucro_admin.com',
+        senha_hash='otavio@123'
+    )
+    
+    produto= Produto(
+        id_produto_bling= 13579,
+        sku= 'LADM0001',
+        descricao_produto= 'gerenciador de lucro',
+        fornecedor= 'Lucro Admin',
+        preco_custo= Decimal('29.99'),
+        created_user_id = 1,
+        updated_user_id= 1
+    )
+
+    marketplace= Marketplace(
+        nome_marketplace= 'Lucro Admin Shop',
+        created_user_id= 1,
+        updated_user_id= 1
+    )
+    
+    situacao_pedido = SituacaoPedidoBling(
+        9, 'Atendido', 'Azul'
+    )
+
+    pedido= Pedido(
+        id_bling= 120543543,
+        num_bling= 12387,
+        id_situacao=1,
+        id_nf_bling= 150789,
+        id_marketplace= 1,
+        id_pedido_marketplace= 20000456382042,
+        data_venda= date(2026, 5, 25),
+        valor_pedido= Decimal('160.00'),
+        created_user_id= 1,
+        updated_user_id=1
+    )    
+
+    session.add_all(
+        [
+           usuario,
+           produto,
+           marketplace,
+           situacao_pedido,
+           pedido 
+        ]
+    )
+
+    session.flush()
+
+    nota_fiscal= NotaFiscal(
+        id_pedido=1,
+        url_xml= 'www.lucroadmin.com/xml/?3456381578910456375930195749382746519305',
+        serie=6,
+        data_emissao= date(2026,6,3),
+        id_nf_bling=6748420,
+        created_user_id=1,
+        updated_user_id=1,
+        valor_nf=Decimal('56.51'),
+        chave_acesso=None
+    )
+
+    session.add(nota_fiscal)
+    session.commit()
+
+    resultado= session.scalar(
+        select(NotaFiscal).where(
+            NotaFiscal.id_nf == 1
+        )
+    )
+
+    assert resultado.id_nf == 1
+
