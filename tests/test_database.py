@@ -1,9 +1,10 @@
 from sqlalchemy import select
+from decimal import Decimal
 
 from lucro_admin.infra.models.usuario import Usuario
 from lucro_admin.infra.models.situacao_pedidos_bling import SituacaoPedidoBling
 from lucro_admin.infra.models.produto import Produto
-from lucro_admin.infra.models.markeplace import Marketplace
+from lucro_admin.infra.models.marketplace import Marketplace
 
 
 def teste_criar_usuario(session):
@@ -54,9 +55,9 @@ def teste_criar_produto(session):
         sku= 'LADM0001',
         descricao_produto= 'gerenciador de lucro',
         fornecedor= 'Lucro Admin',
-        preco_custo= 29.99
-        created_user_id: 1,
-        update_user_id: 1
+        preco_custo= Decimal('29.99'),
+        created_user_id = 1,
+        updated_user_id= 1
     )
     
     session.add(usuario)
@@ -82,8 +83,7 @@ def teste_criando_marketplace(session):
     )
         
     marketplace= Marketplace(
-        nome_markeplace= 'Lucro Admin Shop',
-        status= True,
+        nome_marketplace= 'Lucro Admin Shop',
         created_user_id= 1,
         updated_user_id= 1
     )
@@ -102,26 +102,7 @@ def teste_criando_marketplace(session):
         
     assert resultado.nome_marketplace == 'Lucro Admin Shop'
     
-def teste_criando_pedido(session):
-    
-    usuario= Usuario(
-        nome_usuario='otavio123',
-        email='otavio@lucro_admin.com',
-        senha_hash='otavio@123'
-    )
-    
-    marketplace= Marketplace(
-        nome_markeplace= 'Lucro Admin Shop',
-        status= True,
-        created_user_id= 1,
-        updated_user_id= 1
-    )
-    
-    situacao_pedido = SituacaoPedidoBling(
-        9, 'Atendido', 'Azul'
-    )
-    
-    
+
     
     
     

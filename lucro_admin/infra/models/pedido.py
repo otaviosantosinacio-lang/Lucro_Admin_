@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from datetime import datetime
+from datetime import datetime, date
 from decimal import Decimal
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -49,7 +49,7 @@ class Pedido:
         nullable=True
     )
 
-    data_venda: Mapped[datetime]= mapped_column(
+    data_venda: Mapped[date]= mapped_column(
         nullable=False
     )
 

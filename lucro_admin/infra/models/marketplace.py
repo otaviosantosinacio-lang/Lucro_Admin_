@@ -22,9 +22,15 @@ class Marketplace:
         init=False
     )
     
-    nome_marketplace: Mapped[str] = mapped_column(nullable=False, unique=True)
+    nome_marketplace: Mapped[str] = mapped_column(
+        nullable=False, unique=True
+    )
     status: Mapped[str] = mapped_column(
         Boolean,
+        init=False,
+        nullable=False,
+        default=True,
+        server_default='true',
     )
     created_at: Mapped[datetime]= mapped_column(
         init=False, 
@@ -48,9 +54,11 @@ class Marketplace:
     )
 
     created_user: Mapped['Usuario'] = relationship(
-        foreign_keys=[created_user_id]
+        foreign_keys=[created_user_id],
+        init=False
     )
 
     updated_user: Mapped['Usuario'] = relationship(
-        foreign_keys=[updated_user_id]
+        foreign_keys=[updated_user_id],
+        init=False
     )
