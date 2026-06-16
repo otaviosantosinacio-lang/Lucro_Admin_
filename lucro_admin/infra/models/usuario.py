@@ -11,7 +11,8 @@ class Usuario:
 
     id_usuario: Mapped[int] = mapped_column(
         init=False,
-        primary_key=True)
+        primary_key=True
+    )
     
     nome_usuario: Mapped[str] = mapped_column(
         unique=True,

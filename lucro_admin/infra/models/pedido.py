@@ -78,7 +78,7 @@ class Pedido:
         nullable=False
     )
 
-    situacao_pedido: Mapped['Situacao_Pedido_Bling']= relationship(
+    situacao_pedido: Mapped['SituacaoPedidoBling']= relationship(
         foreign_keys=[id_situacao],
         init=False
     )

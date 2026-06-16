@@ -18,7 +18,8 @@ class Marketplace:
 
     id_marketplace: Mapped[int] = mapped_column(
         primary_key=True, 
-        nullable=False, init=False
+        nullable=False,
+        init=False
     )
     
     nome_marketplace: Mapped[str] = mapped_column(nullable=False, unique=True)
@@ -51,5 +52,5 @@ class Marketplace:
     )
 
     updated_user: Mapped['Usuario'] = relationship(
-        ForeignKey[updated_user_id]
+        foreign_keys=[updated_user_id]
     )
