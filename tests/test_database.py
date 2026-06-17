@@ -1,15 +1,17 @@
-from sqlalchemy import select
-from decimal import Decimal
 from datetime import date
+from decimal import Decimal
 
-from lucro_admin.infra.models.usuario import Usuario
-from lucro_admin.infra.models.situacao_pedidos_bling import SituacaoPedidoBling
-from lucro_admin.infra.models.produto import Produto
-from lucro_admin.infra.models.marketplace import Marketplace
-from lucro_admin.infra.models.pedido import Pedido
+from sqlalchemy import select
+
 from lucro_admin.infra.models.item_pedido import ItemPedido
 from lucro_admin.infra.models.item_pedido_imposto import ItemPedidoImposto
+from lucro_admin.infra.models.marketplace import Marketplace
 from lucro_admin.infra.models.nota_fiscal import NotaFiscal
+from lucro_admin.infra.models.pedido import Pedido
+from lucro_admin.infra.models.produto import Produto
+from lucro_admin.infra.models.situacao_pedidos_bling import SituacaoPedidoBling
+from lucro_admin.infra.models.usuario import Usuario
+
 
 def teste_criar_usuario(session):
 
@@ -17,7 +19,6 @@ def teste_criar_usuario(session):
         nome_usuario='otavio123',
         email='otavio@lucro_admin.com',
         senha_hash='otavio@123',
-        
     )
 
     session.add(usuario)
@@ -30,10 +31,8 @@ def teste_criar_usuario(session):
 
 
 def teste_criar_situacao_pedido_bling(session):
-    
-    situacao_pedido = SituacaoPedidoBling(
-        9, 'Atendido', 'Azul'
-    )
+
+    situacao_pedido = SituacaoPedidoBling(9, 'Atendido', 'Azul')
 
     session.add(situacao_pedido)
     session.commit()
@@ -45,353 +44,311 @@ def teste_criar_situacao_pedido_bling(session):
     )
 
     assert resultado.nome_situacao == 'Atendido'
-    
+
+
 def teste_criar_produto(session):
-    
-    usuario= Usuario(
+
+    usuario = Usuario(
         nome_usuario='otavio123',
         email='otavio@lucro_admin.com',
-        senha_hash='otavio@123'
+        senha_hash='otavio@123',
     )
-    
-    produto= Produto(
-        id_produto_bling= 13579,
-        sku= 'LADM0001',
-        descricao_produto= 'gerenciador de lucro',
-        fornecedor= 'Lucro Admin',
-        preco_custo= Decimal('29.99'),
-        created_user_id = 1,
-        updated_user_id= 1
+
+    produto = Produto(
+        id_produto_bling=13579,
+        sku='LADM0001',
+        descricao_produto='gerenciador de lucro',
+        fornecedor='Lucro Admin',
+        preco_custo=Decimal('29.99'),
+        created_user_id=1,
+        updated_user_id=1,
     )
-    
+
     session.add(usuario)
     session.flush()
-    
+
     session.add(produto)
     session.commit()
-    
-    resultado= session.scalar(
-        select(Produto).where(
-            Produto.id_produto_bling == 13579
-        )
+
+    resultado = session.scalar(
+        select(Produto).where(Produto.id_produto_bling == 13579)
     )
-    
+
     assert resultado.sku == 'LADM0001'
-    
+
+
 def teste_criando_marketplace(session):
-    
-    usuario= Usuario(
+
+    usuario = Usuario(
         nome_usuario='otavio123',
         email='otavio@lucro_admin.com',
-        senha_hash='otavio@123'
+        senha_hash='otavio@123',
     )
-        
-    marketplace= Marketplace(
-        nome_marketplace= 'Lucro Admin Shop',
-        created_user_id= 1,
-        updated_user_id= 1
+
+    marketplace = Marketplace(
+        nome_marketplace='Lucro Admin Shop',
+        created_user_id=1,
+        updated_user_id=1,
     )
-        
+
     session.add(usuario)
     session.flush()
-        
+
     session.add(marketplace)
     session.commit()
-        
-    resultado= session.scalar(
-        select(Marketplace).where(
-            Marketplace.id_marketplace == 1
-        )
+
+    resultado = session.scalar(
+        select(Marketplace).where(Marketplace.id_marketplace == 1)
     )
-        
+
     assert resultado.nome_marketplace == 'Lucro Admin Shop'
-    
+
 
 def teste_criando_pedido(session):
-    
-    usuario= Usuario(
+
+    usuario = Usuario(
         nome_usuario='otavio123',
         email='otavio@lucro_admin.com',
-        senha_hash='otavio@123'
-    )
-    
-    marketplace= Marketplace(
-        nome_marketplace= 'Lucro Admin Shop',
-        created_user_id= 1,
-        updated_user_id= 1
-    )
-    
-    situacao_pedido = SituacaoPedidoBling(
-        9, 'Atendido', 'Azul'
+        senha_hash='otavio@123',
     )
 
-    session.add_all([
-        usuario,
-        marketplace,
-        situacao_pedido
-    ])
+    marketplace = Marketplace(
+        nome_marketplace='Lucro Admin Shop',
+        created_user_id=1,
+        updated_user_id=1,
+    )
+
+    situacao_pedido = SituacaoPedidoBling(9, 'Atendido', 'Azul')
+
+    session.add_all([usuario, marketplace, situacao_pedido])
 
     session.flush()
 
-    pedido= Pedido(
-        id_bling= 120543543,
-        num_bling= 12387,
+    pedido = Pedido(
+        id_bling=120543543,
+        num_bling=12387,
         id_situacao=1,
-        id_nf_bling= 150789,
-        id_marketplace= 1,
-        id_pedido_marketplace= 20000456382042,
-        data_venda= date(2026, 5, 25),
-        valor_pedido= Decimal('160.00'),
-        created_user_id= 1,
-        updated_user_id=1
+        id_nf_bling=150789,
+        id_marketplace=1,
+        id_pedido_marketplace=20000456382042,
+        data_venda=date(2026, 5, 25),
+        valor_pedido=Decimal('160.00'),
+        created_user_id=1,
+        updated_user_id=1,
     )
 
     session.add(pedido)
     session.commit()
 
-    resultado= session.scalar(
-        select(Pedido).where(
-            Pedido.num_bling == 12387
-        )
-    )
+    resultado = session.scalar(select(Pedido).where(Pedido.num_bling == 12387))
 
     assert resultado.id_pedido_marketplace == 20000456382042
 
+
 def teste_criando_item_pedido(session):
 
-    usuario= Usuario(
+    usuario = Usuario(
         nome_usuario='otavio123',
         email='otavio@lucro_admin.com',
-        senha_hash='otavio@123'
-    )
-    
-    produto= Produto(
-        id_produto_bling= 13579,
-        sku= 'LADM0001',
-        descricao_produto= 'gerenciador de lucro',
-        fornecedor= 'Lucro Admin',
-        preco_custo= Decimal('29.99'),
-        created_user_id = 1,
-        updated_user_id= 1
+        senha_hash='otavio@123',
     )
 
-    marketplace= Marketplace(
-        nome_marketplace= 'Lucro Admin Shop',
-        created_user_id= 1,
-        updated_user_id= 1
-    )
-    
-    situacao_pedido = SituacaoPedidoBling(
-        9, 'Atendido', 'Azul'
+    produto = Produto(
+        id_produto_bling=13579,
+        sku='LADM0001',
+        descricao_produto='gerenciador de lucro',
+        fornecedor='Lucro Admin',
+        preco_custo=Decimal('29.99'),
+        created_user_id=1,
+        updated_user_id=1,
     )
 
-    pedido= Pedido(
-        id_bling= 120543543,
-        num_bling= 12387,
+    marketplace = Marketplace(
+        nome_marketplace='Lucro Admin Shop',
+        created_user_id=1,
+        updated_user_id=1,
+    )
+
+    situacao_pedido = SituacaoPedidoBling(9, 'Atendido', 'Azul')
+
+    pedido = Pedido(
+        id_bling=120543543,
+        num_bling=12387,
         id_situacao=1,
-        id_nf_bling= 150789,
-        id_marketplace= 1,
-        id_pedido_marketplace= 20000456382042,
-        data_venda= date(2026, 5, 25),
-        valor_pedido= Decimal('160.00'),
-        created_user_id= 1,
-        updated_user_id=1
+        id_nf_bling=150789,
+        id_marketplace=1,
+        id_pedido_marketplace=20000456382042,
+        data_venda=date(2026, 5, 25),
+        valor_pedido=Decimal('160.00'),
+        created_user_id=1,
+        updated_user_id=1,
     )
 
-    session.add_all(
-        [
-            usuario,
-            marketplace,
-            situacao_pedido,
-            pedido,
-            produto
-        ]
-    )
+    session.add_all([usuario, marketplace, situacao_pedido, pedido, produto])
 
     session.flush()
 
-    item_pedido= ItemPedido(
+    item_pedido = ItemPedido(
         id_pedido=1,
         id_situacao=1,
-        id_produto= 1,
+        id_produto=1,
         quantidade=1,
         preco_custo=Decimal('59.99'),
         preco_venda_unitario=Decimal('149.99'),
         frete_item=Decimal('25.56'),
         comissao_item=Decimal('14.99'),
         created_user_id=1,
-        updated_user_id=1
-    )    
+        updated_user_id=1,
+    )
 
     session.add(item_pedido)
     session.commit()
 
-    resultado= session.scalar(
-        select(ItemPedido).where(
-            ItemPedido.id_situacao == 1
-        )
+    resultado = session.scalar(
+        select(ItemPedido).where(ItemPedido.id_situacao == 1)
     )
 
     assert resultado.id_pedido == 1
 
+
 def teste_criando_item_pedido_imposto(session):
-    usuario= Usuario(
+    usuario = Usuario(
         nome_usuario='otavio123',
         email='otavio@lucro_admin.com',
-        senha_hash='otavio@123'
-    )
-    
-    produto= Produto(
-        id_produto_bling= 13579,
-        sku= 'LADM0001',
-        descricao_produto= 'gerenciador de lucro',
-        fornecedor= 'Lucro Admin',
-        preco_custo= Decimal('29.99'),
-        created_user_id = 1,
-        updated_user_id= 1
+        senha_hash='otavio@123',
     )
 
-    marketplace= Marketplace(
-        nome_marketplace= 'Lucro Admin Shop',
-        created_user_id= 1,
-        updated_user_id= 1
-    )
-    
-    situacao_pedido = SituacaoPedidoBling(
-        9, 'Atendido', 'Azul'
+    produto = Produto(
+        id_produto_bling=13579,
+        sku='LADM0001',
+        descricao_produto='gerenciador de lucro',
+        fornecedor='Lucro Admin',
+        preco_custo=Decimal('29.99'),
+        created_user_id=1,
+        updated_user_id=1,
     )
 
-    pedido= Pedido(
-        id_bling= 120543543,
-        num_bling= 12387,
+    marketplace = Marketplace(
+        nome_marketplace='Lucro Admin Shop',
+        created_user_id=1,
+        updated_user_id=1,
+    )
+
+    situacao_pedido = SituacaoPedidoBling(9, 'Atendido', 'Azul')
+
+    pedido = Pedido(
+        id_bling=120543543,
+        num_bling=12387,
         id_situacao=1,
-        id_nf_bling= 150789,
-        id_marketplace= 1,
-        id_pedido_marketplace= 20000456382042,
-        data_venda= date(2026, 5, 25),
-        valor_pedido= Decimal('160.00'),
-        created_user_id= 1,
-        updated_user_id=1
+        id_nf_bling=150789,
+        id_marketplace=1,
+        id_pedido_marketplace=20000456382042,
+        data_venda=date(2026, 5, 25),
+        valor_pedido=Decimal('160.00'),
+        created_user_id=1,
+        updated_user_id=1,
     )
 
-    item_pedido= ItemPedido(
+    item_pedido = ItemPedido(
         id_pedido=1,
         id_situacao=1,
-        id_produto= 1,
+        id_produto=1,
         quantidade=1,
         preco_custo=Decimal('59.99'),
         preco_venda_unitario=Decimal('149.99'),
         frete_item=Decimal('25.56'),
         comissao_item=Decimal('14.99'),
         created_user_id=1,
-        updated_user_id=1
-    )    
-
-    session.add_all(
-        [
-            usuario,
-            marketplace,
-            situacao_pedido,
-            pedido,
-            produto,
-            item_pedido
-        ]
+        updated_user_id=1,
     )
 
+    session.add_all([
+        usuario,
+        marketplace,
+        situacao_pedido,
+        pedido,
+        produto,
+        item_pedido,
+    ])
+
     session.flush()
-    
-    item_pedido_imposto= ItemPedidoImposto(
+
+    item_pedido_imposto = ItemPedidoImposto(
         id_item_pedido=1,
         tipo_imposto='ICMS',
         valor_imposto=Decimal('10.00'),
         origem_calculo='Calculo Manual',
         created_user_id=1,
-        updated_user_id=1
+        updated_user_id=1,
     )
 
     session.add(item_pedido_imposto)
     session.commit()
 
-    resultado= session.scalar(
-        select(ItemPedidoImposto).where(
-            ItemPedidoImposto.id_item_pedido == 1
-        )
+    resultado = session.scalar(
+        select(ItemPedidoImposto).where(ItemPedidoImposto.id_item_pedido == 1)
     )
 
     assert resultado.id_item_pedido_imposto == 1
-    
+
+
 def test_criando_nota_fiscal(session):
-    usuario= Usuario(
+    usuario = Usuario(
         nome_usuario='otavio123',
         email='otavio@lucro_admin.com',
-        senha_hash='otavio@123'
-    )
-    
-    produto= Produto(
-        id_produto_bling= 13579,
-        sku= 'LADM0001',
-        descricao_produto= 'gerenciador de lucro',
-        fornecedor= 'Lucro Admin',
-        preco_custo= Decimal('29.99'),
-        created_user_id = 1,
-        updated_user_id= 1
+        senha_hash='otavio@123',
     )
 
-    marketplace= Marketplace(
-        nome_marketplace= 'Lucro Admin Shop',
-        created_user_id= 1,
-        updated_user_id= 1
-    )
-    
-    situacao_pedido = SituacaoPedidoBling(
-        9, 'Atendido', 'Azul'
+    produto = Produto(
+        id_produto_bling=13579,
+        sku='LADM0001',
+        descricao_produto='gerenciador de lucro',
+        fornecedor='Lucro Admin',
+        preco_custo=Decimal('29.99'),
+        created_user_id=1,
+        updated_user_id=1,
     )
 
-    pedido= Pedido(
-        id_bling= 120543543,
-        num_bling= 12387,
+    marketplace = Marketplace(
+        nome_marketplace='Lucro Admin Shop',
+        created_user_id=1,
+        updated_user_id=1,
+    )
+
+    situacao_pedido = SituacaoPedidoBling(9, 'Atendido', 'Azul')
+
+    pedido = Pedido(
+        id_bling=120543543,
+        num_bling=12387,
         id_situacao=1,
-        id_nf_bling= 150789,
-        id_marketplace= 1,
-        id_pedido_marketplace= 20000456382042,
-        data_venda= date(2026, 5, 25),
-        valor_pedido= Decimal('160.00'),
-        created_user_id= 1,
-        updated_user_id=1
-    )    
-
-    session.add_all(
-        [
-           usuario,
-           produto,
-           marketplace,
-           situacao_pedido,
-           pedido 
-        ]
+        id_nf_bling=150789,
+        id_marketplace=1,
+        id_pedido_marketplace=20000456382042,
+        data_venda=date(2026, 5, 25),
+        valor_pedido=Decimal('160.00'),
+        created_user_id=1,
+        updated_user_id=1,
     )
+
+    session.add_all([usuario, produto, marketplace, situacao_pedido, pedido])
 
     session.flush()
 
-    nota_fiscal= NotaFiscal(
+    nota_fiscal = NotaFiscal(
         id_pedido=1,
-        url_xml= 'www.lucroadmin.com/xml/?3456381578910456375930195749382746519305',
+        url_xml='www.lucroadmin.com/xml/?3456381578910456375930195749382746519305',
         serie=6,
-        data_emissao= date(2026,6,3),
+        data_emissao=date(2026, 6, 3),
         id_nf_bling=6748420,
         created_user_id=1,
         updated_user_id=1,
         valor_nf=Decimal('56.51'),
-        chave_acesso=None
+        chave_acesso=None,
     )
 
     session.add(nota_fiscal)
     session.commit()
 
-    resultado= session.scalar(
-        select(NotaFiscal).where(
-            NotaFiscal.id_nf == 1
-        )
-    )
+    resultado = session.scalar(select(NotaFiscal).where(NotaFiscal.id_nf == 1))
 
     assert resultado.id_nf == 1
-

@@ -11,12 +11,12 @@ def session():
     engine = create_engine(
         'sqlite:///:memory:',
         connect_args={'check_same_thread': False},
-        poolclass=StaticPool
-        )
+        poolclass=StaticPool,
+    )
 
     @event.listens_for(engine, 'connect')
     def ativar_foreign_keys(dbapi_connection, connection_record):
-        cursor= dbapi_connection.cursor()
+        cursor = dbapi_connection.cursor()
         cursor.execute('PRAGMA foreign_keys=ON')
         cursor.close()
 

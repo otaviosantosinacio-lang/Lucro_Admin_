@@ -2,8 +2,6 @@ import logging
 from logging.config import dictConfig
 from pathlib import Path
 
-from fastapi import FastAPI
-
 from lucro_admin.adapters.bling.bling_credenciais import Refresh
 from lucro_admin.adapters.bling.bling_pedidos import GetBling
 from lucro_admin.adapters.mercado_livre.mercado_livre_credenciais import (
@@ -12,7 +10,6 @@ from lucro_admin.adapters.mercado_livre.mercado_livre_credenciais import (
 from lucro_admin.adapters.mercado_livre.mercado_livre_pedidos import (
     GetMercadoLivre,
 )
-from lucro_admin.api import pedidos
 from lucro_admin.infra.logging.config import Logging_Config
 from lucro_admin.infra.logging.contexto import (
     correlation_id,
@@ -107,8 +104,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-app = FastAPI()
-
-app.include_router(pedidos.router)

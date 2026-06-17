@@ -23,8 +23,8 @@ class CalculadoraDeImposto:
     """
 
     def __init__(self):
-        self.aliq_pis = 1.65/100
-        self.aliq_cofins = 7.6/100
+        self.aliq_pis = 1.65 / 100
+        self.aliq_cofins = 7.6 / 100
 
     def calculadora_de_tributos(
         self, itens, id_bling, sit, uf_dest
@@ -92,7 +92,9 @@ class CalculadoraDeImposto:
                 icms = item_pedido.valor * aliq_orig
                 difal = item_pedido.valor * aliq_dest
                 pis = (item_pedido.valor - (icms + difal)) * self.aliq_pis
-                cofins = (item_pedido.valor - (icms + difal)) * self.aliq_cofins
+                cofins = (
+                    item_pedido.valor - (icms + difal)
+                ) * self.aliq_cofins
 
             else:
                 logger.info(
@@ -108,7 +110,9 @@ class CalculadoraDeImposto:
                 icms = item_pedido.valor * aliq_orig
                 difal = item_pedido.valor * aliq_dest
                 pis = (item_pedido.valor - (icms + difal)) * self.aliq_pis
-                cofins = (item_pedido.valor - (icms + difal)) * self.aliq_cofins
+                cofins = (
+                    item_pedido.valor - (icms + difal)
+                ) * self.aliq_cofins
                 fcp = item_pedido.valor * aliq_fcp
 
             total = icms + pis + cofins + difal + fcp
@@ -150,4 +154,3 @@ class CalculadoraDeImposto:
         return RetornoImpostos(
             produto_imposto=produtos_com_imposto, venda_imposto=impostos_venda
         )
-    
