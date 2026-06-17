@@ -2,7 +2,7 @@ from __future__ import annotations
 from decimal import Decimal
 from datetime import datetime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, func
+from sqlalchemy import ForeignKey, func, UniqueConstraint
 from lucro_admin.infra.models.base import registro_tabela
 from typing import TYPE_CHECKING
 
@@ -13,6 +13,14 @@ if TYPE_CHECKING:
 @registro_tabela.mapped_as_dataclass
 class ItemPedidoImposto:
   __tablename__= 'itens_pedido_imposto'
+
+  __table_args__=(
+    UniqueConstraint(
+      'id_item_pedido',
+      'tipo_imposto',
+      name='uq_item_pedido_imposto_tipo
+    )
+  )
 
   id_item_pedido_imposto: Mapped[int]= mapped_column(
     primary_key=True,
