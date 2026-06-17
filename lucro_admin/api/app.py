@@ -67,3 +67,16 @@ def read_users(
     )
 
     return {'users': users}
+
+@app.put('/users/{user_id}', response_model=UserPublic)
+def update_user(
+    user_id: int, 
+    user: UserSchema,
+    session: Session= Depends(get_session)
+    ):
+    
+@app.delete('/user/{user_id}')
+def delete_user(
+    user_id: int,
+    session: Session= Depends(get_session)
+)

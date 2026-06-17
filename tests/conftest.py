@@ -46,7 +46,7 @@ def session():
 def user(session):
     user= Usuario(
         nome_usuario='lucroadmintest',
-        email='test@lucro_admin.com',
+        email='test@lucroadmin.com',
         senha_hash='lucro_admin_test',
     )
 
