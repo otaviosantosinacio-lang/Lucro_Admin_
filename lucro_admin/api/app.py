@@ -1,12 +1,13 @@
 from http import HTTPStatus
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 
-from lucro_admin.api.schemas import UserPublic, UserSchema
+from lucro_admin.api.schemas import UserPublic, UserSchema, UserList
 from lucro_admin.infra.models.usuario import Usuario
 from lucro_admin.infra.database import get_session
 
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 app = FastAPI()
 
@@ -20,15 +21,9 @@ def home():
     return boas_vindas
 
 
-@app.post(
-        '/users', 
-        status_code=HTTPStatus.CREATED,
-        response_model=UserPublic
-    )
-def creat_user(user: UserSchema): 
+@app.post('/users', status_code=HTTPStatus.CREATED, response_model=UserPublic)
+def create_user(user: UserSchema, session: Session= Depends(get_session)):
     
-    session= get_session()
-
     db_user= session.scalar(
         select(Usuario).where(
             (Usuario.nome_usuario == user.nome_usuario) | 
@@ -60,3 +55,15 @@ def creat_user(user: UserSchema):
     session.refresh(db_user)
 
     return db_user
+
+@app.get('/users/', response_model=UserList)
+def read_users(
+    limit: int= 100,
+    offset: int= 0,
+    session: Session= Depends(get_session)
+):
+    users= session.scalars(
+        select(Usuario).limit(limit).offset(offset) 
+    )
+
+    return {'users': users}

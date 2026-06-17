@@ -2,9 +2,24 @@ import pytest
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
+from fastapi.testclient import TestClient
 
 from lucro_admin.infra import models
+from lucro_admin.infra.models.usuario import Usuario
+from lucro_admin.infra.database import get_session
+from lucro_admin.api.app import app
 
+@pytest.fixture
+def client(session):
+    def get_session_override():
+        return session
+    
+    with TestClient(app) as client:
+        app.dependency_overrides[get_session] = get_session_override
+
+        yield client
+    
+    app.dependency_overrides.clear()
 
 @pytest.fixture
 def session():
@@ -26,3 +41,17 @@ def session():
         yield session
 
     models.registro_tabela.metadata.drop_all(engine)
+
+@pytest.fixture
+def user(session):
+    user= Usuario(
+        nome_usuario='lucroadmintest',
+        email='test@lucro_admin.com',
+        senha_hash='lucro_admin_test',
+    )
+
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    return user
