@@ -9,17 +9,19 @@ from lucro_admin.infra.models.usuario import Usuario
 from lucro_admin.infra.database import get_session
 from lucro_admin.api.app import app
 
+
 @pytest.fixture
 def client(session):
     def get_session_override():
         return session
-    
+
     with TestClient(app) as client:
         app.dependency_overrides[get_session] = get_session_override
 
         yield client
-    
+
     app.dependency_overrides.clear()
+
 
 @pytest.fixture
 def session():
@@ -42,9 +44,10 @@ def session():
 
     models.registro_tabela.metadata.drop_all(engine)
 
+
 @pytest.fixture
 def user(session):
-    user= Usuario(
+    user = Usuario(
         nome_usuario='lucroadmintest',
         email='test@lucroadmin.com',
         senha_hash='lucro_admin_test',

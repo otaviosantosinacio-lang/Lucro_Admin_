@@ -11,7 +11,8 @@ class UserPublic(BaseModel):
     id_usuario: int
     nome_usuario: str
     email: EmailStr
-    model_config= ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)
+
 
 class UserList(BaseModel):
     users: list[UserPublic]

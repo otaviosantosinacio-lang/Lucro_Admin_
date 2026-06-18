@@ -54,7 +54,7 @@ class RetryPolicy:
                 return response
 
             logger.warning(
-                'Retry Policy | Tentativa %s/%s | Status = %s | Aguardando' \ 
+                'Retry Policy | Tentativa %s/%s | Status = %s | Aguardando'
                 '= %.1f',
                 t,
                 self.max_tentativas,

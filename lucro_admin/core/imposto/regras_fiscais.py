@@ -42,7 +42,7 @@ def icms_aliq(UF: str) -> float | int:
     :param UF: UF destino da venda
     :type UF: str
     :return: Valor da aliquota
-    :rtype: Decimal
+    :rtype: float | int
     """
     try:
         aliquota = icms.get(UF)

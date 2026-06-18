@@ -18,7 +18,7 @@ class Usuario:
 
     senha_hash: Mapped[str] = mapped_column(nullable=False)
 
-    status_usuario: Mapped[str] = mapped_column(
+    status_usuario: Mapped[bool] = mapped_column(
         Boolean,
         init=False,
         nullable=False,
