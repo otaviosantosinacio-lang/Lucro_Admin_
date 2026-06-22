@@ -1,14 +1,14 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
-from lucro_admin.infra.models.usuario import Usuario
-from lucro_admin.infra.database import get_session
 from lucro_admin.api.security import (
     create_access_token,
     verify_password,
 )
-from sqlalchemy import select
-from sqlalchemy.orm import Session
+from lucro_admin.infra.database import get_session
+from lucro_admin.infra.models.usuario import Usuario
 
 router = APIRouter(prefix='/auth', tags=['Auth'])
 

@@ -1,14 +1,14 @@
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
-from fastapi.testclient import TestClient
 
-from lucro_admin.infra import models
-from lucro_admin.infra.models.usuario import Usuario
-from lucro_admin.infra.database import get_session
 from lucro_admin.api.app import app
 from lucro_admin.api.security import get_password_hash
+from lucro_admin.infra import models
+from lucro_admin.infra.database import get_session
+from lucro_admin.infra.models.usuario import Usuario
 
 
 @pytest.fixture
@@ -66,7 +66,7 @@ def user(session):
 @pytest.fixture
 def token(client, user):
     response = client.post(
-        '/token',
+        '/auth/token',
         data={'username': user.email, 'password': user.clean_password},
     )
 

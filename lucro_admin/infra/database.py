@@ -1,6 +1,7 @@
-from lucro_admin.settings import Settings
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
+
+from lucro_admin.settings import Settings
 
 engine = create_engine(Settings().DATABASE_URL)
 

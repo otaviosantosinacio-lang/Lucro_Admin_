@@ -1,5 +1,6 @@
 from jwt import decode
-from lucro_admin.api.security import create_access_token, SECRET_KEY, ALGORITHM
+
+from lucro_admin.api.security import ALGORITHM, SECRET_KEY, create_access_token
 
 
 def test_jwt():
@@ -35,7 +36,6 @@ def test_jwt_invalid_user(client, user, token):
 def test_jwt_invalid_subjetc_email(client, user):
     data = {'no-email': 'test'}
     token = create_access_token(data)
-    breakpoint()
     response = client.delete(
         '/users/1', headers={'Authorization': f'Bearer {token}'}
     )

@@ -1,19 +1,18 @@
-from pwdlib import PasswordHash
-from jwt import encode, decode, DecodeError
-from lucro_admin.utils.time import somandosecs
-from lucro_admin.infra.database import get_session
-from lucro_admin.infra.models.usuario import Usuario
-
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-
-from sqlalchemy.orm import Session
+from jwt import DecodeError, decode, encode
+from pwdlib import PasswordHash
 from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from lucro_admin.infra.database import get_session
+from lucro_admin.infra.models.usuario import Usuario
+from lucro_admin.utils.time import somandosecs
 
 SECRET_KEY = 'otavio_santos_inacio_lucro_admin'
 ALGORITHM = 'HS256'
 ACCESS_TOKEN_EXPIRE_SECONDS = 1800
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth/token')
 pwd_context = PasswordHash.recommended()
 
 

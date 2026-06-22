@@ -1,18 +1,24 @@
-from fastapi import APIRouter, HTTPException, Depends
+from typing import Annotated
 
-from lucro_admin.api.schemas import UserPublic, UserSchema, UserList
-from lucro_admin.infra.models.usuario import Usuario
-from lucro_admin.infra.database import get_session
-from lucro_admin.api.security import get_password_hash, get_current_user
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
-from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
-router = APIRouter(prefix='/users', tags=['Users'],)
+from lucro_admin.api.schemas import UserList, UserPublic, UserSchema
+from lucro_admin.api.security import get_current_user, get_password_hash
+from lucro_admin.infra.database import get_session
+from lucro_admin.infra.models.usuario import Usuario
 
+router = APIRouter(
+    prefix='/users',
+    tags=['Users'],
+)
+
+Sessionn= Annotated[Session, Depends(get_session)]
 
 @router.post('/', status_code=201, response_model=UserPublic)
-def create_user(user: UserSchema, session: Session = Depends(get_session)):
+def create_user(user: UserSchema, session: Sessionn):
 
     db_user = session.scalar(
         select(Usuario).where(
@@ -49,7 +55,7 @@ def create_user(user: UserSchema, session: Session = Depends(get_session)):
 def read_users(
     limit: int = 100,
     offset: int = 0,
-    session: Session = Depends(get_session),
+    session: Sessionn,
     current_user=Depends(get_current_user),
 ):
     users = session.scalars(select(Usuario).limit(limit).offset(offset))
@@ -61,7 +67,7 @@ def read_users(
 def update_user(
     user_id: int,
     user: UserSchema,
-    session: Session = Depends(get_session),
+    session: Sessionn,
     current_user: Usuario = Depends(get_current_user),
 ):
 
@@ -104,7 +110,7 @@ def update_user(
 @router.delete('/{user_id}', status_code=200)
 def delete_user(
     user_id: int,
-    session: Session = Depends(get_session),
+    session: Sessionn,
     current_user: Usuario = Depends(get_current_user),
 ):
 
