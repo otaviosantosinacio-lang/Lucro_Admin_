@@ -4,8 +4,12 @@ from fastapi.security import OAuth2PasswordRequestForm
 from lucro_admin.api.schemas import UserPublic, UserSchema, UserList
 from lucro_admin.infra.models.usuario import Usuario
 from lucro_admin.infra.database import get_session
-from lucro_admin.api.security import get_password_hash, verify_password
-
+from lucro_admin.api.security import (
+    create_access_token, 
+    get_password_hash, 
+    verify_password,
+    get_current_user
+)
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -22,7 +26,10 @@ def home():
 
 
 @app.post('/users', status_code=201, response_model=UserPublic)
-def create_user(user: UserSchema, session: Session = Depends(get_session)):
+def create_user(
+    user: UserSchema,
+    session: Session = Depends(get_session)
+    ):
 
     db_user = session.scalar(
         select(Usuario).where(
@@ -57,7 +64,10 @@ def create_user(user: UserSchema, session: Session = Depends(get_session)):
 
 @app.get('/users/', response_model=UserList)
 def read_users(
-    limit: int = 100, offset: int = 0, session: Session = Depends(get_session)
+    limit: int = 100,
+    offset: int = 0,
+    session: Session = Depends(get_session),
+    current_user= Depends(get_current_user)
 ):
     users = session.scalars(select(Usuario).limit(limit).offset(offset))
 
@@ -66,35 +76,11 @@ def read_users(
 
 @app.put('/users/{user_id}', response_model=UserPublic)
 def update_user(
-    user_id: int, user: UserSchema, session: Session = Depends(get_session)
+    user_id: int,
+    user: UserSchema,
+    session: Session= Depends(get_session),
+    current_user= Usuario= Depends(get_current_user)
 ):
-
-    user_db = session.scalar(
-        select(Usuario).where(Usuario.id_usuario == user_id)
-    )
-
-    if not user_db:
-        raise HTTPException(
-            status_code=404, detail={'message': 'User Not Found'}
-        )
-
-    valid_userdb = session.scalar(
-        select(Usuario).where(
-            (Usuario.nome_usuario == user.nome_usuario)
-            | (Usuario.email == user.email)
-        )
-    )
-
-    if valid_userdb:
-        if user.nome_usuario == valid_userdb.nome_usuario:
-            raise HTTPException(
-                status_code=400, detail={'message': 'Username already exists'}
-            )
-
-        elif user.email == valid_userdb.email:
-            raise HTTPException(
-                status_code=400, detail={'message': 'Email already exists'}
-            )
 
     user_db.nome_usuario = user.nome_usuario
     user_db.email = user.email
@@ -131,22 +117,23 @@ def delete_user(
 def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     session: Session = Depends(get_session),
-): 
-    user= session.scalar(
-        select(Usuario).where(
-            Usuario.email == form_data.username
-        )
+):
+    user = session.scalar(
+        select(Usuario).where(Usuario.email == form_data.username)
     )
 
     if not user:
         raise HTTPException(
-            status_code=401,
-            detail={'message': 'Incorrect email or password'}
+            status_code=401, detail={'message': 'Incorrect email or password'}
         )
 
     if not verify_password(form_data.password, user.senha_hash):
         raise HTTPException(
-            status_code=401,
-            detail={'message': 'Incorrect email or password'}
+            status_code=401, detail={'message': 'Incorrect email or password'}
         )
-        
+
+    access_token= create_access_token(
+        {'sub': user.email}
+    )
+
+    return {'access_token': access_token, 'token_type': 'Bearer'}

@@ -8,6 +8,7 @@ from lucro_admin.infra import models
 from lucro_admin.infra.models.usuario import Usuario
 from lucro_admin.infra.database import get_session
 from lucro_admin.api.app import app
+from lucro_admin.api.security import get_password_hash
 
 
 @pytest.fixture
@@ -47,14 +48,25 @@ def session():
 
 @pytest.fixture
 def user(session):
+    password: str= 'lucro_admin_test'
     user = Usuario(
         nome_usuario='lucroadmintest',
         email='test@lucroadmin.com',
-        senha_hash='lucro_admin_test',
+        senha_hash=get_password_hash(password),
     )
 
     session.add(user)
     session.commit()
     session.refresh(user)
 
+    user.clean_password= password
     return user
+
+@pytest.fixture
+def token(client, user):
+    response= client.post(
+        '/token',
+        data={'username': user.email, 'password': user.clean_password}
+    )
+
+    return response.json()['access_token']

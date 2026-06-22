@@ -17,7 +17,7 @@ class Code:
 
     """
 
-    base_url: str = 'https://www.bling.com.br/Api/v3'
+    base_url: str = 'https://www.api.bling.com.br/Api/v3'
 
     def code_request(self, url, headers, data):
         """
@@ -179,7 +179,7 @@ class Refresh:
         """
 
         logger.info('Bling oAuth Refresh | Configurando as credenciais')
-        url: str = 'https://www.bling.com.br/Api/v3/oauth/token'
+        url: str = 'https://www.api.bling.com.br/Api/v3/oauth/token'
         para64: str = f'{client_id}:{client_secret}'
         # Configurando credênciais conforme documentção da API Bling,
         # codificadas em base64 e separadas por ":"

@@ -1,6 +1,5 @@
 from http import HTTPStatus
 
-from fastapi.testclient import TestClient
 from lucro_admin.api.schemas import UserPublic
 
 
@@ -56,16 +55,12 @@ def test_create_user_exists_email(client, user):
     assert response.json() == {'detail': {'message': 'Email already exists'}}
 
 
-def test_read_users(client):
-    response = client.get('/users/')
-
-    assert response.status_code == HTTPStatus.OK
-    assert response.json() == {'users': []}
-
-
-def test_read_users_with_user(client, user):
+def test_read_user(client, user, token):
     user_schema = UserPublic.model_validate(user).model_dump()
-    response = client.get('/users/')
+    response = client.get(
+        '/users/',
+        headers={'Authorization': f'Bearer {token}'}
+        )
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'users': [user_schema]}
@@ -145,3 +140,16 @@ def test_delete_user_exist(client, user):
 
     assert response.status_code == 404
     assert response.json() == {'detail': {'message': 'User not found'}}
+
+def test_get_token(client, user):
+    response = client.post(
+        '/token',
+        data={'username': user.email, 'password': user.clean_password}
+    )
+
+    token = response.json()
+
+    assert response.status_code == 200
+    assert token['token_type'] == 'Bearer'
+    assert 'access_token' in token
+    
