@@ -58,17 +58,17 @@ def test_create_user_exists_email(client, user):
 def test_read_user(client, user, token):
     user_schema = UserPublic.model_validate(user).model_dump()
     response = client.get(
-        '/users/',
-        headers={'Authorization': f'Bearer {token}'}
-        )
+        '/users/', headers={'Authorization': f'Bearer {token}'}
+    )
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'users': [user_schema]}
 
 
-def test_update_user(client, user):
+def test_update_user(client, user, token):
     response = client.put(
         '/users/1',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'nome_usuario': 'lucroadmintestupdate',
             'email': 'test_update@lucroadmin.com',
@@ -84,9 +84,10 @@ def test_update_user(client, user):
     }
 
 
-def test_update_user_notfound(client, user):
+def test_update_user_notfound(client, user, token):
     response = client.put(
         '/users/2',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'nome_usuario': 'lucroadmintestupdate',
             'email': 'test_update@lucroadmin.com',
@@ -94,13 +95,14 @@ def test_update_user_notfound(client, user):
         },
     )
 
-    assert response.status_code == 404
-    assert response.json() == {'detail': {'message': 'User Not Found'}}
+    assert response.status_code == 403
+    assert response.json() == {'detail': 'Not enough permissions'}
 
 
-def test_update_user_exist_username(client, user):
+def test_update_user_exist_username(client, user, token):
     response = client.put(
         '/users/1',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'nome_usuario': 'lucroadmintest',
             'email': 'test_update@lucroadmin.com',
@@ -114,9 +116,10 @@ def test_update_user_exist_username(client, user):
     }
 
 
-def test_update_user_exist_email(client, user):
+def test_update_user_exist_email(client, user, token):
     response = client.put(
         '/users/1',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'nome_usuario': 'lucroadmintestupdate',
             'email': 'test@lucroadmin.com',
@@ -128,23 +131,29 @@ def test_update_user_exist_email(client, user):
     assert response.json() == {'detail': {'message': 'Email already exists'}}
 
 
-def test_delete_user(client, user):
-    response = client.delete('/users/1')
+def test_delete_user(client, user, token):
+    response = client.delete(
+        f'/users/{user.id_usuario}',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     assert response.status_code == 200
     assert response.json() == {'message': 'User delete'}
 
 
-def test_delete_user_exist(client, user):
-    response = client.delete('/users/2')
+def test_delete_user_enougth_permission(client, user, token):
+    response = client.delete(
+        f'/users/2', headers={'Authorization': f'Bearer {token}'}
+    )
 
-    assert response.status_code == 404
-    assert response.json() == {'detail': {'message': 'User not found'}}
+    assert response.status_code == 403
+    assert response.json() == {'detail': 'Not enough permissions'}
+
 
 def test_get_token(client, user):
     response = client.post(
         '/token',
-        data={'username': user.email, 'password': user.clean_password}
+        data={'username': user.email, 'password': user.clean_password},
     )
 
     token = response.json()
@@ -152,4 +161,28 @@ def test_get_token(client, user):
     assert response.status_code == 200
     assert token['token_type'] == 'Bearer'
     assert 'access_token' in token
-    
+
+
+def test_get_token_email_incorrect(client, user):
+    user.email_fail = 'test@testlucroadmin.com'
+    response = client.post(
+        '/token',
+        data={'username': user.email_fail, 'password': user.clean_password},
+    )
+
+    token = response.json()
+
+    assert response.status_code == 401
+    assert token['detail'] == {'message': 'Incorrect email or password'}
+
+
+def test_get_token_password_incorrect(client, user):
+    user.password_fail = 'test13579857'
+    response = client.post(
+        '/token', data={'username': user.email, 'password': user.password_fail}
+    )
+
+    token = response.json()
+
+    assert response.status_code == 401
+    assert token['detail'] == {'message': 'Incorrect email or password'}

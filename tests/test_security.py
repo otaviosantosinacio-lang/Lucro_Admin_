@@ -3,7 +3,6 @@ from lucro_admin.api.security import create_access_token, SECRET_KEY, ALGORITHM
 
 
 def test_jwt():
-
     data = {'test': 'test'}
     token = create_access_token(data)
 
@@ -11,3 +10,35 @@ def test_jwt():
 
     assert decoded['test'] == data['test']
     assert 'exp' in decoded
+
+
+def test_jwt_invalid_token(client):
+    response = client.delete(
+        '/users/1', headers={'Authorization': 'Bearer invalid-token'}
+    )
+
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Could not validate credentials'}
+
+
+def test_jwt_invalid_user(client, user, token):
+
+    user.email = ''
+    response = client.delete(
+        '/users/1', headers={'Authorization': f'Bearer {token}'}
+    )
+
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Could not validate credentials'}
+
+
+def test_jwt_invalid_subjetc_email(client, user):
+    data = {'no-email': 'test'}
+    token = create_access_token(data)
+    breakpoint()
+    response = client.delete(
+        '/users/1', headers={'Authorization': f'Bearer {token}'}
+    )
+
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Could not validate credentials'}
