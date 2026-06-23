@@ -1,7 +1,8 @@
 import pytest
+import pytest_asyncio
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, event
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession 
+from sqlalchemy import event
 from sqlalchemy.pool import StaticPool
 
 from lucro_admin.api.app import app
@@ -13,7 +14,7 @@ from lucro_admin.settings import Settings
 
 
 @pytest.fixture
-def client(session):
+def client(session: AsyncSession):
     def get_session_override():
         return session
 
@@ -25,10 +26,10 @@ def client(session):
     app.dependency_overrides.clear()
 
 
-@pytest.fixture
-def session():
-    engine = create_engine(
-        'sqlite:///:memory:',
+@pytest_asyncio.fixture
+async def session():
+    engine = create_async_engine(
+        'sqlite+aiosqlite:///:memory:',
         connect_args={'check_same_thread': False},
         poolclass=StaticPool,
     )
@@ -39,16 +40,18 @@ def session():
         cursor.execute('PRAGMA foreign_keys=ON')
         cursor.close()
 
-    models.registro_tabela.metadata.create_all(engine)
+    async with engine.begin() as conn:
+        await conn.run_sync(models.registro_tabela.metadata.create_all)
 
-    with Session(engine) as session:
+    async with AsyncSession(engine, expire_on_commit=False) as session:
         yield session
 
-    models.registro_tabela.metadata.drop_all(engine)
+    async with engine.begin() as conn:
+        await conn.run_sync(models.registro_tabela.metadata.drop_all)
 
 
 @pytest.fixture
-def user(session):
+def user(session: AsyncSession):
     password: str = 'lucro_admin_test'
     user = Usuario(
         nome_usuario='lucroadmintest',

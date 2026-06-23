@@ -1,9 +1,9 @@
 from http import HTTPStatus
-
+import pytest
 from lucro_admin.api.schemas import UserPublic
 
-
-def test_create_user(client):
+@pytest.mark.asyncio
+async def test_create_user(client):
 
     response = client.post(
         '/users',
