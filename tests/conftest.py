@@ -9,6 +9,7 @@ from lucro_admin.api.security import get_password_hash
 from lucro_admin.infra import models
 from lucro_admin.infra.database import get_session
 from lucro_admin.infra.models.usuario import Usuario
+from lucro_admin.settings import Settings
 
 
 @pytest.fixture
@@ -71,3 +72,8 @@ def token(client, user):
     )
 
     return response.json()['access_token']
+
+
+@pytest.fixture
+def settings():
+    return Settings()

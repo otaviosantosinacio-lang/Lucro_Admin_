@@ -1,11 +1,16 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from lucro_admin.api.schemas import UserList, UserPublic, UserSchema
+from lucro_admin.api.schemas import (
+    UserList,
+    UserPublic,
+    UserSchema,
+    FilterPage,
+)
 from lucro_admin.api.security import get_current_user, get_password_hash
 from lucro_admin.infra.database import get_session
 from lucro_admin.infra.models.usuario import Usuario
@@ -15,10 +20,13 @@ router = APIRouter(
     tags=['Users'],
 )
 
-Sessionn= Annotated[Session, Depends(get_session)]
+T_Session = Annotated[Session, Depends(get_session)]
+current_user = Annotated[Usuario, Depends(get_current_user)]
+filter_page = Annotated[FilterPage, Query()]
+
 
 @router.post('/', status_code=201, response_model=UserPublic)
-def create_user(user: UserSchema, session: Sessionn):
+async def create_user(user: UserSchema, session: T_Session):
 
     db_user = session.scalar(
         select(Usuario).where(
@@ -40,7 +48,7 @@ def create_user(user: UserSchema, session: Sessionn):
 
     db_user = Usuario(
         nome_usuario=user.nome_usuario,
-        email=user.email,
+        email=user.email,   
         senha_hash=get_password_hash(user.senha_hash),
     )
 
@@ -52,23 +60,22 @@ def create_user(user: UserSchema, session: Sessionn):
 
 
 @router.get('/', response_model=UserList)
-def read_users(
-    limit: int = 100,
-    offset: int = 0,
-    session: Sessionn,
-    current_user=Depends(get_current_user),
+async def read_users(
+    session: T_Session, current_user: current_user, filter_page: filter_page
 ):
-    users = session.scalars(select(Usuario).limit(limit).offset(offset))
+    users = session.scalars(
+        select(Usuario).limit(filter_page.limit).offset(filter_page.offset)
+    )
 
     return {'users': users}
 
 
 @router.put('/{user_id}', response_model=UserPublic)
-def update_user(
+async def update_user(
     user_id: int,
     user: UserSchema,
-    session: Sessionn,
-    current_user: Usuario = Depends(get_current_user),
+    session: T_Session,
+    current_user: current_user,
 ):
 
     if current_user.id_usuario != user_id:
@@ -108,10 +115,10 @@ def update_user(
 
 
 @router.delete('/{user_id}', status_code=200)
-def delete_user(
+async def delete_user(
     user_id: int,
-    session: Sessionn,
-    current_user: Usuario = Depends(get_current_user),
+    session: T_Session,
+    current_user: current_user,
 ):
 
     if current_user.id_usuario != user_id:

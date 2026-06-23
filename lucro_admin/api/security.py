@@ -8,10 +8,9 @@ from sqlalchemy.orm import Session
 from lucro_admin.infra.database import get_session
 from lucro_admin.infra.models.usuario import Usuario
 from lucro_admin.utils.time import somandosecs
+from lucro_admin.settings import Settings
 
-SECRET_KEY = 'otavio_santos_inacio_lucro_admin'
-ALGORITHM = 'HS256'
-ACCESS_TOKEN_EXPIRE_SECONDS = 1800
+settings = Settings()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth/token')
 pwd_context = PasswordHash.recommended()
 
@@ -27,16 +26,19 @@ def verify_password(plain_password: str, hashed_password: str):
 def create_access_token(data: dict):
     to_encode = data.copy()
 
-    expire = somandosecs(ACCESS_TOKEN_EXPIRE_SECONDS)
+    expire = somandosecs(settings.ACCESS_TOKEN_EXPIRE_SECONDS)
 
     to_encode.update({'exp': expire})
 
-    encode_jwt = encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encode_jwt = encode(
+        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+    )
 
     return encode_jwt
 
 
 def get_current_user(
+    settings,
     session: Session = Depends(get_session),
     token: str = Depends(oauth2_scheme),
 ):
@@ -48,7 +50,9 @@ def get_current_user(
     )
 
     try:
-        payload = decode(token, SECRET_KEY, algorithms=ALGORITHM)
+        payload = decode(
+            token, settings.SECRET_KEY, algorithms=settings.ALGORITHM
+        )
         subject_email = payload.get('sub')
         if not subject_email:
             raise credentials_exception

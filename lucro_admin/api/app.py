@@ -8,7 +8,7 @@ app.include_router(auth.router)
 
 
 @app.get('/', tags=['Home'])
-def home():
+async def home():
     boas_vindas = {
         'Olá usuário, seja bem-vindo ao Lucro Admin, um sistema financeiro'
         ' para gerenciamento das suas vendas'
