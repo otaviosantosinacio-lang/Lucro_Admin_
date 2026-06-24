@@ -2,9 +2,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from lucro_admin.api.security import (
     create_access_token,
@@ -15,7 +14,7 @@ from lucro_admin.infra.models.usuario import Usuario
 
 router = APIRouter(prefix='/auth', tags=['Auth'])
 
-T_Session = Annotated[Session, Depends(get_session)]
+T_Session = Annotated[AsyncSession, Depends(get_session)]
 form_data = Annotated[OAuth2PasswordRequestForm, Depends()]
 
 
@@ -24,7 +23,7 @@ async def login_for_access_token(
     session: T_Session,
     form_data: form_data,
 ):
-    user = session.scalar(
+    user = await session.scalar(
         select(Usuario).where(Usuario.email == form_data.username)
     )
 

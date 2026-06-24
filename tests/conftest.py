@@ -1,8 +1,8 @@
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession 
 from sqlalchemy import event
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.pool import StaticPool
 
 from lucro_admin.api.app import app
@@ -34,7 +34,7 @@ async def session():
         poolclass=StaticPool,
     )
 
-    @event.listens_for(engine, 'connect')
+    @event.listens_for(engine.sync_engine, 'connect')
     def ativar_foreign_keys(dbapi_connection, connection_record):
         cursor = dbapi_connection.cursor()
         cursor.execute('PRAGMA foreign_keys=ON')
@@ -50,8 +50,8 @@ async def session():
         await conn.run_sync(models.registro_tabela.metadata.drop_all)
 
 
-@pytest.fixture
-def user(session: AsyncSession):
+@pytest_asyncio.fixture
+async def user(session: AsyncSession):
     password: str = 'lucro_admin_test'
     user = Usuario(
         nome_usuario='lucroadmintest',
@@ -60,8 +60,8 @@ def user(session: AsyncSession):
     )
 
     session.add(user)
-    session.commit()
-    session.refresh(user)
+    await session.commit()
+    await session.refresh(user)
 
     user.clean_password = password
     return user

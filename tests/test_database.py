@@ -1,7 +1,9 @@
 from datetime import date
 from decimal import Decimal
 
+import pytest
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from lucro_admin.infra.models.item_pedido import ItemPedido
 from lucro_admin.infra.models.item_pedido_imposto import ItemPedidoImposto
@@ -13,7 +15,8 @@ from lucro_admin.infra.models.situacao_pedidos_bling import SituacaoPedidoBling
 from lucro_admin.infra.models.usuario import Usuario
 
 
-def teste_criar_usuario(session):
+@pytest.mark.asyncio
+async def teste_criar_usuario(session: AsyncSession):
 
     usuario = Usuario(
         nome_usuario='otavio123',
@@ -22,31 +25,36 @@ def teste_criar_usuario(session):
     )
 
     session.add(usuario)
-    session.commit()
+    await session.commit()
 
-    resultado = session.scalar(
+    resultado = await session.scalar(
         select(Usuario).where(Usuario.email == 'otavio@lucro_admin.com')
     )
+
+    assert resultado is not None
     assert resultado.nome_usuario == 'otavio123'
 
 
-def teste_criar_situacao_pedido_bling(session):
+@pytest.mark.asyncio
+async def teste_criar_situacao_pedido_bling(session: AsyncSession):
 
     situacao_pedido = SituacaoPedidoBling(9, 'Atendido', 'Azul')
 
     session.add(situacao_pedido)
-    session.commit()
+    await session.commit()
 
-    resultado = session.scalar(
+    resultado = await session.scalar(
         select(SituacaoPedidoBling).where(
             SituacaoPedidoBling.id_situacao_bling == 9
         )
     )
 
+    assert resultado is not None
     assert resultado.nome_situacao == 'Atendido'
 
 
-def teste_criar_produto(session):
+@pytest.mark.asyncio
+async def teste_criar_produto(session: AsyncSession):
 
     usuario = Usuario(
         nome_usuario='otavio123',
@@ -65,19 +73,21 @@ def teste_criar_produto(session):
     )
 
     session.add(usuario)
-    session.flush()
+    await session.flush()
 
     session.add(produto)
-    session.commit()
+    await session.commit()
 
-    resultado = session.scalar(
+    resultado = await session.scalar(
         select(Produto).where(Produto.id_produto_bling == 13579)
     )
 
+    assert resultado is not None
     assert resultado.sku == 'LADM0001'
 
 
-def teste_criando_marketplace(session):
+@pytest.mark.asyncio
+async def teste_criando_marketplace(session):
 
     usuario = Usuario(
         nome_usuario='otavio123',
@@ -92,19 +102,20 @@ def teste_criando_marketplace(session):
     )
 
     session.add(usuario)
-    session.flush()
+    await session.flush()
 
     session.add(marketplace)
-    session.commit()
+    await session.commit()
 
-    resultado = session.scalar(
+    resultado = await session.scalar(
         select(Marketplace).where(Marketplace.id_marketplace == 1)
     )
 
     assert resultado.nome_marketplace == 'Lucro Admin Shop'
 
 
-def teste_criando_pedido(session):
+@pytest.mark.asyncio
+async def teste_criando_pedido(session: AsyncSession):
 
     usuario = Usuario(
         nome_usuario='otavio123',
@@ -122,7 +133,7 @@ def teste_criando_pedido(session):
 
     session.add_all([usuario, marketplace, situacao_pedido])
 
-    session.flush()
+    await session.flush()
 
     pedido = Pedido(
         id_bling=120543543,
@@ -138,14 +149,18 @@ def teste_criando_pedido(session):
     )
 
     session.add(pedido)
-    session.commit()
+    await session.commit()
 
-    resultado = session.scalar(select(Pedido).where(Pedido.num_bling == 12387))
+    resultado = await session.scalar(
+        select(Pedido).where(Pedido.num_bling == 12387)
+    )
 
+    assert resultado is not None
     assert resultado.id_pedido_marketplace == 20000456382042
 
 
-def teste_criando_item_pedido(session):
+@pytest.mark.asyncio
+async def teste_criando_item_pedido(session: AsyncSession):
 
     usuario = Usuario(
         nome_usuario='otavio123',
@@ -186,7 +201,7 @@ def teste_criando_item_pedido(session):
 
     session.add_all([usuario, marketplace, situacao_pedido, pedido, produto])
 
-    session.flush()
+    await session.flush()
 
     item_pedido = ItemPedido(
         id_pedido=1,
@@ -202,16 +217,18 @@ def teste_criando_item_pedido(session):
     )
 
     session.add(item_pedido)
-    session.commit()
+    await session.commit()
 
-    resultado = session.scalar(
+    resultado = await session.scalar(
         select(ItemPedido).where(ItemPedido.id_situacao == 1)
     )
 
+    assert resultado is not None
     assert resultado.id_pedido == 1
 
 
-def teste_criando_item_pedido_imposto(session):
+@pytest.mark.asyncio
+async def teste_criando_item_pedido_imposto(session: AsyncSession):
     usuario = Usuario(
         nome_usuario='otavio123',
         email='otavio@lucro_admin.com',
@@ -271,7 +288,7 @@ def teste_criando_item_pedido_imposto(session):
         item_pedido,
     ])
 
-    session.flush()
+    await session.flush()
 
     item_pedido_imposto = ItemPedidoImposto(
         id_item_pedido=1,
@@ -283,16 +300,18 @@ def teste_criando_item_pedido_imposto(session):
     )
 
     session.add(item_pedido_imposto)
-    session.commit()
+    await session.commit()
 
-    resultado = session.scalar(
+    resultado = await session.scalar(
         select(ItemPedidoImposto).where(ItemPedidoImposto.id_item_pedido == 1)
     )
 
+    assert resultado is not None
     assert resultado.id_item_pedido_imposto == 1
 
 
-def test_criando_nota_fiscal(session):
+@pytest.mark.asyncio
+async def test_criando_nota_fiscal(session: AsyncSession):
     usuario = Usuario(
         nome_usuario='otavio123',
         email='otavio@lucro_admin.com',
@@ -332,7 +351,7 @@ def test_criando_nota_fiscal(session):
 
     session.add_all([usuario, produto, marketplace, situacao_pedido, pedido])
 
-    session.flush()
+    await session.flush()
 
     nota_fiscal = NotaFiscal(
         id_pedido=1,
@@ -347,8 +366,11 @@ def test_criando_nota_fiscal(session):
     )
 
     session.add(nota_fiscal)
-    session.commit()
+    await session.commit()
 
-    resultado = session.scalar(select(NotaFiscal).where(NotaFiscal.id_nf == 1))
+    resultado = await session.scalar(
+        select(NotaFiscal).where(NotaFiscal.id_nf == 1)
+    )
 
+    assert resultado is not None
     assert resultado.id_nf == 1

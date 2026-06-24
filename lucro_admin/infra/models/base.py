@@ -1,4 +1,5 @@
 from sqlalchemy import MetaData
+from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import registry
 
 convention = {
@@ -10,3 +11,7 @@ convention = {
 }
 
 registro_tabela = registry(metadata=MetaData(naming_convention=convention))
+
+
+class BaseModel(AsyncAttrs):
+    pass

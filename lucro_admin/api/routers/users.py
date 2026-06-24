@@ -3,13 +3,13 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from lucro_admin.api.schemas import (
+    FilterPage,
     UserList,
     UserPublic,
     UserSchema,
-    FilterPage,
 )
 from lucro_admin.api.security import get_current_user, get_password_hash
 from lucro_admin.infra.database import get_session
@@ -20,7 +20,7 @@ router = APIRouter(
     tags=['Users'],
 )
 
-T_Session = Annotated[Session, Depends(get_session)]
+T_Session = Annotated[AsyncSession, Depends(get_session)]
 current_user = Annotated[Usuario, Depends(get_current_user)]
 filter_page = Annotated[FilterPage, Query()]
 
@@ -28,7 +28,7 @@ filter_page = Annotated[FilterPage, Query()]
 @router.post('/', status_code=201, response_model=UserPublic)
 async def create_user(user: UserSchema, session: T_Session):
 
-    db_user = session.scalar(
+    db_user = await session.scalar(
         select(Usuario).where(
             (Usuario.nome_usuario == user.nome_usuario)
             | (Usuario.email == user.email)
@@ -48,13 +48,13 @@ async def create_user(user: UserSchema, session: T_Session):
 
     db_user = Usuario(
         nome_usuario=user.nome_usuario,
-        email=user.email,   
+        email=user.email,
         senha_hash=get_password_hash(user.senha_hash),
     )
 
     session.add(db_user)
-    session.commit()
-    session.refresh(db_user)
+    await session.commit()
+    await session.refresh(db_user)
 
     return db_user
 
@@ -63,7 +63,7 @@ async def create_user(user: UserSchema, session: T_Session):
 async def read_users(
     session: T_Session, current_user: current_user, filter_page: filter_page
 ):
-    users = session.scalars(
+    users = await session.scalars(
         select(Usuario).limit(filter_page.limit).offset(filter_page.offset)
     )
 
@@ -81,7 +81,7 @@ async def update_user(
     if current_user.id_usuario != user_id:
         raise HTTPException(status_code=403, detail='Not enough permissions')
 
-    valid_userdb = session.scalar(
+    valid_userdb = await session.scalar(
         select(Usuario).where(
             (Usuario.nome_usuario == user.nome_usuario)
             | (Usuario.email == user.email)
@@ -108,8 +108,8 @@ async def update_user(
         )
 
     session.add(current_user)
-    session.commit()
-    session.refresh(current_user)
+    await session.commit()
+    await session.refresh(current_user)
 
     return current_user
 
@@ -126,5 +126,5 @@ async def delete_user(
 
     current_user.status_usuario = False
     session.add(current_user)
-    session.commit()
+    await session.commit()
     return {'message': 'User delete'}

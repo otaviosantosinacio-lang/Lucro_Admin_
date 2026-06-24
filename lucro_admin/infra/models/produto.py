@@ -7,14 +7,14 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from lucro_admin.infra.models.base import registro_tabela
+from lucro_admin.infra.models.base import BaseModel, registro_tabela
 
 if TYPE_CHECKING:
     from lucro_admin.infra.models.usuario import Usuario
 
 
 @registro_tabela.mapped_as_dataclass
-class Produto:
+class Produto(BaseModel):
     __tablename__ = 'produtos'
 
     id_produto: Mapped[int] = mapped_column(init=False, primary_key=True)

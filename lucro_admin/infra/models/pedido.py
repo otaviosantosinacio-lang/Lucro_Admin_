@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from lucro_admin.infra.models.base import registro_tabela
+from lucro_admin.infra.models.base import BaseModel, registro_tabela
 
 if TYPE_CHECKING:
     from lucro_admin.infra.models.marketplace import Marketplace
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 
 @registro_tabela.mapped_as_dataclass
-class Pedido:
+class Pedido(BaseModel):
     __tablename__ = 'pedidos'
 
     id_pedido: Mapped[int] = mapped_column(init=False, primary_key=True)

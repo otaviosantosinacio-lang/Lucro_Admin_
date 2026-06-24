@@ -3,11 +3,11 @@ from datetime import datetime
 from sqlalchemy import Boolean, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from lucro_admin.infra.models.base import registro_tabela
+from lucro_admin.infra.models.base import BaseModel, registro_tabela
 
 
 @registro_tabela.mapped_as_dataclass
-class Usuario:
+class Usuario(BaseModel):
     __tablename__ = 'usuarios'
 
     id_usuario: Mapped[int] = mapped_column(init=False, primary_key=True)

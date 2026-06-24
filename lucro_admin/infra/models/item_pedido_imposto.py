@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from lucro_admin.infra.models.base import registro_tabela
+from lucro_admin.infra.models.base import BaseModel, registro_tabela
 
 if TYPE_CHECKING:
     from lucro_admin.infra.models.item_pedido import ItemPedido
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 @registro_tabela.mapped_as_dataclass
-class ItemPedidoImposto:
+class ItemPedidoImposto(BaseModel):
     __tablename__ = 'itens_pedido_imposto'
 
     __table_args__ = (
