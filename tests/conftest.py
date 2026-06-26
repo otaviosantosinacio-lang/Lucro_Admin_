@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.pool import StaticPool
+import factory
 
 from lucro_admin.api.app import app
 from lucro_admin.api.security import get_password_hash
@@ -76,6 +77,17 @@ def token(client, user):
 
     return response.json()['access_token']
 
+class UserFactory(factory.Factory):
+    class Meta:
+        model= Usuario
+    
+    nome_usuario= factory.Sequence(lambda n: f'test{n}')
+    email= factory.LazyAttribute(
+        lambda obj: f'{obj.nome_usuario}@lucroadmintest.com'
+        )
+    senha_hash= factory.LazyAttribute(
+        lambda obj: f'{obj.nome_usuario}@lucroadmintest.com'
+        )
 
 @pytest.fixture
 def settings():

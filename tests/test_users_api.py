@@ -149,3 +149,5 @@ def test_delete_user_enougth_permission(client, user, token):
 
     assert response.status_code == 403
     assert response.json() == {'detail': 'Not enough permissions'}
+
+

@@ -595,6 +595,43 @@ dnspython = ">=2.0.0"
 idna = ">=2.0.0"
 
 [[package]]
+name = "factory-boy"
+version = "3.3.3"
+description = "A versatile test fixtures replacement based on thoughtbot's factory_bot for Ruby."
+optional = false
+python-versions = ">=3.8"
+groups = ["dev"]
+files = [
+    {file = "factory_boy-3.3.3-py2.py3-none-any.whl", hash = "sha256:1c39e3289f7e667c4285433f305f8d506efc2fe9c73aaea4151ebd5cdea394fc"},
+    {file = "factory_boy-3.3.3.tar.gz", hash = "sha256:866862d226128dfac7f2b4160287e899daf54f2612778327dd03d0e2cb1e3d03"},
+]
+
+[package.dependencies]
+Faker = ">=0.7.0"
+
+[package.extras]
+dev = ["Django", "Pillow", "SQLAlchemy", "coverage", "flake8", "isort", "mongoengine", "mongomock", "mypy", "tox", "wheel (>=0.32.0)", "zest.releaser[recommended]"]
+doc = ["Sphinx", "sphinx-rtd-theme", "sphinxcontrib-spelling"]
+
+[[package]]
+name = "faker"
+version = "40.23.0"
+description = "Faker is a Python package that generates fake data for you."
+optional = false
+python-versions = ">=3.10"
+groups = ["dev"]
+files = [
+    {file = "faker-40.23.0-py3-none-any.whl", hash = "sha256:775922453e54afa42eaf60eac478fa3a969357f224d09a8022b93e3ad88f18ae"},
+    {file = "faker-40.23.0.tar.gz", hash = "sha256:f135e563f1f95f19346bb680bc2e43570bc43b7893e566023746f51f32c69dfc"},
+]
+
+[package.dependencies]
+tzdata = {version = "*", markers = "platform_system == \"Windows\""}
+
+[package.extras]
+tzdata = ["tzdata"]
+
+[[package]]
 name = "fastapi"
 version = "0.136.3"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -2359,11 +2396,12 @@ version = "2026.2"
 description = "Provider of IANA time zone data"
 optional = false
 python-versions = ">=2"
-groups = ["main"]
+groups = ["main", "dev"]
 files = [
     {file = "tzdata-2026.2-py2.py3-none-any.whl", hash = "sha256:bbe9af844f658da81a5f95019480da3a89415801f6cc966806612cc7169bffe7"},
     {file = "tzdata-2026.2.tar.gz", hash = "sha256:9173fde7d80d9018e02a662e168e5a2d04f87c41ea174b139fbef642eda62d10"},
 ]
+markers = {dev = "platform_system == \"Windows\""}
 
 [[package]]
 name = "urllib3"
@@ -2668,4 +2706,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12, <4.0"
-content-hash = "3a0292ae4be0f49d29bf3a44d28e440f535d0827e3e6d7c15fc11d45060da9f7"
+content-hash = "123ab2e2b84aa3dee27ead67854acf3570ac5b8e4014473cc888e319bc9207d3"
