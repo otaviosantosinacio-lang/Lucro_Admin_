@@ -54,12 +54,7 @@ async def session():
 @pytest_asyncio.fixture
 async def user(session: AsyncSession):
     password: str = 'lucro_admin_test'
-    user = Usuario(
-        nome_usuario='lucroadmintest',
-        email='test@lucroadmin.com',
-        senha_hash=get_password_hash(password),
-    )
-
+    user = UserFactory(senha_hash=get_password_hash(password))
     session.add(user)
     await session.commit()
     await session.refresh(user)
@@ -67,6 +62,16 @@ async def user(session: AsyncSession):
     user.clean_password = password
     return user
 
+@pytest_asyncio.fixture
+async def other_user(session: AsyncSession):
+    password: str = 'lucro_admin_test'
+    user = UserFactory(senha_hash=get_password_hash(password))
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+
+    user.clean_password = password
+    return user
 
 @pytest.fixture
 def token(client, user):
