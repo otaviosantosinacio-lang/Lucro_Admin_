@@ -132,19 +132,19 @@ def test_update_user_exist_email(client, user, other_user, token):
 
 
 def test_update_user_with_wrong_user(client, token, other_user):
-    response= client.put(
+    response = client.put(
         f'/users/{other_user.id_usuario}',
-        headers= {'Authorization': f'Bearer {token}'},
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'nome_usuario': 'lucroadmintestupdate',
             'email': 'test_update@lucroadmin.com',
-            'senha_hash': 'lucro_admin_test_update'
-        }
+            'senha_hash': 'lucro_admin_test_update',
+        },
     )
 
     assert response.json() == {'detail': 'Not enough permissions'}
     assert response.status_code == 403
-    
+
 
 def test_delete_user(client, user, token):
     response = client.delete(
@@ -158,10 +158,9 @@ def test_delete_user(client, user, token):
 
 def test_delete_user_enougth_permission(client, other_user, token):
     response = client.delete(
-        f'/users/{other_user.id_usuario}', headers={'Authorization': f'Bearer {token}'}
+        f'/users/{other_user.id_usuario}',
+        headers={'Authorization': f'Bearer {token}'},
     )
 
     assert response.status_code == 403
     assert response.json() == {'detail': 'Not enough permissions'}
-
-

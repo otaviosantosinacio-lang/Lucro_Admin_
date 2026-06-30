@@ -16,6 +16,7 @@ class Code:
     e Refresh Token
 
     """
+
     def __init__(self):
         self.timeout = 30
 

@@ -15,6 +15,7 @@ class Request:
     Base para os requests get do bling
 
     """
+
     def __init__(self):
         self.timeout: int = 30
 
@@ -42,7 +43,6 @@ class Request:
 
 
 class GetBling:
-
     def __init__(self):
         self.request = Request()
 

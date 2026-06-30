@@ -12,10 +12,14 @@ base_url: str = 'https://api.mercadolibre.com/oauth/token'
 
 
 class Code:
+
+    def __init__(self):
+        self.timeout = 20
+
     def code_request(self, headers, data) -> requests.Response:
 
         return requests.post(
-            url=base_url, headers=headers, data=data, timeout=20
+            url=base_url, headers=headers, data=data, timeout=self.timeout
         )
 
     def troca_code_por_tokens(
@@ -98,11 +102,17 @@ class Code:
 
 
 class RefreshML:
+
+    def __init__(self):
+        self.timeout = 20
+
     def refresh_request(
         self, url: str, headers: dict[str, str], data: str
     ) -> requests.Response:
 
-        return requests.post(url=url, headers=headers, data=data, timeout=20)
+        return requests.post(
+            url=url, headers=headers, data=data, timeout=self.timeout
+        )
 
     def usando_refresh_token(
         self, client_id: str, client_secret: str, refresh_token: str

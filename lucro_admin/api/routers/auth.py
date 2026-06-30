@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from lucro_admin.api.security import (
     create_access_token,
     verify_password,
-    get_current_user
+    get_current_user,
 )
 from lucro_admin.infra.database import get_session
 from lucro_admin.infra.models.usuario import Usuario
@@ -42,9 +42,10 @@ async def login_for_access_token(
 
     return {'access_token': access_token, 'token_type': 'Bearer'}
 
+
 @router.post('/refresh_token')
 async def refresh_access_token(
-    usuario: Annotated[Usuario, Depends(get_current_user)]
+    usuario: Annotated[Usuario, Depends(get_current_user)],
 ):
-    new_access_token= create_access_token(data={'sub': usuario.email})
+    new_access_token = create_access_token(data={'sub': usuario.email})
     return {'access_token': new_access_token, 'token_type': 'Bearer'}

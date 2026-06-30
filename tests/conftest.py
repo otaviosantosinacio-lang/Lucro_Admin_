@@ -62,6 +62,7 @@ async def user(session: AsyncSession):
     user.clean_password = password
     return user
 
+
 @pytest_asyncio.fixture
 async def other_user(session: AsyncSession):
     password: str = 'lucro_admin_test'
@@ -73,6 +74,7 @@ async def other_user(session: AsyncSession):
     user.clean_password = password
     return user
 
+
 @pytest.fixture
 def token(client, user):
     response = client.post(
@@ -82,17 +84,19 @@ def token(client, user):
 
     return response.json()['access_token']
 
+
 class UserFactory(factory.Factory):
     class Meta:
-        model= Usuario
-    
-    nome_usuario= factory.Sequence(lambda n: f'test{n}')
-    email= factory.LazyAttribute(
+        model = Usuario
+
+    nome_usuario = factory.Sequence(lambda n: f'test{n}')
+    email = factory.LazyAttribute(
         lambda obj: f'{obj.nome_usuario}@lucroadmintest.com'
-        )
-    senha_hash= factory.LazyAttribute(
+    )
+    senha_hash = factory.LazyAttribute(
         lambda obj: f'{obj.nome_usuario}@lucroadmintest.com'
-        )
+    )
+
 
 @pytest.fixture
 def settings():
