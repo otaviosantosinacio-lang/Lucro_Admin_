@@ -15,6 +15,8 @@ class Request:
     Base para os requests get do bling
 
     """
+    def __init__(self):
+        self.timeout: int = 30
 
     def request_endpoint(
         self, url: str, headers: dict[str, str]
@@ -36,10 +38,14 @@ class Request:
             'Bling request_pedidos | Enviando requisição para o end point %s',
             url,
         )
-        return get(url=url, headers=headers, timeout=20)
+        return get(url=url, headers=headers, timeout=self.timeout)
 
 
 class GetBling:
+
+    def __init__(self):
+        self.request = Request()
+
     def get_endpoints_bling(self, access_token: str, url: str):
         """
         :param self: Objeto
@@ -57,9 +63,8 @@ class GetBling:
             'enable_jwt': '1',
         }
 
-        request = Request()
         response = retry_policy.executa(
-            lambda: request.request_endpoint(url, headers)
+            lambda: self.request.request_endpoint(url, headers)
         )
         logger.info(
             'Bling get_endpoints_bling | Retorno da requisição é %s',
@@ -75,6 +80,9 @@ class GetUrlXML:
 
     """
 
+    def __init__(self):
+        self.timeout: int = 30
+
     def request_xml_endpoint(self, url):
         """
         request_xml_endpoint
@@ -84,7 +92,7 @@ class GetUrlXML:
         :param self:
         :param url: EndPoint
         """
-        return get(url=url)
+        return get(url=url, timeout=self.timeout)
 
     def request_xml(self, url: str):
         """

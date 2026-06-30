@@ -16,6 +16,8 @@ class Code:
     e Refresh Token
 
     """
+    def __init__(self):
+        self.timeout = 30
 
     base_url: str = 'https://www.api.bling.com.br/Api/v3'
 
@@ -31,7 +33,9 @@ class Code:
         :param headers: Headers para validação obtenção das credenciais
         :param data: Passando code em um Body
         """
-        return requests.post(url=url, headers=headers, data=data, timeout=20)
+        return requests.post(
+            url=url, headers=headers, data=data, timeout=self.timeout
+        )
 
     def gerando_url_request(self, client_id: str, state: str) -> str:
         """
@@ -145,6 +149,9 @@ class Refresh:
 
     """
 
+    def __init__(self):
+        self.timeout = 30
+
     def refresh_request(self, url: str, headers: dict[str, str], data: str):
         """
         refresh_request
@@ -157,7 +164,9 @@ class Refresh:
         :param data: Passando Refresh em um Body
         :type data: stR
         """
-        return requests.post(url=url, headers=headers, data=data, timeout=20)
+        return requests.post(
+            url=url, headers=headers, data=data, timeout=self.timeout
+        )
 
     def usando_refresh_token(
         self, client_id: str, client_secret: str, refresh_token: str
