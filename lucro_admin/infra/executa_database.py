@@ -83,7 +83,7 @@ def consultageral(execute: str):
     consultageral
 
     :param execute: Query para retornar diversos dados na consulta ao banco
-      de dados
+    de dados
     :type execute: str
     """
     try:
@@ -159,7 +159,7 @@ def consultadb_multiplos_retornos(
 ) -> Any:
     """
     consultadb -> Consulta no banco de dados para dados especificos mediante
-      a Query informada
+    a Query informada
 
     :param execute: Query para consulta no banco de dados.
     :type execute: str

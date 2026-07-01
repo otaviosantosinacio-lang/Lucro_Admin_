@@ -49,7 +49,12 @@ class Atendidos:
         :return: Endpoint montada corretamente
         :rtype: str
         """
-        return f'{base_url}/pedidos/vendas?pagina={pagina}&limite=20&idsSituacoes%5B%5D={sit}&dataInicial={data_inicial}&dataFinal={data_final}'
+        url: str = (
+            f'{base_url}/pedidos/vendas?pagina={pagina}&limite=20&'
+            f'idsSituacoes%5B%5D={sit}&dataInicial={data_inicial}'
+            f'&dataFinal={data_final}'
+            )
+        return url
 
     def get_id_por_pag(self) -> ResultadoGetPaginas:
         """
@@ -59,6 +64,7 @@ class Atendidos:
         :return: Ids das vendas
         :rtype: ResultadoGetPaginas
         """
+        max_pedidos_pag: int = 100
         sit = self.situacao('Atendido')
         mais_pagina: bool = True
         pagina = 1
@@ -81,7 +87,7 @@ class Atendidos:
                 id = [item['id'] for item in response.data]
                 vendas_id.extend(id)
 
-                if len(response.data) < 100:
+                if len(response.data) < max_pedidos_pag:
                     mais_pagina = False
                 else:
                     pagina += 1
@@ -140,7 +146,8 @@ class Atendidos:
 
     def data_inicial_repo(self) -> datetime:
         """
-        data_inicial_repo -> Extraindo data do ultimo pedido registrado no banco de dados
+        data_inicial_repo -> Extraindo data do ultimo pedido registrado
+        no banco de dados
 
         :param self: Objeto
         :return: Data do ultimo pedido
@@ -156,7 +163,8 @@ class Atendidos:
 
 class ProcessaId:
     """
-    ProcessaId -> Processas os ids passados para obtenção de maiores detalhes da venda
+    ProcessaId ->
+    Processas os ids passados para obtenção de maiores detalhes da venda
 
     """
 

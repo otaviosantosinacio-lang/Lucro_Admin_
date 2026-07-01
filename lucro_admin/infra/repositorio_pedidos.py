@@ -10,12 +10,12 @@ class InsertPedidos:
         logger.info('Pedidos Repo | Iniciando a inserção dos pedidos')
         for pedido in pedidos:
             query = """
-            INSERT INTO pedidos_venda 
-            (id_bling, num_bling, situacao, id_nf, 
-             id_loja, loja, data, icms, 
-             pis, cofins, icms_dest, fcp, 
-             total_imposto, frete, comissao, 
-             lucro, custo_total_produtos, valor_pedido) VALUES %s"""
+            INSERT INTO pedidos_venda
+            (id_bling, num_bling, situacao, id_nf,
+            id_loja, loja, data, icms,
+            pis, cofins, icms_dest, fcp,
+            total_imposto, frete, comissao,
+            lucro, custo_total_produtos, valor_pedido) VALUES %s"""
             values = [
                 (
                     pedido.id_bling,

@@ -47,7 +47,8 @@ class oAuthCodeBling:
 
         if state != state_request:
             logger.critical(
-                'Bling oAuth Code | State retornado na url é invalido - Parando requisições. '
+                'Bling oAuth Code | State retornado na url é invalido -'
+                ' Parando requisições. '
             )
             raise Exception('O state retornado não é válido.')
 
@@ -63,7 +64,8 @@ class oAuthCodeBling:
 
         if not atualiza:
             logger.critical(
-                'Bling oAuth Code | Credenciais não atualizadas por falha no banco de dados'
+                'Bling oAuth Code | Credenciais não atualizadas por falha no'
+                ' banco de dados'
             )
         else:
             logger.info(
@@ -74,7 +76,8 @@ class oAuthCodeBling:
 
 class oAuthRefreshBling:
     """
-    oAuthRefreshBling -> Orquestração do fluxo usando Refresh Token para obter o Access Token Válido
+    oAuthRefreshBling -> Orquestração do fluxo usando Refresh Token para obter
+    o Access Token Válido
 
     """
 
@@ -120,7 +123,8 @@ class oAuthRefreshBling:
                 logger.info('Bling oAuth Refresh | Credenciais atualizadas')
             else:
                 logger.critical(
-                    'Bling oAuth Refresh | Credenciais não atualizadas por falha no banco de dados'
+                    'Bling oAuth Refresh | Credenciais não atualizadas por'
+                    ' falha no banco de dados'
                 )
             return tokens.access_token
 
@@ -131,6 +135,7 @@ class oAuthRefreshBling:
             )
             fluxo_code = oAuthCodeBling(self.repositorio)
             logger.warning(
-                'Bling oAuth Refresh | Foi necessário forçar o inicio do fluxo code'
+                'Bling oAuth Refresh |'
+                ' Foi necessário forçar o inicio do fluxo code'
             )
             return fluxo_code.fluxo_oAuthCode_bling()

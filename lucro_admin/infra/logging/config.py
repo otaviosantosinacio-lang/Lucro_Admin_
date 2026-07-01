@@ -12,10 +12,12 @@ Logging_Config: dict[str, Any] = {
     },
     'formatters': {
         'error_file': {
-            'format': '%(levelname)s | %(name)s | %(asctime)s | %(message)s | %(filename)s | %(lineno)d'
+            'format': '%(levelname)s | %(name)s | %(asctime)s |'
+            ' %(message)s | %(filename)s | %(lineno)d'
         },
         'file': {
-            'format': '%(levelname)s | cid= %(correlation_id)s | %(name)s | %(asctime)s | %(message)s | %(filename)s | %(lineno)d'
+            'format': '%(levelname)s | cid= %(correlation_id)s | %(name)s |'
+            ' %(asctime)s | %(message)s | %(filename)s | %(lineno)d'
         },
         'console': {'format': '%(message)s', 'datefmt': '[%X]'},
     },

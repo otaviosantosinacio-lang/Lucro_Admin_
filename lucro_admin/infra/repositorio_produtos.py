@@ -17,7 +17,8 @@ class Produtos:
 
     def consulta_todos_produtos(self):
         logger.info(
-            'Produtos Repo | Iniciando a consulta no banco de dados de todos os produtos'
+            'Produtos Repo | Iniciando a consulta no banco de dados de todos'
+            ' os produtos'
         )
         query = 'SELECT * FROM produtos'
         produtos = consultageral(execute=query)

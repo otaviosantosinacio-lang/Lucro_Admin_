@@ -45,3 +45,6 @@ ruff_report.txt
 
 #database
 database.db
+
+#testrapido
+testrapido.py

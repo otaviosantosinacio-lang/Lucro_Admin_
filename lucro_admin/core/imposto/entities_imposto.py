@@ -63,7 +63,7 @@ class ImpostosDaVenda:
 
         :param cls:
         :param produtos_imposto: Lista com produtos individualizados com
-          impostos
+        impostos
         :param id_bling: Id único gerado pelo Bling
         :return: Retorno formatado para impostos da venda
         :rtype: ImpostosDaVenda

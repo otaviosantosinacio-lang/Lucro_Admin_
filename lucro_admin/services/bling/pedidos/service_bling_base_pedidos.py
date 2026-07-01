@@ -1,4 +1,5 @@
 import logging
+from http import HTTPStatus
 
 from lucro_admin.core.entities_pedidos import ResultadoPagina
 
@@ -22,7 +23,7 @@ class BaseHTTPBling:
             self.access_token, url
         )
 
-        if response.status_code == 200:
+        if response.status_code == HTTPStatus.OK:
             data = response.json().get('data', [])
             logger.info(
                 'Bling Pedidos organiza_get_request | Retorno da endpoint %s',
@@ -30,9 +31,10 @@ class BaseHTTPBling:
             )
             return ResultadoPagina(status='ok', data=data)
 
-        if response.status_code == 429:
+        if response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
             logger.error(
-                'Bling Pedidos organiza_get_request | Retorno da endpoint %s -> %s ',
+                'Bling Pedidos organiza_get_request |'
+                ' Retorno da endpoint %s -> %s ',
                 response.status_code,
                 response.text,
             )
@@ -41,7 +43,8 @@ class BaseHTTPBling:
                 error={'url': url, 'status': 429, 'body': response.text},
             )
         logger.critical(
-            'Bling Pedidos organiza_get_request | Retorno da endpoint %s -> %s ',
+            'Bling Pedidos organiza_get_request |'
+            ' Retorno da endpoint %s -> %s ',
             response.status_code,
             response.text,
         )

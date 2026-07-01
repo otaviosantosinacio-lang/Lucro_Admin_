@@ -89,7 +89,8 @@ class ParseXML:
                 data=datetime.now(),
             )
             logger.error(
-                'Bling get_xml | Erro ao buscar informações na endpoint %s -> %s',
+                'Bling get_xml |'
+                ' Erro ao buscar informações na endpoint %s -> %s',
                 url,
                 erro.status,
             )

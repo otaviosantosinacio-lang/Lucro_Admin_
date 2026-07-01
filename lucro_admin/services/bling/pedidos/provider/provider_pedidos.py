@@ -67,14 +67,17 @@ class PedidosProviderBling(PedidosProvider):
             logger.info('Bling Provider Pedido | Pedido %s', pedido)
             if pedido.nf_id > 0:
                 logger.info(
-                    'Bling Provider Pedido | Buscando dados fiscais da nf_id -> %s',
+                    'Bling Provider Pedido |'
+                    ' Buscando dados fiscais da nf_id -> %s',
                     pedido.nf_id,
                 )
                 imposto = self.service_xml.get_xml(
                     pedido=pedido, situacao=situacao
                 )
                 logger.info(
-                    'Bling Provider Pedido | Impostos retornados por produto-> %s -> Impostos da venda retornado -> %s',
+                    'Bling Provider Pedido | '
+                    'Impostos retornados por produto-> %s -> '
+                    'Impostos da venda retornado -> %s',
                     imposto.produto_imposto,
                     imposto.venda_imposto,
                 )
@@ -83,7 +86,8 @@ class PedidosProviderBling(PedidosProvider):
 
             else:
                 logger.info(
-                    'Bling Provider Pedido | Calculando custos fiscais com a calculadora de impostos'
+                    'Bling Provider Pedido |'
+                    ' Calculando custos fiscais com a calculadora de impostos'
                 )
                 imposto = self.calculadora.calculadora_de_tributos(
                     itens=pedido.itens,
@@ -92,7 +96,9 @@ class PedidosProviderBling(PedidosProvider):
                     uf_dest=pedido.uf_dest,
                 )
                 logger.info(
-                    'Bling Provider Pedido | Impostos retornados por produto da calculadora-> %s -> Impostos da venda retornado da calculadora -> %s',
+                    'Bling Provider Pedido |'
+                    ' Impostos retornados por produto da calculadora->'
+                    ' %s -> Impostos da venda retornado da calculadora -> %s',
                     imposto.produto_imposto,
                     imposto.venda_imposto,
                 )
