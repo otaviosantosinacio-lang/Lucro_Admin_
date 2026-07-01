@@ -53,7 +53,7 @@ class Atendidos:
             f'{base_url}/pedidos/vendas?pagina={pagina}&limite=20&'
             f'idsSituacoes%5B%5D={sit}&dataInicial={data_inicial}'
             f'&dataFinal={data_final}'
-            )
+        )
         return url
 
     def get_id_por_pag(self) -> ResultadoGetPaginas:

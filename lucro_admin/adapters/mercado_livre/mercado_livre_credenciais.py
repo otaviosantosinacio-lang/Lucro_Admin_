@@ -12,7 +12,6 @@ base_url: str = 'https://api.mercadolibre.com/oauth/token'
 
 
 class Code:
-
     def __init__(self):
         self.timeout = 20
 
@@ -102,7 +101,6 @@ class Code:
 
 
 class RefreshML:
-
     def __init__(self):
         self.timeout = 20
 

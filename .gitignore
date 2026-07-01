@@ -48,3 +48,5 @@ database.db
 
 #testrapido
 testrapido.py
+
+pathlib_tests.py
