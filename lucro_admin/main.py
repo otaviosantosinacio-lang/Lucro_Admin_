@@ -21,7 +21,7 @@ from lucro_admin.infra.repositorio_bling import (
 )
 from lucro_admin.infra.repositorio_pedidos import InsertPedidos
 from lucro_admin.infra.repositorio_produtos_pedido import InsertPedidosProdutos
-from lucro_admin.infra.repositorioMercadoLivre.repositorio_mercadolivre import (
+from lucro_admin.infra.repositorioMercadoLivre.repositorio_mercadolivre import(
     CredenciaisMercadoLivre,
 )
 from lucro_admin.services.bling.credenciais.tokens.providers.bling_provider import (
@@ -39,9 +39,13 @@ from lucro_admin.services.token_service import TokenService
 
 def main():
     """
-    Iniciando a aplicação, estamos configurando os objetos que serão necessário para seguir com a aplicação
-    Esta def não solicita nenhum atributo pois é ela quem fará as requisições a outros pacotes do app
+    Iniciando a aplicação, estamos configurando os objetos
+    que serão necessário para seguir com a aplicação.
+    Esta def não solicita nenhum atributo pois é ela quem fará as requisições
+    a outros pacotes do app
     """
+
+    breakpoint()
     Path('logs').mkdir(exist_ok=True)
     cid = generate_correlation_id()
     correlation_id.set(cid)

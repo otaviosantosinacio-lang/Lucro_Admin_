@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from lucro_admin.api.security import (
     create_access_token,
-    verify_password,
     get_current_user,
+    verify_password,
 )
 from lucro_admin.infra.database import get_session
 from lucro_admin.infra.models.usuario import Usuario

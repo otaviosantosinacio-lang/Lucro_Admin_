@@ -9,17 +9,28 @@ logger = logging.getLogger('lucroadmin.adapters.mercadolivre')
 
 
 class RequestMercadoLivre:
+
+    def __init__(self):
+        self.time_out = 20
+
     def request_endpoint_mercadolivre(self, url: str, headers: dict[str, str]):
 
         logger.info(
             'Mercado Livre Request | Enviando requisição para o end point %s',
             url,
         )
-        response = requests.get(url=url, headers=headers, timeout=20)
+        response = requests.get(
+            url=url, headers=headers, timeout=self.time_out
+        )
+
         return response
 
 
 class GetMercadoLivre:
+
+    def __init__(self):
+        self.request_ml = RequestMercadoLivre()
+
     def get_endpoints_mercadolivre(self, access_token: str, url: str):
         """
         :param self: Objeto
@@ -39,9 +50,8 @@ class GetMercadoLivre:
             'Accept': 'application/json',
         }
 
-        request = RequestMercadoLivre()
         response = retry_policy.executa(
-            lambda: request.request_endpoint_mercadolivre(url, headers)
+            lambda: self.request_ml.request_endpoint_mercadolivre(url, headers)
         )
         logger.info(
             'Bling get_endpoints_bling | Retorno da requisição é %s',

@@ -140,7 +140,8 @@ class Atendidos:
                 nome_sit = sit[1]
                 break
         logger.info(
-            f'Bling Pedidos situacao | Situação retornada {cod_sit} -> {nome_sit}'
+            f'Bling Pedidos situacao | Situação retornada {cod_sit} -> '
+            f'{nome_sit}'
         )
         return SituacaoBling(cod_sit=cod_sit, nome_sit=nome_sit)
 

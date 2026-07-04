@@ -2,17 +2,17 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from jwt import ExpiredSignatureError, DecodeError, decode, encode
+from jwt import DecodeError, ExpiredSignatureError, decode, encode
 from pwdlib import PasswordHash
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from lucro_admin.infra.database import get_session
 from lucro_admin.infra.models.usuario import Usuario
-from lucro_admin.settings import Settings
+from lucro_admin.settings import DataBaseSettings
 from lucro_admin.utils.time import somandosecs
 
-settings = Settings()
+settings = DataBaseSettings()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth/token')
 pwd_context = PasswordHash.recommended()
 T_Session = Annotated[AsyncSession, Depends(get_session)]

@@ -1,5 +1,6 @@
 import logging
 import webbrowser
+from http import HTTPStatus
 
 from lucro_admin.adapters.bling.bling_credenciais import Code
 from lucro_admin.core.entities_credenciais import Credencial
@@ -115,7 +116,7 @@ class oAuthRefreshBling:
 
             tokens: Credencial = Credencial.from_api_response(tokens_dict)
 
-        if tokens.response_status_code == 200:
+        if tokens.response_status_code == HTTPStatus.OK:
             atualiza = self.repositorio.salva_token(
                 tokens.access_token, tokens.refresh_token, tokens.expire
             )
@@ -128,7 +129,7 @@ class oAuthRefreshBling:
                 )
             return tokens.access_token
 
-        elif tokens.response_status_code != 200:
+        elif tokens.response_status_code != HTTPStatus.OK:
             logger.critical(
                 'Bling oAuth Refresh | Erro na requisição: %s',
                 tokens.response_status_code,

@@ -53,7 +53,8 @@ class ParseXML:
         get_xml -> Get do XML por endpoint Bling
 
         :param self: Objeto
-        :param pedido: Pedido completo de onde será feito a extração dos impostos
+        :param pedido: Pedido completo de onde será feito a extração dos
+        impostos
         :param situacao: Situação do pedido dentro do Bling (Ex: Atendido)
         :return: Impostos por produtos e imposto total da venda
         :rtype: RetornoImpostos | Any
@@ -112,7 +113,8 @@ class ParseXML:
         :param xml: Texto XML
         :param id_bling: Id único gerado pelo Bling por venda
         :param situacao: Situação do pedido dentro do Bling (Ex: Atendido)
-        :return: Impostos individualizado por produto e total de impostos da venda
+        :return: Impostos individualizado por produto e total de impostos da 
+        venda
         :rtype: ProdutoComImposto | ErrorParse
         """
         vICMS_n = vPIS_n = vCOFINS_n = vICMS_dest_n = vFCP_n = 0

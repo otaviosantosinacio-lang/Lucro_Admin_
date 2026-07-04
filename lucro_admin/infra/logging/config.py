@@ -3,6 +3,7 @@ from typing import Any
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 LOG_DIR = BASE_DIR / 'logs'
+LOG_DIR.mkdir(exist_ok=True)
 
 Logging_Config: dict[str, Any] = {
     'version': 1,
