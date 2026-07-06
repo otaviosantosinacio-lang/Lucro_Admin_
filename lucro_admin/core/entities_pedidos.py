@@ -221,6 +221,16 @@ class IdsPedidoML:
     pack_id: int
     geral: Any
 
+@dataclass
+class ShipCommission:
+    id: int
+    commission: float
+    ship_cost: float
+    sku: str
+
+@dataclass
+class SaleCosts:
+    costs: list[ShipCommission]
 
 @dataclass
 class ProdutoCompleto:

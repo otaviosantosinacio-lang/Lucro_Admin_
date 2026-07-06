@@ -9,8 +9,8 @@ from lucro_admin.core.entities_pedidos import (
     SituacaoBling,
 )
 from lucro_admin.core.marketplace import nome_marketplace
-from lucro_admin.services.bling.pedidos.service_bling_base_pedidos import (
-    BaseHTTPBling,
+from lucro_admin.services.service_http_request_base import (
+    BaseRequestHTTP,
 )
 
 base_url = 'https://api.bling.com.br/Api/v3'
@@ -27,7 +27,7 @@ class Atendidos:
         self.access_token = access_token
         self.repo_pedidos = repo_pedidos
         self.adapt_pedidos = adapt_pedidos
-        self.service_base = BaseHTTPBling(
+        self.service_base = BaseRequestHTTP(
             self.adapt_pedidos, self.access_token
         )
 
@@ -51,8 +51,8 @@ class Atendidos:
         """
         url: str = (
             f'{base_url}/pedidos/vendas?pagina={pagina}&limite=20&'
-            f'idsSituacoes%5B%5D={sit}&dataInicial={data_inicial}'
-            f'&dataFinal={data_final}'
+            f'idsSituacoes%5B%5D={sit}&dataInicial=2026-06-20'
+            f'&dataFinal=2026-06-20'
         )
         return url
 
@@ -84,10 +84,11 @@ class Atendidos:
             response = self.service_base.organiza_get_request(url)
 
             if response.status == 'ok':
-                id = [item['id'] for item in response.data]
+                data = response.data.get('data', [])
+                id = [item['id'] for item in data]
                 vendas_id.extend(id)
 
-                if len(response.data) < max_pedidos_pag:
+                if len(data) < max_pedidos_pag:
                     mais_pagina = False
                 else:
                     pagina += 1
@@ -173,7 +174,7 @@ class ProcessaId:
         self.access_token = access_token
         self.adapt_pedidos = adapt_pedidos
         self.repo_pedidos = repo_pedidos
-        self.service_base = BaseHTTPBling(
+        self.service_base = BaseRequestHTTP(
             self.adapt_pedidos, self.access_token
         )
 
@@ -205,21 +206,22 @@ class ProcessaId:
             response = self.service_base.organiza_get_request(url)
 
             if response.status == 'ok':
-                id_loja = response.data['loja']['id']
+                data = response.data.get('data', [])
+                id_loja = data['loja']['id']
                 nome_mkt = nome_marketplace(id_loja)
-                transporte = response.data.get('transporte') or {}
+                transporte = data.get('transporte') or {}
                 volumes = transporte.get('volumes') or []
 
                 pedido = DadosPedidos(
                     id_bling=id,
-                    num_bling=response.data['numero'],
-                    id_mkt=response.data['numeroLoja'],
-                    data=response.data['data'],
+                    num_bling=data['numero'],
+                    id_mkt=data['numeroLoja'],
+                    data=data['data'],
                     nome_loja=nome_mkt,
-                    nf_id=response.data['notaFiscal']['id'],
-                    valor_pedido=response.data['total'],
-                    itens=response.data['itens'],
-                    uf_dest=response.data['transporte']['etiqueta']['uf'],
+                    nf_id=data['notaFiscal']['id'],
+                    valor_pedido=data['total'],
+                    itens=data['itens'],
+                    uf_dest=data['transporte']['etiqueta']['uf'],
                     servico_trans=volumes[0].get('servico')
                     if volumes
                     else 'SEM_SERVIÇO',

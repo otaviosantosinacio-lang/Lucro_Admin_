@@ -46,7 +46,7 @@ class GetBling:
     def __init__(self):
         self.request = Request()
 
-    def get_endpoints_bling(self, access_token: str, url: str):
+    def get_endpoint(self, access_token: str, url: str):
         """
         :param self: Objeto
         :param access_token: Credencial de acesso válida
@@ -60,7 +60,7 @@ class GetBling:
         headers: dict[str, str] = {
             'Authorization': f'Bearer {access_token}',
             'Accept': 'application/json',
-            'enable_jwt': '1',
+            'enable-jwt': '1',
         }
 
         response = retry_policy.executa(

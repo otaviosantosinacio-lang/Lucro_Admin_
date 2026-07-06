@@ -31,7 +31,7 @@ class GetMercadoLivre:
     def __init__(self):
         self.request_ml = RequestMercadoLivre()
 
-    def get_endpoints_mercadolivre(self, access_token: str, url: str):
+    def get_endpoint(self, access_token: str, url: str):
         """
         :param self: Objeto
         :param access_token: Credencial de acesso válida

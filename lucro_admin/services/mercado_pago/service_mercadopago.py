@@ -5,8 +5,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from lucro_admin.adapters.mercado_pago.mercado_pago_get import GetMercadoPago
-from lucro_admin.services.mercado_pago.service_mercadopago_base import (
-    BaseHTTPMercadoPago,
+from lucro_admin.services.service_http_request_base import (
+    BaseRequestHTTP,
 )
 
 logger = logging.getLogger('lucroadmin.services.mercadopago')
@@ -19,7 +19,7 @@ class MercadoPagoCustos:
         access_token = os.getenv('access_token')
         self.access_token = access_token
         self.adapt_pedidos = GetMercadoPago()
-        self.service_base = BaseHTTPMercadoPago(
+        self.service_base = BaseRequestHTTP(
             self.adapt_pedidos, self.access_token
         )
 

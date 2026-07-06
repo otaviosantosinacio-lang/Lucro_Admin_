@@ -16,8 +16,8 @@ from lucro_admin.core.imposto.entities_imposto import (
 )
 from lucro_admin.core.imposto.regras_fiscais import uf_sem_fcp
 from lucro_admin.infra.repositorio_produtos import Produtos
-from lucro_admin.services.bling.pedidos.service_bling_base_pedidos import (
-    BaseHTTPBling,
+from lucro_admin.services.service_http_request_base import (
+    BaseRequestHTTP,
 )
 
 logger = logging.getLogger('lucroadmin.services.blingpedidos')
@@ -32,7 +32,7 @@ class ParseXML:
     def __init__(self, access_token, adapt_pedidos) -> None:
         self.access_token = access_token
         self.adapt_pedidos = adapt_pedidos
-        self.service_base = BaseHTTPBling(
+        self.service_base = BaseRequestHTTP(
             self.adapt_pedidos, self.access_token
         )
         self.calculadora = CalculadoraDeImposto()
@@ -65,7 +65,8 @@ class ParseXML:
         response: ResultadoPagina = self.service_base.organiza_get_request(url)
 
         if response.status == 'ok':
-            url_xml = response.data['xml']
+            data = response.data.get('data', [])
+            url_xml = data['xml']
             response_xml = adapt_xml.request_xml(url_xml)
             logger.info('Bling get_xml | Xml extraído %s', response_xml)
             parse = self.parse_xml(

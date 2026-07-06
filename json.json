@@ -1,0 +1,338 @@
+{
+    "receiver": {
+        "compensations": [],
+        "cost": 0,
+        "discounts": [
+            {
+                "rate": 1,
+                "type": "ratio",
+                "promoted_amount": 11
+            }
+        ],
+        "user_id": 254798459,
+        "cost_details": [],
+        "save": 11,
+        "compensation": 0
+    },
+    "gross_amount": 22.36,
+    "senders": [
+        {
+            "compensations": [],
+            "charges": {
+                "charge_flex": 0
+            },
+            "cost": 7.95,
+            "discounts": [
+                {
+                    "rate": 0.3,
+                    "type": "mandatory",
+                    "promoted_amount": 3.41
+                }
+            ],
+            "user_id": 790037830,
+            "save": 3.41,
+            "compensation": 0
+        }
+    ],
+    "base_exchange": null
+}
+
+{
+    "id": 2000017029374648,
+    "date_created": "2026-06-20T08:54:11.000-04:00",
+    "last_updated": "2026-06-30T13:23:02.000-04:00",
+    "date_closed": "2026-06-23T09:31:05.000-04:00",
+    "pack_id": null,
+    "fulfilled": true,
+    "buying_mode": "buy_equals_pay",
+    "shipping_cost": null,
+    "mediations": [],
+    "total_amount": 50.90,
+    "paid_amount": 50.90,
+    "order_items": [
+        {
+            "item": {
+                "id": "MLB3179297879",
+                "title": "Torneira De Cozinha Flexível Bancada Pia Preta 1/4 De Volta Preto",
+                "category_id": "MLB270023",
+                "variation_id": null,
+                "seller_custom_field": "MCB001",
+                "variation_attributes": [
+                    {
+                        "name": "Cor",
+                        "id": "COLOR",
+                        "value_id": "52049",
+                        "value_name": "Preto"
+                    }
+                ],
+                "warranty": "Garantia do vendedor: 3 meses",
+                "condition": "new",
+                "seller_sku": "MCB001",
+                "global_price": null,
+                "net_weight": null,
+                "user_product_id": "MLBU1969614333",
+                "release_date": null,
+                "attributes": [
+                    {
+                        "id": "ITEM_CONDITION",
+                        "values": [
+                            {
+                                "id": "2230284"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "quantity": 1,
+            "requested_quantity": {
+                "measure": "unit",
+                "value": 1
+            },
+            "picked_quantity": null,
+            "unit_price": 50.90,
+            "currency_id": "BRL",
+            "manufacturing_days": null,
+            "sale_fee": 3.65,
+            "listing_type_id": "gold_special",
+            "base_exchange_rate": null,
+            "base_currency_id": null,
+            "element_id": null,
+            "discounts": null,
+            "bundle": null,
+            "compat_id": null,
+            "stock": {
+                "store_id": null,
+                "node_id": "BRRJ02"
+            },
+            "kit_instance_id": null,
+            "gross_price": 72.90
+        }
+    ],
+    "currency_id": "BRL",
+    "payments": [
+        {
+            "id": 165000808936,
+            "order_id": 2000017029374648,
+            "payer_id": 254798459,
+            "collector": {
+                "id": 790037830
+            },
+            "card_id": 9709966265,
+            "reason": "Torneira De Cozinha Flexível Bancada Pia Preta 1/4 De Volta Preto",
+            "site_id": "MLB",
+            "payment_method_id": "visa",
+            "currency_id": "BRL",
+            "installments": 1,
+            "issuer_id": "25",
+            "atm_transfer_reference": {
+                "transaction_id": null,
+                "company_id": null
+            },
+            "coupon_id": null,
+            "activation_uri": null,
+            "operation_type": "regular_payment",
+            "payment_type": "credit_card",
+            "available_actions": [
+                ""
+            ],
+            "status": "rejected",
+            "status_code": null,
+            "status_detail": "cc_rejected_insufficient_amount",
+            "transaction_amount": 50.90,
+            "transaction_amount_refunded": 0.00,
+            "taxes_amount": 0.00,
+            "shipping_cost": 0.00,
+            "coupon_amount": 0.00,
+            "overpaid_amount": 0.00,
+            "total_paid_amount": 50.90,
+            "installment_amount": 50.90,
+            "deferred_period": null,
+            "date_approved": null,
+            "transaction_order_id": null,
+            "date_created": "2026-06-20T08:54:12.000-04:00",
+            "date_last_modified": "2026-06-20T08:54:14.000-04:00",
+            "marketplace_fee": 0.00,
+            "reference_id": null,
+            "authorization_code": null
+        },
+        {
+            "id": 165001134506,
+            "order_id": 2000017029374648,
+            "payer_id": 254798459,
+            "collector": {
+                "id": 790037830
+            },
+            "card_id": 9524877620,
+            "reason": "Torneira De Cozinha Flexível Bancada Pia Preta 1/4 De Volta Preto",
+            "site_id": "MLB",
+            "payment_method_id": "master",
+            "currency_id": "BRL",
+            "installments": 1,
+            "issuer_id": "12518",
+            "atm_transfer_reference": {
+                "transaction_id": null,
+                "company_id": null
+            },
+            "coupon_id": null,
+            "activation_uri": null,
+            "operation_type": "regular_payment",
+            "payment_type": "credit_card",
+            "available_actions": [
+                ""
+            ],
+            "status": "rejected",
+            "status_code": null,
+            "status_detail": "cc_rejected_insufficient_amount",
+            "transaction_amount": 50.90,
+            "transaction_amount_refunded": 0.00,
+            "taxes_amount": 0.00,
+            "shipping_cost": 0.00,
+            "coupon_amount": 0.00,
+            "overpaid_amount": 0.00,
+            "total_paid_amount": 50.90,
+            "installment_amount": 50.90,
+            "deferred_period": null,
+            "date_approved": null,
+            "transaction_order_id": null,
+            "date_created": "2026-06-20T08:57:18.000-04:00",
+            "date_last_modified": "2026-06-20T08:57:21.000-04:00",
+            "marketplace_fee": 0.00,
+            "reference_id": null,
+            "authorization_code": null
+        },
+        {
+            "id": 165435758018,
+            "order_id": 2000017029374648,
+            "payer_id": 254798459,
+            "collector": {
+                "id": 790037830
+            },
+            "card_id": 9709966265,
+            "reason": "Torneira De Cozinha Flexível Bancada Pia Preta 1/4 De Volta Preto",
+            "site_id": "MLB",
+            "payment_method_id": "visa",
+            "currency_id": "BRL",
+            "installments": 1,
+            "issuer_id": "25",
+            "atm_transfer_reference": {
+                "transaction_id": null,
+                "company_id": null
+            },
+            "coupon_id": null,
+            "activation_uri": null,
+            "operation_type": "regular_payment",
+            "payment_type": "credit_card",
+            "available_actions": [
+                ""
+            ],
+            "status": "rejected",
+            "status_code": null,
+            "status_detail": "cc_rejected_insufficient_amount",
+            "transaction_amount": 50.90,
+            "transaction_amount_refunded": 0.00,
+            "taxes_amount": 0.00,
+            "shipping_cost": 0.00,
+            "coupon_amount": 0.00,
+            "overpaid_amount": 0.00,
+            "total_paid_amount": 50.90,
+            "installment_amount": 50.90,
+            "deferred_period": null,
+            "date_approved": null,
+            "transaction_order_id": null,
+            "date_created": "2026-06-23T09:30:12.000-04:00",
+            "date_last_modified": "2026-06-23T09:30:14.000-04:00",
+            "marketplace_fee": 0.00,
+            "reference_id": null,
+            "authorization_code": null
+        },
+        {
+            "id": 164613378595,
+            "order_id": 2000017029374648,
+            "payer_id": 254798459,
+            "collector": {
+                "id": 790037830
+            },
+            "card_id": 9524877620,
+            "reason": "Torneira De Cozinha Flexível Bancada Pia Preta 1/4 De Volta Preto",
+            "site_id": "MLB",
+            "payment_method_id": "master",
+            "currency_id": "BRL",
+            "installments": 1,
+            "issuer_id": "12518",
+            "atm_transfer_reference": {
+                "transaction_id": null,
+                "company_id": null
+            },
+            "coupon_id": null,
+            "activation_uri": null,
+            "operation_type": "regular_payment",
+            "payment_type": "credit_card",
+            "available_actions": [
+                "refund"
+            ],
+            "status": "approved",
+            "status_code": null,
+            "status_detail": "accredited",
+            "transaction_amount": 50.90,
+            "transaction_amount_refunded": 0.00,
+            "taxes_amount": 0.00,
+            "shipping_cost": 0.00,
+            "coupon_amount": 0.00,
+            "overpaid_amount": 0.00,
+            "total_paid_amount": 50.90,
+            "installment_amount": 50.90,
+            "deferred_period": null,
+            "date_approved": "2026-06-23T09:31:05.000-04:00",
+            "transaction_order_id": null,
+            "date_created": "2026-06-23T09:31:02.000-04:00",
+            "date_last_modified": "2026-06-23T09:31:05.000-04:00",
+            "marketplace_fee": 0.00,
+            "reference_id": null,
+            "authorization_code": "405265"
+        }
+    ],
+    "shipping": {
+        "id": 47343196206
+    },
+    "status": "paid",
+    "status_detail": null,
+    "tags": [
+        "order_has_discount",
+        "paid",
+        "delivered"
+    ],
+    "static_tags": [],
+    "feedback": {
+        "seller": null,
+        "buyer": null
+    },
+    "context": {
+        "channel": "marketplace",
+        "site": "MLB",
+        "flows": []
+    },
+    "seller": {
+        "id": 790037830
+    },
+    "buyer": {
+        "id": 254798459,
+        "nickname": "ARACELLIFL",
+        "first_name": "Aracelli",
+        "last_name": "Lirio",
+        "billing_info": {
+            "id": "856154851965622959"
+        }
+    },
+    "taxes": {
+        "amount": null,
+        "currency_id": null,
+        "id": null
+    },
+    "cancel_detail": null,
+    "manufacturing_ending_date": null,
+    "order_request": {
+        "change": null,
+        "return": null
+    },
+    "related_orders": null
+}

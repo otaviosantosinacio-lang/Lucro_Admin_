@@ -21,7 +21,7 @@ from lucro_admin.infra.repositorio_bling import (
 )
 from lucro_admin.infra.repositorio_pedidos import InsertPedidos
 from lucro_admin.infra.repositorio_produtos_pedido import InsertPedidosProdutos
-from lucro_admin.infra.repositorioMercadoLivre.repositorio_mercadolivre import(
+from lucro_admin.infra.repositorioMercadoLivre.repositorio_mercadolivre import (
     CredenciaisMercadoLivre,
 )
 from lucro_admin.services.bling.credenciais.tokens.providers.bling_provider import (

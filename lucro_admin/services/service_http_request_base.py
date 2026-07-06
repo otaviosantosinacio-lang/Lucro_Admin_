@@ -1,11 +1,12 @@
 import logging
+from http import HTTPStatus
 
 from lucro_admin.core.entities_pedidos import ResultadoPagina
 
-logger = logging.getLogger('lucroadmin.services.mercadolivre')
+logger = logging.getLogger('lucroadmin.services.baserequesthttp')
 
 
-class BaseHTTPMercadoLivre:
+class BaseRequestHTTP:
     def __init__(self, adapt_pedidos, access_token: str):
         self.adapt_pedidos = adapt_pedidos
         self.access_token = access_token
@@ -15,24 +16,25 @@ class BaseHTTPMercadoLivre:
 
         url: str
 
-        Chama api MercadoLivre mediante a endpoint (url) e padroniza o retorno.
+        Padroniza retorno de Api externa.
 
         """
-        response = self.adapt_pedidos.get_endpoints_mercadolivre(
+        response = self.adapt_pedidos.get_endpoint(
             self.access_token, url
         )
 
-        if response.status_code == 200:
+        if response.status_code == HTTPStatus.OK:
             data = response.json()
             logger.info(
-                'Mercado Livre organiza_get_request | Retorno da endpoint %s',
+                'BaseRequestHTTP organiza_get_request | Retorno da endpoint %s',
                 response.status_code,
             )
             return ResultadoPagina(status='ok', data=data)
 
-        if response.status_code == 429:
+        if response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
             logger.error(
-                'Mercado Livre organiza_get_request | Retorno da endpoint %s -> %s ',
+                'BaseRequestHTTP organiza_get_request |'
+                ' Retorno da endpoint %s -> %s ',
                 response.status_code,
                 response.text,
             )
@@ -41,7 +43,8 @@ class BaseHTTPMercadoLivre:
                 error={'url': url, 'status': 429, 'body': response.text},
             )
         logger.critical(
-            'Mercado Livre organiza_get_request | Retorno da endpoint %s -> %s ',
+            'BaseRequestHTTP organiza_get_request |'
+            ' Retorno da endpoint %s -> %s ',
             response.status_code,
             response.text,
         )

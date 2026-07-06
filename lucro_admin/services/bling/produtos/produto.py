@@ -1,6 +1,6 @@
 import logging
 
-from lucro_admin.services.bling.pedidos.service_bling_base_pedidos import (
+from lucro_admin.services.service_http_request_base import (
     BaseHTTPBling,
 )
 from lucro_admin.core.entities_produtos import Produto

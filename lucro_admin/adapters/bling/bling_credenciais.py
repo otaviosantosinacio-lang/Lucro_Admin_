@@ -203,7 +203,7 @@ class Refresh:
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/json',
             'Authorization': f'Basic {credenciaisbase64}',
-            'enable_jwt': '1',
+            'enable-jwt': '1',
         }
 
         data: str = f'grant_type=refresh_token&refresh_token={refresh_token}'
