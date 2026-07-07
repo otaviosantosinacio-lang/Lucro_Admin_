@@ -12,9 +12,8 @@ retry_policy = RetryPolicy()
 
 class Code:
     """
-    Class para trocarmos o code por Tokens de maior duração como Access Token
-    e Refresh Token
-
+    Class for exchanging the code for longer-lived tokens,
+    such as an Access Token and a Refresh Token.
     """
 
     def __init__(self):
@@ -39,116 +38,116 @@ class Code:
             url=url, headers=headers, data=data, timeout=self.timeout
         )
 
-    def gerando_url_request(self, client_id: str, state: str) -> str:
+    def generate_url_request(self, client_id: str, state: str) -> str:
         """
-        gerando_url_request
-        Montagem correta e formatada da url onde será enviada a requisição
-        para obtenção dos tokens.
+        generate_url_request
+        Correctly constructs and formats the URL to which the request
+        for obtaining tokens will be sent.
 
         :param self:
-        :param client_id: Credencial do aplicativo Bling
-        :param state: State aleátorio para validação do retorno
-        :return: URL (end point)para obtenção das credenciais
+        :param client_id: Bling application credential
+        :param state: Random state for response validation
+        :return: URL (endpoint) for obtaining credentials
         """
         url: str = (
             f'{self.base_url}/oauth/authorize?response_type=code&'
             f'client_id={client_id}&state={state}'
         )
-        logger.info('Bling oAuth Code | URL de requisição do code montada')
+        logger.info('Bling oAuth Code | Constructed code request URL')
         return url
 
-    def troca_code_por_tokens(
+    def exchange_code_for_tokens(
         self, client_id: str, client_secret: str, code: str
     ):  # pyright: ignore[reportReturnType]
         """
-        troca_code_por_tokens
-        Utilizada para através do code obtido trocarmos por credênciais de
-        maior tempo de expiração.
+        exchange_code_for_tokens
+        Used to exchange the obtained code for credentials with
+        a longer expiration time.
 
         :param self:
-        :param client_id: Credencial do aplicativo Bling
-        :param client_secret: Credencial do aplicativo Bling
-        :param code: Token obtido através do processo de autorização manual
+        :param client_id: Bling application credential
+        :param client_secret: Bling application credential
+        :param code: Token obtained through the manual authorization process
         """
 
-        para64: str = f'{client_id}:{client_secret}'
-        # Configurando credênciais conforme documentação da api bling,
-        # codificadas em base64 separadas por ":".
-        credenciaisbase64: str = b64encode(para64.encode('utf-8')).decode(
+        # Base64-encoded and separated by ":".
+        to_64: str = f'{client_id}:{client_secret}'
+
+        # Configuring credentials according to the Bling API documentation,
+        credentialsbase64: str = b64encode(to_64.encode('utf-8')).decode(
             'utf-8'
         )
 
-        # Montagem de headers e data para envio request
+        # Assembling headers and data for request submission
         headers: dict[str, str | int] = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/json',
-            'Authorization': f'Basic {credenciaisbase64}',
+            'Authorization': f'Basic {credentialsbase64}',
             'enable-jwt': '1',
         }
         data: str = f'grant_type=authorization_code&code={code}'
 
         url: str = f'{self.base_url}/oauth/token'
         logger.info(
-            'Bling oAuth Code | Enviando requisição para o endpoint %s', url
+            'Bling oAuth Code | Sending request to the endpoint %s', url
         )
 
-        # Enviando requisição para o endpoint
+        # Sending request to the endpoint
         response = retry_policy.executa(
             lambda: self.code_request(url, headers, data)
         )
 
-        # Verificando o retorno
+        # Checking response
         if response.status_code == HTTPStatus.OK:
             logger.info(
-                'Bling oAuth Code | Retorno %s da requisição com CODE',
+                'Bling oAuth Code | Request returned %s with CODE',
                 response.status_code,
             )
             response_json = response.json()
             access: str = response_json['access_token']
             refresh: str = response_json['refresh_token']
             expire: int = response_json['expires_in']
-            credencial = {
+            credentials = {
                 'response_status_code': response.status_code,
                 'access_token': access,
                 'refresh_token': refresh,
                 'expire': expire,
             }
-            return credencial
+            return credentials
 
-        # Tratanto erro temporário
+        # Handling a temporary error
         elif response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
-            logger.warning('Bling oAuth Code | Limite que requisições (429)')
-            credenciais = {
+            logger.warning('Bling oAuth Code | Rate limit requests (429)')
+            credentials = {
                 'response_status_code': response.status_code,
                 'access_token': '',
                 'refresh_token': '',
-                'expire': 100,
+                'expire': 1,
             }
-            return credenciais
-        # Erro crítico na requisição como credênciais expiradas ou
-        # request inválido
+            return credentials
+        # Critical request error, such as expired credentials or
+        # invalid request
         else:
             logger.critical(
-                'Bling oAuth Code | HOUVE UM ERRO NA REQUISIÇÃO (%s) -> (%s)',
+                'Bling oAuth Code | There was an error with the request. (%s) -> (%s)',
                 response.status_code,
                 response.text,
             )
-            credenciais = {
+            credentials = {
                 'response_status_code': response.status_code,
                 'access_token': '',
                 'refresh_token': '',
-                'expire': 100,
+                'expire': 1,
             }
             return credenciais
 
 
 class Refresh:
     """
-    Toca de Refresh Token por um novo Access Token
-    Validades:
-    Refresh Token -> Validade de 30 dias
-    Access Token -> 6 horas
-
+    Exchange Refresh Token for a new Access Token.
+    Validity periods:
+    Refresh Token -> 30-day validity /
+    Access Token -> 6 hours
     """
 
     def __init__(self):
@@ -157,44 +156,47 @@ class Refresh:
     def refresh_request(self, url: str, headers: dict[str, str], data: str):
         """
         refresh_request
-        Utilizando o Refresh Token para obter um novo Access Token válido.
+
+        Uses the Refresh Token to obtain a new, valid Access Token.
+
         :param self:
-        :param url: EndPoint das credênciais
+        :param url: Credentials endpoint
         :type url: str
-        :param header: Headers para validação obtenção das credenciais
+        :param header: Headers for credential validation/retrieval
         :type headers: dict[str, str]
-        :param data: Passando Refresh em um Body
-        :type data: stR
+        :param data: Refresh token passed in the request body
+        :type data: str
         """
         return requests.post(
             url=url, headers=headers, data=data, timeout=self.timeout
         )
 
-    def usando_refresh_token(
+    def refresh_access_token(
         self, client_id: str, client_secret: str, refresh_token: str
     ):
         """
-        usando_refresh_token
+        refresh_access_token
 
-        Configurando headers e data para trocar o Refresh Token por
-        um novo Access Token.
+        Configuring headers and data to exchange the Refresh Token for
+        a new Access Token. 
 
         :param self:
-        :param client_id: Credecial do aplicativo Bling
+        :param client_id: Bling application credential
         :type client_id: str
-        :param client_secret: Credencial do aplicativo Bling
+        :param client_secret: Bling application credential
         :type client_secret: str
-        :param refresh_token: Credencial obtida atráves de request e
-        pode ser trocada por um novo access token quando o mesmo expira.
+        :param refresh_token: Credential obtained via request that
+        can be exchanged for a new access token when the current one expires. 
         :type refresh_token: str
         """
 
-        logger.info('Bling oAuth Refresh | Configurando as credenciais')
+        logger.info('Bling oAuth Refresh | Configuring credentials')
         url: str = 'https://api.bling.com.br/Api/v3/oauth/token'
-        para64: str = f'{client_id}:{client_secret}'
+        # Base64-encoded and separated by ":".
+        to_64: str = f'{client_id}:{client_secret}'
         # Configurando credênciais conforme documentção da API Bling,
-        # codificadas em base64 e separadas por ":"
-        credenciaisbase64: str = b64encode(para64.encode('utf-8')).decode(
+
+        base64_credentials: str = b64encode(to_64.encode('utf-8')).decode(
             'utf-8'
         )
 
@@ -202,7 +204,7 @@ class Refresh:
         headers: dict[str, str] = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/json',
-            'Authorization': f'Basic {credenciaisbase64}',
+            'Authorization': f'Basic {base64_credentials}',
             'enable-jwt': '1',
         }
 
