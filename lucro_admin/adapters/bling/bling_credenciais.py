@@ -74,7 +74,7 @@ class Code:
         to_64: str = f'{client_id}:{client_secret}'
 
         # Configuring credentials according to the Bling API documentation,
-        credentialsbase64: str = b64encode(to_64.encode('utf-8')).decode(
+        base64_credentials: str = b64encode(to_64.encode('utf-8')).decode(
             'utf-8'
         )
 
@@ -82,7 +82,7 @@ class Code:
         headers: dict[str, str | int] = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/json',
-            'Authorization': f'Basic {credentialsbase64}',
+            'Authorization': f'Basic {base64_credentials}',
             'enable-jwt': '1',
         }
         data: str = f'grant_type=authorization_code&code={code}'
@@ -129,7 +129,7 @@ class Code:
         # invalid request
         else:
             logger.critical(
-                'Bling oAuth Code | There was an error with the request. (%s) -> (%s)',
+        'Bling oAuth Code | There was an error with the request. (%s) -> (%s)',
                 response.status_code,
                 response.text,
             )
@@ -200,7 +200,7 @@ class Refresh:
             'utf-8'
         )
 
-        # Headers e Data para envio de Request
+        # Headers e Data for send Request
         headers: dict[str, str] = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/json',
@@ -211,62 +211,60 @@ class Refresh:
         data: str = f'grant_type=refresh_token&refresh_token={refresh_token}'
 
         logger.info(
-            'Bling oAuth Refresh | Headers e Body montado, enviando requisição'
-            ' para o endpoint %s',
+            'Bling oAuth Refresh | Headers and body assembled, sending request'
+            ' to the endpoint %s',
             url,
         )
 
         response = retry_policy.executa(
             lambda: self.refresh_request(url=url, headers=headers, data=data)
         )
-
-        # Retorno sendo sucesso configuramos ele conforme dataclass
-        #  estabelecido
+        # If the return is successful, we configure it according
+        # to the established dataclass.
         if response.status_code == HTTPStatus.OK:
             logger.info(
-                'Bling oAuth Refresh | Retorno %s para a requisição '
-                'com o Refresh',
+                'Bling oAuth Refresh | Returning %s for the request '
+                'with the Refresh',
                 response.status_code,
             )
             response_json = response.json()
             access: str = response_json['access_token']
             refresh: str = response_json['refresh_token']
             expire: int = response_json['expires_in']
-            credenciais = {
+            credentials = {
                 'access_token': access,
                 'refresh_token': refresh,
                 'expire': expire,
                 'response_status_code': response.status_code,
             }
-            logger.info('Bling oAuth Refresh | Request finalizado')
-            return credenciais
+            logger.info('Bling oAuth Refresh | Finish Request')
+            return credentials
 
-        # Sendo um retorno também configrado para tratarmos ele
         elif response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
             logging.warning(
-                'Bling oAuth Refresh | Limite de requisições retorno %s',
+                'Bling oAuth Refresh | Request limit, response %s',
                 response.status_code,
             )
-            credenciais = {
+            credentials = {
                 'response_status_code': response.status_code,
                 'access_token': '',
                 'refresh_token': '',
-                'expire': 100,
+                'expire': 1,
             }
-            return credenciais
+            return credentials
 
-        # Erro critico de falha na configuração do request ou até credênciais
+        # Critical error: request configuration or credential failure.
         else:
             logger.critical(
-                'Bling oAuth Refresh | Houve um erro critico na requisição'
-                ' retorno %s -> %s',
+            'Bling oAuth Refresh | A critical error occurred in the request'
+                ' response %s -> %s',
                 response.status_code,
                 response.text,
             )
-            credenciais = {
+            credentials = {
                 'response_status_code': response.status_code,
                 'access_token': '',
                 'refresh_token': '',
-                'expire': 100,
+                'expire': 1,
             }
-            return credenciais
+            return credentials
