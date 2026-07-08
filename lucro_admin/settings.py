@@ -11,10 +11,11 @@ class DataBaseSettings(BaseSettings):
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_SECONDS: int = 1800
 
+
 class MeradoPagoSettings(BaseSettings):
-        model_config = SettingsConfigDict(
+    model_config = SettingsConfigDict(
         env_file='mp.env', env_file_encoding='utf-8'
-    )
+)
 
     DATABASE_URL: str
     SECRET_KEY: str

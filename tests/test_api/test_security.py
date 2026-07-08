@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from jwt import decode
 
 from lucro_admin.api.security import create_access_token
@@ -18,7 +20,7 @@ def test_jwt_invalid_token(client):
         '/users/1', headers={'Authorization': 'Bearer invalid-token'}
     )
 
-    assert response.status_code == 401
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
     assert response.json() == {'detail': 'Could not validate credentials'}
 
 
@@ -29,7 +31,7 @@ def test_jwt_invalid_user(client, user, token):
         '/users/1', headers={'Authorization': f'Bearer {token}'}
     )
 
-    assert response.status_code == 401
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
     assert response.json() == {'detail': 'Could not validate credentials'}
 
 
@@ -40,5 +42,5 @@ def test_jwt_invalid_subjetc_email(client, user):
         '/users/1', headers={'Authorization': f'Bearer {token}'}
     )
 
-    assert response.status_code == 401
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
     assert response.json() == {'detail': 'Could not validate credentials'}

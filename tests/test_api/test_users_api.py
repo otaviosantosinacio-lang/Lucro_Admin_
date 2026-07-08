@@ -34,7 +34,7 @@ def test_create_user_exists_username(client, user):
         },
     )
 
-    assert response.status_code == 400
+    assert response.status_code == HTTPStatus.BAD_REQUEST
     assert response.json() == {
         'detail': {'message': 'Username already exists'}
     }
@@ -51,7 +51,7 @@ def test_create_user_exists_email(client, user):
         },
     )
 
-    assert response.status_code == 400
+    assert response.status_code == HTTPStatus.BAD_REQUEST
     assert response.json() == {'detail': {'message': 'Email already exists'}}
 
 
@@ -76,7 +76,7 @@ def test_update_user(client, user, token):
         },
     )
 
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json() == {
         'id_usuario': user.id_usuario,
         'nome_usuario': 'lucroadmintestupdate',
@@ -95,7 +95,7 @@ def test_update_user_notfound(client, user, token):
         },
     )
 
-    assert response.status_code == 403
+    assert response.status_code == HTTPStatus.FORBIDDEN
     assert response.json() == {'detail': 'Not enough permissions'}
 
 
@@ -110,7 +110,7 @@ def test_update_user_exist_username(client, user, other_user, token):
         },
     )
 
-    assert response.status_code == 400
+    assert response.status_code == HTTPStatus.BAD_REQUEST
     assert response.json() == {
         'detail': {'message': 'Username already exists'}
     }
@@ -127,7 +127,7 @@ def test_update_user_exist_email(client, user, other_user, token):
         },
     )
 
-    assert response.status_code == 400
+    assert response.status_code == HTTPStatus.BAD_REQUEST
     assert response.json() == {'detail': {'message': 'Email already exists'}}
 
 
@@ -143,7 +143,7 @@ def test_update_user_with_wrong_user(client, token, other_user):
     )
 
     assert response.json() == {'detail': 'Not enough permissions'}
-    assert response.status_code == 403
+    assert response.status_code == HTTPStatus.FORBIDDEN
 
 
 def test_delete_user(client, user, token):
@@ -152,7 +152,7 @@ def test_delete_user(client, user, token):
         headers={'Authorization': f'Bearer {token}'},
     )
 
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'User delete'}
 
 
@@ -162,5 +162,5 @@ def test_delete_user_enougth_permission(client, other_user, token):
         headers={'Authorization': f'Bearer {token}'},
     )
 
-    assert response.status_code == 403
+    assert response.status_code == HTTPStatus.FORBIDDEN
     assert response.json() == {'detail': 'Not enough permissions'}
