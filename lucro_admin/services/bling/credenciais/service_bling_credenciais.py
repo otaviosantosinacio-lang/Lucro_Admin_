@@ -37,7 +37,7 @@ class oAuthCodeBling:
             raise Exception('Credenciais não encontradas')
 
         state: str = cript_state()
-        url: str = adapt_code.gerando_url_request(client_id, state=state)
+        url: str = adapt_code.generate_url_request(client_id, state=state)
 
         webbrowser.open(url)
 
@@ -55,7 +55,7 @@ class oAuthCodeBling:
 
         logger.info('Bling oAuth Code | Code salvo e state validado')
 
-        tokens_dict = adapt_code.troca_code_por_tokens(
+        tokens_dict = adapt_code.exchange_code_for_tokens(
             client_id, client_secret, code
         )
         tokens: Credencial = Credencial.from_api_response(tokens_dict)
@@ -110,7 +110,7 @@ class oAuthRefreshBling:
                 'Bling oAuth Refresh | Credenciais validadas iniciando request'
             )
 
-            tokens_dict = self.adapt_refresh.usando_refresh_token(
+            tokens_dict = self.adapt_refresh.refresh_access_token(
                 client_id, client_secret, refresh_token
             )
 

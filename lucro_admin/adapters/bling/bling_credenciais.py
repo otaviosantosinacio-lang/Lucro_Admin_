@@ -20,7 +20,6 @@ class Code:
         self.timeout = 30
 
     base_url: str = 'https://api.bling.com.br/Api/v3'
-    base_url_code = 'https://bling.com.br/Api/v3'
 
     def code_request(self, url, headers, data):
         """
@@ -85,7 +84,10 @@ class Code:
             'Authorization': f'Basic {base64_credentials}',
             'enable-jwt': '1',
         }
-        data: str = f'grant_type=authorization_code&code={code}'
+        data: dict[str, str] = {
+            'grant_type': 'authorization_code',
+            'code': f'{code}'
+        }
 
         url: str = f'{self.base_url}/oauth/token'
         logger.info(
@@ -178,7 +180,7 @@ class Refresh:
         refresh_access_token
 
         Configuring headers and data to exchange the Refresh Token for
-        a new Access Token. 
+        a new Access Token.
 
         :param self:
         :param client_id: Bling application credential
@@ -186,7 +188,7 @@ class Refresh:
         :param client_secret: Bling application credential
         :type client_secret: str
         :param refresh_token: Credential obtained via request that
-        can be exchanged for a new access token when the current one expires. 
+        can be exchanged for a new access token when the current one expires.
         :type refresh_token: str
         """
 
