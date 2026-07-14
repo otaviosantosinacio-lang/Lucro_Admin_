@@ -2,9 +2,9 @@ import logging
 from logging.config import dictConfig
 from pathlib import Path
 
-from lucro_admin.adapters.bling.bling_credenciais import Refresh
-from lucro_admin.adapters.bling.bling_pedidos import GetBling
-from lucro_admin.adapters.mercado_livre.mercado_livre_credenciais import (
+from lucro_admin.adapters.bling.bling_credentials import Refresh
+from lucro_admin.adapters.bling.bling_orders import GetBling
+from lucro_admin.adapters.mercado_livre.mercado_livre_credentials import (
     RefreshML,
 )
 from lucro_admin.adapters.mercado_livre.mercado_livre_pedidos import (
@@ -78,8 +78,11 @@ def main():
     # Token Services
     token_service_bling = TokenService(bling_provider_credenciais)
     token_service_ML = TokenService(mercadolivre_provider_credenciais)
-    """Aqui e¨ chamando o metodo valida_access que esta dentro da classe TokenService,
-    você pode observar que eu estou usando o objeto token_service_bling para chamar o metodo"""
+    """
+        Aqui e¨ chamando o metodo valida_access que esta dentro da classe
+        TokenService, você pode observar que eu estou usando o objeto
+        token_service_bling para chamar o metodo
+    """
     # Bling
     access_token_bling = token_service_bling.valida_access()
 
@@ -95,7 +98,7 @@ def main():
 
     pedidos = bling_provider_pedidos.processa_ids()
 
-    custos_ml = mercadolivre_pedidos.extraindo_custos(pedidos=pedidos)
+    custos_ml = mercadolivre_pedidos.get_sale_costs(pedidos=pedidos)
 
     insert_pedidos = repo_pedidos.insert_pedidos(custos_ml.pedidos)
 

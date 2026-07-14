@@ -8,8 +8,8 @@ from lucro_admin.core.entities_pedidos import (
     PedidoseProdutosCompletos,
     ProdutoCompleto,
     ResultadoPagina,
+    SaleCosts,
     ShipCommission,
-    SaleCosts
 )
 from lucro_admin.services.mercado_pago.service_mercadopago import (
     MercadoPagoCustos,

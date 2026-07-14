@@ -2,7 +2,7 @@ import logging
 import os
 import subprocess
 
-from lucro_admin.adapters.mercado_livre.mercado_livre_credenciais import Code
+from lucro_admin.adapters.mercado_livre.mercado_livre_credentials import Code
 from lucro_admin.core.entities_credenciais import Credencial
 from lucro_admin.utils.code_state import code_string
 from lucro_admin.utils.cript_state import cript_state
@@ -25,7 +25,7 @@ class oAuthCodeMercadoLivre:
         :rtype: bool
         """
         caminho_edge: str = (
-            r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
+            'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
         )
         if os.path.exists(caminho_edge):
             comando = [caminho_edge, url]
@@ -89,7 +89,7 @@ class oAuthCodeMercadoLivre:
 
         logger.info('Mercado Livre oAuth Code | Code salvo e state validado')
 
-        tokens_dict: dict[str, int] = adapt_code.troca_code_por_tokens(
+        tokens_dict: dict[str, int] = adapt_code.exchange_code_for_tokens(
             client_id=client_id,
             client_secret=client_secret,
             code=code,
@@ -141,16 +141,18 @@ class oAuthRefreshMercadoLivre:
 
         if not client_id or not client_secret or not refresh_token:
             logger.exception(
-                'Mercado Livre oAuth Refresh | Credenciais não encontradas ou não retornadas do banco de dados'
+                'Mercado Livre oAuth Refresh | Credenciais não encontradas ou'
+                ' não retornadas do banco de dados'
             )
             raise Exception('Credenciais não encontradas')
         else:
             logger.info(
-                'Mercado Livre oAuth Refresh | Credenciais validadas iniciando request'
+                'Mercado Livre oAuth Refresh | Credenciais validadas iniciando'
+                ' request'
             )
 
             tokens_dict: dict[str, int] = (
-                self.adapt_refresh.usando_refresh_token(
+                self.adapt_refresh.using_refresh_token(
                     client_id, client_secret, refresh_token
                 )
             )

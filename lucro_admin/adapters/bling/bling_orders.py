@@ -1,7 +1,6 @@
 import logging
 
 import requests
-from requests import get
 
 from lucro_admin.infra.http.retry import RetryPolicy
 
@@ -12,7 +11,7 @@ logger = logging.getLogger('lucroadmin.adapters.bling')
 class Request:
     """
 
-    Base para os requests get do bling
+    Base for Bling GET requests
 
     """
 
@@ -25,21 +24,22 @@ class Request:
         """
         request_endpoint
 
-        Request básico individualizado para CRUD Get do Bling
+        Individualized basic request for Bling CRUD Get
 
         :param self:
-        :param url: EndPoint Bling
+        :param url: Bling Endpoint
         :type url: str
-        :param headers: Headers para validação obtenção das credenciais
+        :param headers: Headers for credential validation
         :type headers: dict[str, str]
-        :return: Retorno formatado da endpoint
+        :return: Formatted return from the endpoint
         :rtype: Response
+
         """
         logger.info(
-            'Bling request_pedidos | Enviando requisição para o end point %s',
+            'Bling request_pedidos | Sending a request to the endpoint %s',
             url,
         )
-        return get(url=url, headers=headers, timeout=self.timeout)
+        return requests.get(url=url, headers=headers, timeout=self.timeout)
 
 
 class GetBling:
@@ -48,15 +48,15 @@ class GetBling:
 
     def get_endpoint(self, access_token: str, url: str):
         """
-        :param self: Objeto
-        :param access_token: Credencial de acesso válida
+        :param self: Object
+        :param access_token: Valid access credential
         :type access_token: string
-        :param url: Endpoint Bling V3
+        :param url: Bling V3 Endpoint
         :type url: String
 
-        Headers e request para endpoint bling para retornar ao service o json.
+        Headers and request to Bling endpoint to return the JSON to the service.
         """
-        logger.info('Bling get_endpoints_bling | Iniciando o Request')
+        logger.info('Bling get_endpoints_bling | Starting the Request')
         headers: dict[str, str] = {
             'Authorization': f'Bearer {access_token}',
             'Accept': 'application/json',
@@ -66,17 +66,16 @@ class GetBling:
         response = retry_policy.executa(
             lambda: self.request.request_endpoint(url, headers)
         )
-        logger.info(
-            'Bling get_endpoints_bling | Retorno da requisição é %s',
+        logger.warning(
+            'Bling get_endpoints_bling | The request return is %s',
             response.status_code,
         )
-
         return response
 
 
 class GetUrlXML:
     """
-    Metodo GET apenas para baixarmos o XML
+    GET method only to download the XML
 
     """
 
@@ -87,24 +86,24 @@ class GetUrlXML:
         """
         request_xml_endpoint
 
-        Metodo GET
+        Method GET
 
         :param self:
         :param url: EndPoint
         """
-        return get(url=url, timeout=self.timeout)
+        return requests.get(url=url, timeout=self.timeout)
 
     def request_xml(self, url: str):
         """
         request_xml
 
-        Organizando Request XML
+        Organizing XML Request
 
         :param self:
         :param url: EndPoint XML
         :type url: str
         """
         response = retry_policy.executa(lambda: self.request_xml_endpoint(url))
-        logger.info('XML EndPoint | Retorno HTTP %s', response.status_code)
+        logger.info('XML EndPoint | Return HTTP %s', response.status_code)
 
         return response.text

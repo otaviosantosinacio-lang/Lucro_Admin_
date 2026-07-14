@@ -4,7 +4,7 @@ from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
-from lucro_admin.adapters.bling.bling_pedidos import GetUrlXML
+from lucro_admin.adapters.bling.bling_orders import GetUrlXML
 from lucro_admin.core.entities_pedidos import ErrorHTTP, ResultadoPagina
 from lucro_admin.core.entities_produtos import ConfigSku
 from lucro_admin.core.imposto.calcula_imposto import CalculadoraDeImposto

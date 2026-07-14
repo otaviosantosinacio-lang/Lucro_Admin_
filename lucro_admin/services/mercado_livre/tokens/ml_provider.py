@@ -16,7 +16,7 @@ class MLProvider(TokenProvider):
 
     def get_access_token(self) -> str:
         logger.info(
-            'Mercado Livre Provider | Buscando no Banco de Dados o access token.'
+        'Mercado Livre Provider | Buscando no Banco de Dados o access token.'
         )
         return self.repositorio.get_access_token()
 
@@ -28,7 +28,7 @@ class MLProvider(TokenProvider):
 
     def use_refresh_token(self) -> str | None:
         logger.info(
-            'Mercado Livre Provider | Iniciando o fluxo de uso do refresh token.'
+        'Mercado Livre Provider | Iniciando o fluxo de uso do refresh token.'
         )
         fluxo_refresh = oAuthRefreshMercadoLivre(
             self.repositorio, self.adapter_refresh
