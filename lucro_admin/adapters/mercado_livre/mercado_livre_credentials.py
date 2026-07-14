@@ -171,8 +171,8 @@ class RefreshML:
             )
             credenciais = {
                 'response_status_code': response.status_code,
-                'access_token': '',
-                'refresh_token': '',
+                'access_token': None,
+                'refresh_token': None,
                 'expire': 1,
             }
             return credenciais
@@ -187,8 +187,8 @@ class RefreshML:
             )
             credenciais = {
                 'response_status_code': response.status_code,
-                'access_token': '',
-                'refresh_token': '',
-                'expire': 100,
+                'access_token': None,
+                'refresh_token': None,
+                'expire': 1,
             }
             return credenciais

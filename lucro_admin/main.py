@@ -7,7 +7,7 @@ from lucro_admin.adapters.bling.bling_orders import GetBling
 from lucro_admin.adapters.mercado_livre.mercado_livre_credentials import (
     RefreshML,
 )
-from lucro_admin.adapters.mercado_livre.mercado_livre_pedidos import (
+from lucro_admin.adapters.mercado_livre.mercado_livre_orders import (
     GetMercadoLivre,
 )
 from lucro_admin.infra.logging.config import Logging_Config

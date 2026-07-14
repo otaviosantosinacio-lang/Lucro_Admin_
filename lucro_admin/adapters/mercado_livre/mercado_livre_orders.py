@@ -16,7 +16,7 @@ class RequestMercadoLivre:
     def request_endpoint_mercadolivre(self, url: str, headers: dict[str, str]):
 
         logger.info(
-            'Mercado Livre Request | Enviando requisição para o end point %s',
+            'Mercado Livre Request | Sending request to the endpoint %s',
             url,
         )
         response = requests.get(
@@ -33,17 +33,17 @@ class GetMercadoLivre:
 
     def get_endpoint(self, access_token: str, url: str):
         """
-        :param self: Objeto
-        :param access_token: Credencial de acesso válida
+        :param self: Object
+        :param access_token: Valid access credential
         :type access_token: string
-        :param url: Endpoint Mercado Livre
+        :param url: Mercado Livre endpoint
         :type url: String
 
-        Headers e request para endpoint Mercado Livre para retornar ao
-        service o json.
+        Headers and request for the Mercado Livre endpoint to return the
+        JSON to the service.
         """
         logger.info(
-            'Mercado Livre get_endpoints_mercadolivre | Iniciando o Request'
+            'Mercado Livre get_endpoints_mercadolivre | Starting Request'
         )
         headers: dict[str, str] = {
             'Authorization': f'Bearer {access_token}',
@@ -54,7 +54,7 @@ class GetMercadoLivre:
             lambda: self.request_ml.request_endpoint_mercadolivre(url, headers)
         )
         logger.info(
-            'Bling get_endpoints_bling | Retorno da requisição é %s',
+            'Bling get_endpoints_bling | The request response is %s',
             response.status_code,
         )
 
