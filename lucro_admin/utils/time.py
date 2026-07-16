@@ -1,10 +1,10 @@
 import logging
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 
 def somandosecs(segundos):
     logger = logging.getLogger('lucroadmin.utils.time')
-    from datetime import datetime, timedelta
 
     agora = datetime.now(tz=ZoneInfo('UTC'))
     expira = agora + timedelta(seconds=segundos)

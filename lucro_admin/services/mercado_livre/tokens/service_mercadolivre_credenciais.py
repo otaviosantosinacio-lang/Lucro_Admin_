@@ -3,7 +3,7 @@ import os
 import subprocess
 
 from lucro_admin.adapters.mercado_livre.mercado_livre_credentials import Code
-from lucro_admin.core.entities_credenciais import Credencial
+from lucro_admin.core.entities_credential import Credential
 from lucro_admin.utils.code_state import code_string
 from lucro_admin.utils.cript_state import cript_state
 
@@ -95,7 +95,7 @@ class oAuthCodeMercadoLivre:
             code=code,
             redirect_url=redirect_url,
         )
-        tokens: Credencial = Credencial.from_api_response(tokens_dict)
+        tokens: Credential = Credential.from_api_response(tokens_dict)
 
         atualiza: bool = self.repositorio.salva_token(
             tokens.access_token, tokens.refresh_token, tokens.expire

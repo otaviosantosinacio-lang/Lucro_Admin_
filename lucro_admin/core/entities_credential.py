@@ -8,31 +8,32 @@ logger = logging.getLogger('lucroadmin.core.entities')
 
 
 @dataclass
-class Credencial:
+class Credential:
     """
-    Credencial
+    Credential
 
     Attributes:
-        access_token: Token de acesso atual (Bearer)
-        refresh_token: Token com expiração maior para obter o próximo
-        access token quando expirado
-        expire: Data/hora/segundos de quando o access token expira
-        response_status_code: Status HTTP para controle de erros
+        access_token: Current access token (Bearer)
+        refresh_token: Token with a loger expiration
+        expire: Date/time/seconds of when the access token expires
+        response_status_code: HTTP status for error handling
     """
 
     access_token: str
     refresh_token: str
-    expire: datetime
+    expire: int | datetime
     response_status_code: int
 
     @classmethod
-    def from_api_response(cls, response_data: dict) -> 'Credencial':
-        """Converte retorno da API (com expire em segundos) para Credenciais"""
+    def from_api_response(cls, response_data: dict) -> 'Credential':
+        """
+        access_tConverts API return (with expiry in seconds) to Credentials
+        """
         return cls(
             access_token=response_data['access_token'],
             refresh_token=response_data['refresh_token'],
             expire=somandosecs(
                 response_data['expire']
-            ),  # Converte int para datetime
+            ),  # Convert int for datetime
             response_status_code=response_data['response_status_code'],
         )
