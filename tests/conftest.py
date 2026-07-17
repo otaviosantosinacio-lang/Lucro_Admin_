@@ -8,6 +8,7 @@ from sqlalchemy.pool import StaticPool
 
 from lucro_admin.api.app import app
 from lucro_admin.api.security import get_password_hash
+from lucro_admin.core.imposto.entities_imposto import ProductWithTax
 from lucro_admin.infra import models
 from lucro_admin.infra.database import get_session
 from lucro_admin.infra.models.usuario import Usuario
@@ -101,3 +102,37 @@ class UserFactory(factory.Factory):
 @pytest.fixture
 def settings():
     return DataBaseSettings()
+
+@pytest.fixture
+def products_tax():
+    products_tax = [
+        ProductWithTax(
+            id_bling=1,
+            order_status='Atendido',
+            sku='LA001',
+            quantity=1,
+            cost_price=10.99,
+            value=42.00,
+            icms=5.0,
+            pis=1.5,
+            cofins=2.0,
+            difal=8.0,
+            fcp=0.96,
+            total=17.46
+        ),
+        ProductWithTax(
+            id_bling=1,
+            order_status='Atendido',
+            sku='LA005',
+            quantity=2,
+            cost_price=15.99,
+            value=80.00,
+            icms=5.93,
+            pis=1.52,
+            cofins=2.79,
+            difal=15.39,
+            fcp=1.2,
+            total=26.83
+        )
+    ]
+    return products_tax

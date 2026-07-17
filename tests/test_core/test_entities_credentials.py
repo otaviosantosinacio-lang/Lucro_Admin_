@@ -6,6 +6,7 @@ from freezegun import freeze_time
 
 from lucro_admin.core.entities_credential import Credential
 
+
 def test_entitiy_credential():
     with freeze_time('2025-04-01 13:00:00'):
         expire_test = 60
@@ -30,15 +31,16 @@ def test_entitiy_credential():
         assert credentials.expire == expected_expiration
         assert credentials.response_status_code == HTTPStatus.OK
 
-def test_entitie_credential_missing():
+
+def test_entitie_credential_without_access_token():
     expire_test = 60
     credentials_dict: dict[str,str|int] = {
         'refresh_token': 'refresh_token_test',
         'expire': expire_test,
         'response_status_code': HTTPStatus.OK
     }
-    
+
     with pytest.raises(KeyError, match='access_token'):
-        credentials: Credential = Credential.from_api_response(credentials_dict)
-
-
+        credentials: Credential = Credential.from_api_response(
+            credentials_dict
+            )

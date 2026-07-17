@@ -11,7 +11,7 @@ class ProductWithTax:
         situacao_pedido: Order status within Bling
         sku: Product SKU
         quantidade: Quantity of the item sold
-        valor: Product sale value
+        value: Product sale value
         icms: Amount paid in ICMS
         pis: Amount paid in PIS
         cofins: Amount paid in COFINS
@@ -58,7 +58,7 @@ class SalesTaxes:
     cost: float
 
     @classmethod
-    def sum_taxes(cls, produtos_imposto, id_bling) -> 'SalesTaxes':
+    def sum_taxes(cls, products_tax, id_bling) -> 'SalesTaxes':
         """
         Sum of product taxes to generate total taxes for the sale
 
@@ -70,13 +70,13 @@ class SalesTaxes:
         """
         return cls(
             id_bling=id_bling,
-            icms=sum(p.icms for p in produtos_imposto),
-            pis=sum(p.pis for p in produtos_imposto),
-            cofins=sum(p.cofins for p in produtos_imposto),
-            difal=sum(p.difal for p in produtos_imposto),
-            fcp=sum(p.fcp for p in produtos_imposto),
-            total=sum(p.total for p in produtos_imposto),
-            cost=sum(p.preco_custo for p in produtos_imposto),
+            icms=sum(p.icms for p in products_tax),
+            pis=sum(p.pis for p in products_tax),
+            cofins=sum(p.cofins for p in products_tax),
+            difal=sum(p.difal for p in products_tax),
+            fcp=sum(p.fcp for p in products_tax),
+            total=sum(p.total for p in products_tax),
+            cost=sum(p.cost_price for p in products_tax),
         )
 
 
@@ -96,19 +96,19 @@ class TaxReturn:
 
 
 @dataclass
-class ItemPedido:
+class OrderItem:
     """
-    ItemPedido
+    OrderItem
 
     Attributes:
-        codigo: SKU do produto
-        quantidade: Quantidade vendida
-        valor: Valor de venda
+        code: Product SKU
+        quantity: Quantity sold
+        value: Sale value
     """
 
-    codigo: str
-    quantidade: int
-    valor: float
+    code: str
+    quantity: int
+    value: float
 
 
 @dataclass
@@ -117,8 +117,8 @@ class ErrorParse:
     ErrorParse
 
     Attributes:
-        tag: Tag do XML que não foi encontrada
-        error: Tipo de erro.
+        tag: XML tag that was not found
+        error: Type of error.
 
     """
 
