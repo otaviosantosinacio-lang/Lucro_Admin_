@@ -7,12 +7,12 @@ from typing import Any
 from lucro_admin.adapters.bling.bling_orders import GetUrlXML
 from lucro_admin.core.entities_pedidos import ErrorHTTP, ResultadoPagina
 from lucro_admin.core.entities_produtos import ConfigSku
-from lucro_admin.core.imposto.calcula_imposto import CalculadoraDeImposto
+from lucro_admin.core.imposto.tax_calculator import TaxCalculator
 from lucro_admin.core.imposto.entities_imposto import (
     ErrorParse,
-    ImpostosDaVenda,
-    ProdutoComImposto,
-    RetornoImpostos,
+    ProductWithTax,
+    SalesTaxes,
+    TaxReturn,
 )
 from lucro_admin.core.imposto.regras_fiscais import uf_sem_fcp
 from lucro_admin.infra.repositorio_produtos import Produtos
@@ -35,7 +35,7 @@ class ParseXML:
         self.service_base = BaseRequestHTTP(
             self.adapt_pedidos, self.access_token
         )
-        self.calculadora = CalculadoraDeImposto()
+        self.calculadora = TaxCalculator()
 
     def url_nf(self, id_nf) -> str:
         """
@@ -48,7 +48,7 @@ class ParseXML:
         """
         return f'{base_url}/nfe/{id_nf}'
 
-    def get_xml(self, pedido, situacao) -> RetornoImpostos | Any:
+    def get_xml(self, pedido, situacao) -> TaxReturn | Any:
         """
         get_xml -> Get do XML por endpoint Bling
 
@@ -73,8 +73,8 @@ class ParseXML:
                 xml=response_xml, id_bling=pedido.id_bling, situacao=situacao
             )
             if isinstance(parse, ErrorParse):
-                parse = self.calculadora.calculadora_de_tributos(
-                    itens=pedido.itens,
+                parse = self.calculadora.tax_calculator(
+                    items=pedido.itens,
                     id_bling=pedido.id_bling,
                     sit=situacao,
                     uf_dest=pedido.uf_dest,
@@ -97,8 +97,8 @@ class ParseXML:
                 erro.status,
             )
 
-            return self.calculadora.calculadora_de_tributos(
-                itens=pedido.itens,
+            return self.calculadora.tax_calculator(
+                items=pedido.itens,
                 id_bling=pedido.id_bling,
                 sit=situacao,
                 uf_dest=pedido.uf_dest,
@@ -106,7 +106,7 @@ class ParseXML:
 
     def parse_xml(
         self, xml, id_bling, situacao
-    ) -> RetornoImpostos | ErrorParse:
+    ) -> TaxReturn | ErrorParse:
         """
         parse_xml -> Extração de impostos por tags XML
 
@@ -252,13 +252,13 @@ class ParseXML:
 
             preco_custo = produtos.consulta_custo(SKU=sku)
             preco_custo *= qCom_n
-            imposto_produto = ProdutoComImposto(
+            imposto_produto = ProductWithTax(
                 id_bling=id_bling,
-                situacao_pedido=situacao,
+                order_status=situacao,
                 sku=sku,
-                quantidade=qCom_n,
-                preco_custo=preco_custo,
-                valor=vProd_n,
+                quantity=qCom_n,
+                cost_price=preco_custo,
+                value=vProd_n,
                 icms=vICMS_n,
                 pis=vPIS_n,
                 cofins=vCOFINS_n,
@@ -268,15 +268,15 @@ class ParseXML:
             )
             produtos_com_imposto.append(imposto_produto)
 
-        imposto_venda = ImpostosDaVenda.soma_impostos(
-            produtos_imposto=produtos_com_imposto, id_bling=id_bling
+        imposto_venda = SalesTaxes.sum_taxes(
+            products_tax=produtos_com_imposto, id_bling=id_bling
         )
         logger.info(
             'Bling debug_xml | Produto com impostos individualizado -> %s',
             produtos_com_imposto,
         )
-        return RetornoImpostos(
-            produto_imposto=produtos_com_imposto, venda_imposto=imposto_venda
+        return TaxReturn(
+            product_tax=produtos_com_imposto, sale_tax=imposto_venda
         )
 
     def parse_decimal(self, text: str | None) -> Decimal:

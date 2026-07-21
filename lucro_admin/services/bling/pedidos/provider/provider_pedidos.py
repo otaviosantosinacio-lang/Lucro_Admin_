@@ -6,7 +6,7 @@ from lucro_admin.core.entities_pedidos import (
     ResultadoGetDetalhes,
     ResultadoGetPaginas,
 )
-from lucro_admin.core.imposto.calcula_imposto import CalculadoraDeImposto
+from lucro_admin.core.imposto.tax_calculator import TaxCalculator
 from lucro_admin.services.bling.pedidos.parse_xml import ParseXML
 from lucro_admin.services.bling.pedidos.provider.provider import (
     PedidosProvider,
@@ -37,7 +37,7 @@ class PedidosProviderBling(PedidosProvider):
             self.access_token, self.adapt_pedidos, self.repo_pedidos
         )
         self.service_xml = ParseXML(self.access_token, self.adapt_pedidos)
-        self.calculadora = CalculadoraDeImposto()
+        self.calculadora = TaxCalculator()
 
     def id_pag(self) -> ResultadoGetPaginas:
         """
@@ -78,10 +78,10 @@ class PedidosProviderBling(PedidosProvider):
                     'Bling Provider Pedido | '
                     'Impostos retornados por produto-> %s -> '
                     'Impostos da venda retornado -> %s',
-                    imposto.produto_imposto,
-                    imposto.venda_imposto,
+                    imposto.product_tax,
+                    imposto.sale_tax,
                 )
-                for produto in imposto.produto_imposto:
+                for produto in imposto.product_tax:
                     imposto_produto.append(produto)
 
             else:
@@ -89,8 +89,8 @@ class PedidosProviderBling(PedidosProvider):
                     'Bling Provider Pedido |'
                     ' Calculando custos fiscais com a calculadora de impostos'
                 )
-                imposto = self.calculadora.calculadora_de_tributos(
-                    itens=pedido.itens,
+                imposto = self.calculadora.tax_calculator(
+                    items=pedido.itens,
                     id_bling=pedido.id_bling,
                     sit=situacao,
                     uf_dest=pedido.uf_dest,
@@ -99,10 +99,10 @@ class PedidosProviderBling(PedidosProvider):
                     'Bling Provider Pedido |'
                     ' Impostos retornados por produto da calculadora->'
                     ' %s -> Impostos da venda retornado da calculadora -> %s',
-                    imposto.produto_imposto,
-                    imposto.venda_imposto,
+                    imposto.product_tax,
+                    imposto.sale_tax,
                 )
-                for produto in imposto.produto_imposto:
+                for produto in imposto.product_tax:
                     imposto_produto.append(produto)
             PedidocomImposto = Dados_Pedido_imposto(
                 id_bling=pedido.id_bling,
@@ -114,13 +114,13 @@ class PedidosProviderBling(PedidosProvider):
                 nf_id=pedido.nf_id,
                 valor_pedido=pedido.valor_pedido,
                 servico_trans=pedido.servico_trans,
-                icms=imposto.venda_imposto.icms,
-                pis=imposto.venda_imposto.pis,
-                cofins=imposto.venda_imposto.cofins,
-                difal=imposto.venda_imposto.difal,
-                fcp=imposto.venda_imposto.fcp,
-                custo_produto=imposto.venda_imposto.custo,
-                total=imposto.venda_imposto.total,
+                icms=imposto.sale_tax.icms,
+                pis=imposto.sale_tax.pis,
+                cofins=imposto.sale_tax.cofins,
+                difal=imposto.sale_tax.difal,
+                fcp=imposto.sale_tax.fcp,
+                custo_produto=imposto.sale_tax.cost,
+                total=imposto.sale_tax.total,
             )
             pedidos_imposto.append(PedidocomImposto)
         return PedidoseImpostos(

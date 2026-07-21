@@ -68,6 +68,9 @@ async def teste_criar_produto(session: AsyncSession):
         descricao_produto='gerenciador de lucro',
         fornecedor='Lucro Admin',
         preco_custo=Decimal('29.99'),
+        origem=1,
+        ncm='123456',
+        cest='456789',
         created_user_id=1,
         updated_user_id=1,
     )
@@ -174,6 +177,9 @@ async def teste_criando_item_pedido(session: AsyncSession):
         descricao_produto='gerenciador de lucro',
         fornecedor='Lucro Admin',
         preco_custo=Decimal('29.99'),
+        origem=1,
+        ncm='123456',
+        cest='456789',
         created_user_id=1,
         updated_user_id=1,
     )
@@ -241,6 +247,9 @@ async def teste_criando_item_pedido_imposto(session: AsyncSession):
         descricao_produto='gerenciador de lucro',
         fornecedor='Lucro Admin',
         preco_custo=Decimal('29.99'),
+        origem=1,
+        ncm='123456',
+        cest='456789',
         created_user_id=1,
         updated_user_id=1,
     )
@@ -324,6 +333,9 @@ async def test_criando_nota_fiscal(session: AsyncSession):
         descricao_produto='gerenciador de lucro',
         fornecedor='Lucro Admin',
         preco_custo=Decimal('29.99'),
+        origem=1,
+        ncm='123456',
+        cest='456789',
         created_user_id=1,
         updated_user_id=1,
     )

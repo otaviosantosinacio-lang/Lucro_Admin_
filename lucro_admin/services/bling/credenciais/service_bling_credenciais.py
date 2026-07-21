@@ -3,7 +3,7 @@ import webbrowser
 from http import HTTPStatus
 
 from lucro_admin.adapters.bling.bling_credentials import Code
-from lucro_admin.core.entities_credential import Credencial
+from lucro_admin.core.entities_credential import Credential
 from lucro_admin.utils.code_state import code_string
 from lucro_admin.utils.cript_state import cript_state
 
@@ -58,7 +58,7 @@ class oAuthCodeBling:
         tokens_dict = adapt_code.exchange_code_for_tokens(
             client_id, client_secret, code
         )
-        tokens: Credencial = Credencial.from_api_response(tokens_dict)
+        tokens: Credential = Credential.from_api_response(tokens_dict)
         atualiza = self.repositorio.salva_token(
             tokens.access_token, tokens.refresh_token, tokens.expire
         )
@@ -114,7 +114,7 @@ class oAuthRefreshBling:
                 client_id, client_secret, refresh_token
             )
 
-            tokens: Credencial = Credencial.from_api_response(tokens_dict)
+            tokens: Credential = Credential.from_api_response(tokens_dict)
 
         if tokens.response_status_code == HTTPStatus.OK:
             atualiza = self.repositorio.salva_token(

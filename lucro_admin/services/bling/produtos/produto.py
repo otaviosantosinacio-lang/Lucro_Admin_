@@ -1,10 +1,8 @@
 import logging
 
-from lucro_admin.services.service_http_request_base import (
-    BaseHTTPBling,
-)
 from lucro_admin.core.entities_produtos import Produto
 from lucro_admin.infra.repositorio_produtos import Produtos
+from lucro_admin.services.service_http_request_base import BaseRequestHTTP
 
 logger = logging.getLogger('lucroadmin.services.blingprodutos')
 
@@ -17,7 +15,7 @@ class ProdutosRequest:
     ):
         self.access_token = access_token
         self.adapt_pedidos = adapt_bling
-        self.service_base = BaseHTTPBling(
+        self.service_base = BaseRequestHTTP(
             adapt_pedidos=self.adapt_pedidos, access_token=self.access_token
         )
 

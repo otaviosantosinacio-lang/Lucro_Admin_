@@ -156,7 +156,7 @@ class oAuthRefreshMercadoLivre:
                     client_id, client_secret, refresh_token
                 )
             )
-            tokens: Credencial = Credencial.from_api_response(tokens_dict)
+            tokens: Credential = Credential.from_api_response(tokens_dict)
 
         if tokens.response_status_code == 200:
             atualiza = self.repositorio.salva_token(
