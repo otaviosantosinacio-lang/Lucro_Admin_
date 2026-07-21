@@ -29,6 +29,12 @@ class Produto(BaseModel):
 
     preco_custo: Mapped[Decimal]
 
+    origem: Mapped[int]
+
+    ncm: Mapped[str]
+
+    cest: Mapped[str]
+
     created_at: Mapped[datetime] = mapped_column(
         init=False, server_default=func.now()
     )
