@@ -7,21 +7,21 @@ from typing import Any
 from lucro_admin.adapters.bling.bling_orders import GetUrlXML
 from lucro_admin.core.entities_pedidos import ErrorHTTP, ResultadoPagina
 from lucro_admin.core.entities_produtos import ConfigSku
-from lucro_admin.core.imposto.tax_calculator import TaxCalculator
 from lucro_admin.core.imposto.entities_imposto import (
     ErrorParse,
     ProductWithTax,
     SalesTaxes,
     TaxReturn,
 )
-from lucro_admin.core.imposto.regras_fiscais import uf_sem_fcp
+from lucro_admin.core.imposto.regras_fiscais import uf_without_fcp
+from lucro_admin.core.imposto.tax_calculator import TaxCalculator
 from lucro_admin.infra.repositorio_produtos import Produtos
 from lucro_admin.services.service_http_request_base import (
     BaseRequestHTTP,
 )
 
 logger = logging.getLogger('lucroadmin.services.blingpedidos')
-base_url = 'https://api.bling.com.br/Api/v3'
+
 
 
 class ParseXML:
@@ -36,6 +36,7 @@ class ParseXML:
             self.adapt_pedidos, self.access_token
         )
         self.calculadora = TaxCalculator()
+        self.base_url = 'https://api.bling.com.br/Api/v3'
 
     def url_nf(self, id_nf) -> str:
         """
@@ -46,7 +47,7 @@ class ParseXML:
         :return: URL endpoint para requisição da NF
         :rtype: str
         """
-        return f'{base_url}/nfe/{id_nf}'
+        return f'{self.base_url}/nfe/{id_nf}'
 
     def get_xml(self, pedido, situacao) -> TaxReturn | Any:
         """
@@ -139,7 +140,7 @@ class ParseXML:
             return ErrorParse(tag='UF', error='Tag não encontrada')
         else:
             uf_dest = ender_dest.find(f'{namespace}UF').text
-        sem_fcp = uf_sem_fcp(uf_dest)
+        sem_fcp = uf_without_fcp(uf=uf_dest)
         # Pegando as dets(produtos) do XML
         dets = infNFe.findall(f'{namespace}det')
         if dets is None:

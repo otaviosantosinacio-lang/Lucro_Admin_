@@ -58,8 +58,6 @@ def test_tax_calculator_interstate_operation(products_list, fake_product_cost):
         uf_dest='RJ'
         )
 
-    print(taxes)
-
     for c, item in enumerate(taxes.product_tax):
         if c == 0:
             assert item.icms == pytest.approx(4.02)
@@ -95,8 +93,6 @@ def test_tax_calculator_interstate_operation_without_fcp(
         sit='Atendido',
         uf_dest='AC'
         )
-
-    print(taxes)
 
     for c, item in enumerate(taxes.product_tax):
         if c == 0:

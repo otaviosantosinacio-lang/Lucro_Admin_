@@ -13,7 +13,6 @@ from lucro_admin.services.service_http_request_base import (
     BaseRequestHTTP,
 )
 
-base_url = 'https://api.bling.com.br/Api/v3'
 logger = logging.getLogger('lucroadmin.services.blingpedidos')
 
 
@@ -30,6 +29,7 @@ class Atendidos:
         self.service_base = BaseRequestHTTP(
             self.adapt_pedidos, self.access_token
         )
+        self.base_url = 'https://api.bling.com.br/Api/v3'
 
     def url_endpoint_pag(
         self, pagina: int, sit: int, data_inicial: date, data_final: date
@@ -50,9 +50,9 @@ class Atendidos:
         :rtype: str
         """
         url: str = (
-            f'{base_url}/pedidos/vendas?pagina={pagina}&limite=20&'
-            f'idsSituacoes%5B%5D={sit}&dataInicial=2026-06-20'
-            f'&dataFinal=2026-06-20'
+            f'{self.base_url}/pedidos/vendas?pagina={pagina}&limite=20&'
+            f'idsSituacoes%5B%5D={sit}&dataInicial={data_inicial}'
+            f'&dataFinal={data_final}'
         )
         return url
 
@@ -69,7 +69,7 @@ class Atendidos:
         mais_pagina: bool = True
         pagina = 1
         data_inicial = self.data_inicial_repo()
-        if data_inicial == None:
+        if data_inicial is None:
             data_inicial = datetime.now().date()
 
         data_final = datetime.now().date
