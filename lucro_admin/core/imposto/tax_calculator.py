@@ -1,5 +1,7 @@
 import logging
 
+from sqlalchemy import false
+
 from lucro_admin.core.entities_produtos import ConfigSku
 from lucro_admin.core.imposto.entities_imposto import (
     OrderItem,
@@ -178,7 +180,7 @@ def fcp_tax(item_value, uf_dest) -> float:
 
     # Validating FCP rates
     without_fcp = uf_sem_fcp(uf_dest)
-    if without_fcp:
+    if not without_fcp and uf_dest != 'SP':
         fcp_tax: float = item_value * (2 / 100)
 
     else:

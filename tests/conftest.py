@@ -137,11 +137,12 @@ def products_tax():
     ]
     return products_tax
 
+
 @pytest.fixture
 def products_list():
     items = [
         {
-            'codigo': 'lucro_admin_test2',
+            'codigo': 'lucro_admin_test',
             'quantidade': 2,
             'valor': 100.50
         },
