@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger('lucroadmin.core.regrasfiscais')
 
 sem_fcp = {'AC', 'AP', 'PA', 'SC'}
-icms = {
+icms: dict[str, int | float] = {
     'RS': 17,
     'SC': 17,
     'MT': 17,
@@ -35,38 +35,38 @@ icms = {
 
 def icms_aliq(UF: str) -> float | int:
     """
-    icms_aliq
+    icms_rate
 
-    Carregando aliquota ICMS mediante parametro UF
+    Loading ICMS rate based on the state parameter
 
-    :param UF: UF destino da venda
+    :param UF: Destination state of the sale
     :type UF: str
-    :return: Valor da aliquota
+    :return: Rate value
     :rtype: float | int
     """
     try:
-        aliquota = icms.get(UF)
+        rate: int | float = icms.get(UF)
         logger.info(
-            'Regras Fiscais | A aliquota ICMS da UF - %s - é de %s',
+            'Tax Rules | The ICMS rate of the state - %s - is %s',
             UF,
-            aliquota,
+            rate,
         )
-        return aliquota
+        return rate
     except KeyError:
         logger.exception(
-            'Regras Fiscais | Aliquota de ICMS não cadastrada para a UF - %s',
+            'Tax Rules | ICMS rate not registered for the state - %s',
             UF,
         )
-        raise ValueError(f'Aliquota de ICMS não cadastrada para a UF - {UF}')
+        raise ValueError(f'ICMS rate not registered for the state - {UF}')
 
 
-def uf_sem_fcp(uf: str) -> bool:
+def uf_without_fcp(uf: str) -> bool:
     """
-    uf_sem_fcp
+    uf_without_fcp
 
-    Função para descobrirmos quais estados não fazem cobrança do FCP
+    Function to determine which states do not charge the FCP
 
-    :param uf: UF para verificação de cobrança ou não do FCP
+    :param uf: State abbreviation to check whether it charges the FCP or not
     :type uf: str
     :return: True or False
     :rtype: bool

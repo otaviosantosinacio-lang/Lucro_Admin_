@@ -50,7 +50,7 @@ class GetMercadoLivre:
             'Accept': 'application/json',
         }
 
-        response = retry_policy.executa(
+        response = retry_policy.execute(
             lambda: self.request_ml.request_endpoint_mercadolivre(url, headers)
         )
         logger.info(

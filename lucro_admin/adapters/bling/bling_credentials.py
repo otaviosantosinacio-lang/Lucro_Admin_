@@ -95,7 +95,7 @@ class Code:
         )
 
         # Sending request to the endpoint
-        response = retry_policy.executa(
+        response = retry_policy.execute(
             lambda: self.code_request(url, headers, data)
         )
 
@@ -221,7 +221,7 @@ class Refresh:
             url,
         )
 
-        response = retry_policy.executa(
+        response = retry_policy.execute(
             lambda: self.refresh_request(url=url, headers=headers, data=data)
         )
         # If the return is successful, we configure it according

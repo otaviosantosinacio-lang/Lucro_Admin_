@@ -5,30 +5,27 @@ logger = logging.getLogger('lucroadmin.services.bling')
 
 
 class TokenService:
-    """Definindo os atribustos do construtor da classe TokenServiceBling,
-    onde repositorio é um objeto que traz a classe CredenciaisDB_bling e adapter_refresh é um objeto que traz a classe Refresh.
-    O expire é um atribusto que esta pegando o valor do metodo get_expire_token que esta dentro da classe CredenciaisDB_bling"""
 
     def __init__(self, provider):
         self.provider = provider
 
-    def valida_access(self) -> str:
+    def validate_access_token(self) -> str:
         """
-        valida_access -> Definindo a validade do access token, se for inválido ele já inicia fluxo para obter um válido
+        validate_access_token -> Setting the validity of the access token if
+        it is invalid, it immediately starts the flow to obtain a valid one
 
-        :param self: Objeto
-        :return: Access Token válido
+        :return: Valid Access Token
         :rtype: str
         """
         expire = self.provider.get_expire()
-        expirado: bool = datetime.now() > expire
-        if expirado:
+        expired: bool = datetime.now() > expire
+        if expired:
             logger.info(
-                'Bling Token Service | Token expirado, iniciando fluxo de refresh'
+                'Bling Token Service | Token expired, starting refresh flow'
             )
             access_token: str = self.provider.use_refresh_token()
             return access_token
         else:
-            logger.info('Bling Token Service | Token válido')
+            logger.info('Bling Token Service | Valid token')
             access_token: str = self.provider.get_access_token()
             return access_token

@@ -1,7 +1,5 @@
 import logging
 
-from sqlalchemy import false
-
 from lucro_admin.core.entities_produtos import ConfigSku
 from lucro_admin.core.imposto.entities_imposto import (
     OrderItem,
@@ -9,7 +7,7 @@ from lucro_admin.core.imposto.entities_imposto import (
     SalesTaxes,
     TaxReturn,
 )
-from lucro_admin.core.imposto.regras_fiscais import icms_aliq, uf_sem_fcp
+from lucro_admin.core.imposto.regras_fiscais import icms_aliq, uf_without_fcp
 from lucro_admin.infra.repositorio_produtos import Produtos
 
 logger = logging.getLogger('lucroadmin.core.taxcalculator')
@@ -179,7 +177,7 @@ def cofins_tax(
 def fcp_tax(item_value, uf_dest) -> float:
 
     # Validating FCP rates
-    without_fcp = uf_sem_fcp(uf_dest)
+    without_fcp = uf_without_fcp(uf_dest)
     if not without_fcp and uf_dest != 'SP':
         fcp_tax: float = item_value * (2 / 100)
 

@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from lucro_admin.services.bling.credenciais.service_bling_credenciais import (
+from lucro_admin.services.bling.credenciais.service_bling_credentials import (
     oAuthRefreshBling,
 )
 from lucro_admin.services.providers.provider import TokenProvider
@@ -10,27 +10,30 @@ logger = logging.getLogger('lucroadmin.services.provider')
 
 
 class BlingProvider(TokenProvider):
-    def __init__(self, repositorio, adapter_refresh):
-        self.repositorio = repositorio
+    def __init__(self, repository, adapter_refresh):
+        self.repository = repository
         self.adapter_refresh = adapter_refresh
 
     def get_access_token(self) -> str:
         logger.info(
-            'Bling Provider | Buscando no Banco de Dados o access token.'
+            'Bling Provider | Searching the Database for the access token.'
         )
-        return self.repositorio.get_access_token()
+        return self.repository.get_access_token()
 
     def get_expire(self) -> datetime:
-        logger.info('Bling Provider | Buscando no Banco de Dados o expire.')
-        return self.repositorio.get_expire()
+        logger.info(
+            'Bling Provider | Searching the Database for the access tokens'
+            ' expiration.'
+        )
+        return self.repository.get_expire()
 
     def use_refresh_token(self) -> str:
         logger.info(
-            'Bling Provider | Iniciando o fluxo de uso do refresh token.'
+            'Bling Provider | Starting the refresh token usage flow.'
         )
-        fluxo_refresh = oAuthRefreshBling(
-            self.repositorio, self.adapter_refresh
+        refresh_flow = oAuthRefreshBling(
+            self.repository, self.adapter_refresh
         )
-        access_token: str = fluxo_refresh.fluxo_refresh_token()
-        logger.info('Bling Provider | Fluxo do refresh token finalizado.')
+        access_token: str = refresh_flow.refresh_token_flow_bling()
+        logger.info('Bling Provider | Refresh token flow completed.')
         return access_token

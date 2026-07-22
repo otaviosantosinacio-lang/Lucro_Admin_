@@ -49,7 +49,7 @@ class Code:
             base_url,
         )
 
-        response = retry_policy.executa(
+        response = retry_policy.execute(
             lambda: self.code_request(headers, data)
         )
 
@@ -139,7 +139,7 @@ class RefreshML:
             base_url,
         )
 
-        response = retry_policy.executa(
+        response = retry_policy.execute(
             lambda: self.refresh_request(
                 url=base_url, headers=headers, data=data
             )

@@ -7,59 +7,61 @@ logger = logging.getLogger('lucroadmin.infra.retry')
 
 class RetryPolicy:
     """
-    Tratamento de erros para requisições https
+    Error handling for https requests
 
     """
 
     def __init__(
         self,
-        # Máximo de 6 tentativas para que o python execute 5 vezes
-        max_tentativas: int = 6,
-        delay_inicial: float = 0.8,
-        fator_exponencial: float = 2.0,
+        # Maximum attempts 5
+        max_attempts: int = 6,
+        initial_delay: float = 0.8,
+        exponential_factor: float = 2.0,
+        success_delay: float = 0.0,
         status_retry: Iterable[int] = (429, 500, 502, 503, 504),
     ):
-        self.max_tentativas = max_tentativas
-        self.delay_inicial = delay_inicial
-        self.fator_exponencial = fator_exponencial
+        self.max_attempts = max_attempts
+        self.initial_delay = initial_delay
+        self.exponencial_factor = exponential_factor
         self.status_retry = set(status_retry)
+        self.success_delay = success_delay
 
-    def executa(self, func: Callable[[], Any]):
+    def execute(self, func: Callable[[], Any]):
         """
-        Docstring para executa
+        execute
 
-        :param self: Objeto
-        :param func: Função chamada
+        :param self: Object
+        :param func: Function Called
         :type func: Callable[[], Any]
         """
-        logger.info('Retry Policy | Iniciando fluxo retry.')
-        delay = self.delay_inicial
-        #              aqui o porque max_tentativa é 6
-        for t in range(1, self.max_tentativas + 1):
+        logger.info('Retry Policy | Starting retry flow.')
+        delay = self.initial_delay
+
+        for t in range(1, self.max_attempts + 1):
             response = func()
 
             logger.info(
                 'Retry Policy | Request status %s', response.status_code
             )
             if response.status_code not in self.status_retry:
-                time.sleep(self.delay_inicial)
+                time.sleep(self.success_delay)
                 return response
 
-            if t == self.max_tentativas:
+            if t == self.max_attempts:
                 logger.critical(
-                    'Retry Policy | Tentativas esgotadas %s | status %s',
-                    self.max_tentativas,
+                    'Retry Policy | Attempts exhausted %s | status %s',
+                    self.max_attempts,
                     response.status_code,
                 )
                 return response
 
             logger.warning(
-                'Retry Policy | Tentativa %s/%s | Status = %s | Aguardando'
+                'Retry Policy | Attempt %s/%s | Status = %s | Waiting'
                 '= %.1f',
                 t,
-                self.max_tentativas,
+                self.max_attempts,
                 response.status_code,
                 delay,
             )
             time.sleep(delay)
-            delay *= self.fator_exponencial
+            delay *= self.exponencial_factor

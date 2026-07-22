@@ -63,7 +63,7 @@ class GetBling:
             'enable-jwt': '1',
         }
 
-        response = retry_policy.executa(
+        response = retry_policy.execute(
             lambda: self.request.request_endpoint(url, headers)
         )
         logger.warning(
@@ -103,7 +103,7 @@ class GetUrlXML:
         :param url: EndPoint XML
         :type url: str
         """
-        response = retry_policy.executa(lambda: self.request_xml_endpoint(url))
+        response = retry_policy.execute(lambda: self.request_xml_endpoint(url))
         logger.info('XML EndPoint | Return HTTP %s', response.status_code)
 
         return response.text

@@ -9,7 +9,9 @@ Logging_Config: dict[str, Any] = {
     'version': 1,
     'disable_existing_loggers': False,
     'filters': {
-        'correlation_id': {'()': 'infra.logging.filters.CorrelationIdFilter'}
+        'correlation_id': {
+            '()': 'infra.logging.filters.CorrelationIdFilter'
+        }
     },
     'formatters': {
         'error_file': {
