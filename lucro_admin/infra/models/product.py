@@ -7,29 +7,29 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from lucro_admin.infra.models.base import BaseModel, registro_tabela
+from lucro_admin.infra.models.base import BaseModel, table_registry_base
 
 if TYPE_CHECKING:
-    from lucro_admin.infra.models.usuario import Usuario
+    from lucro_admin.infra.models.user import User
 
 
-@registro_tabela.mapped_as_dataclass
-class Produto(BaseModel):
-    __tablename__ = 'produtos'
+@table_registry_base.mapped_as_dataclass
+class Product(BaseModel):
+    __tablename__ = 'products'
 
-    id_produto: Mapped[int] = mapped_column(init=False, primary_key=True)
+    product_id: Mapped[int] = mapped_column(init=False, primary_key=True)
 
-    id_produto_bling: Mapped[int] = mapped_column(unique=True, nullable=False)
+    product_bling_id: Mapped[int] = mapped_column(unique=True, nullable=False)
 
     sku: Mapped[str] = mapped_column(unique=True, nullable=True)
 
-    descricao_produto: Mapped[str]
+    product_description: Mapped[str]
 
-    fornecedor: Mapped[str]
+    supplier: Mapped[str]
 
-    preco_custo: Mapped[Decimal]
+    cost_price: Mapped[Decimal]
 
-    origem: Mapped[int]
+    origin: Mapped[int]
 
     ncm: Mapped[str]
 
@@ -40,7 +40,7 @@ class Produto(BaseModel):
     )
 
     created_user_id: Mapped[int] = mapped_column(
-        ForeignKey('usuarios.id_usuario'), nullable=True
+        ForeignKey('users.user_id'), nullable=True
     )
 
     updated_at: Mapped[datetime] = mapped_column(
@@ -48,13 +48,13 @@ class Produto(BaseModel):
     )
 
     updated_user_id: Mapped[int] = mapped_column(
-        ForeignKey('usuarios.id_usuario'), nullable=False
+        ForeignKey('users.user_id'), nullable=False
     )
 
-    created_user: Mapped['Usuario'] = relationship(
+    created_user: Mapped['User'] = relationship(
         foreign_keys=[created_user_id], init=False
     )
 
-    updated_user: Mapped['Usuario'] = relationship(
+    updated_user: Mapped['User'] = relationship(
         foreign_keys=[updated_user_id], init=False
     )

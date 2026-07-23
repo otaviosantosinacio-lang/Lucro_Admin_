@@ -2,14 +2,14 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class UserSchema(BaseModel):
-    nome_usuario: str
+    user_name: str
     email: EmailStr
-    senha_hash: str
+    password: str
 
 
 class UserPublic(BaseModel):
-    id_usuario: int
-    nome_usuario: str
+    user_id: int
+    user_name: str
     email: EmailStr
     model_config = ConfigDict(from_attributes=True)
 

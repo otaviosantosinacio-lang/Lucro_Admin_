@@ -10,7 +10,7 @@ convention = {
     'pk': 'pk_%(table_name)s',
 }
 
-registro_tabela = registry(metadata=MetaData(naming_convention=convention))
+table_registry_base = registry(metadata=MetaData(naming_convention=convention))
 
 
 class BaseModel(AsyncAttrs):

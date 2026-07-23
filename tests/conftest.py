@@ -11,7 +11,7 @@ from lucro_admin.api.security import get_password_hash
 from lucro_admin.core.imposto.entities_imposto import ProductWithTax
 from lucro_admin.infra import models
 from lucro_admin.infra.database import get_session
-from lucro_admin.infra.models.usuario import Usuario
+from lucro_admin.infra.models.user import Usuario
 from lucro_admin.settings import DataBaseSettings
 
 

@@ -3,20 +3,23 @@ from datetime import datetime
 from sqlalchemy import Boolean, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from lucro_admin.infra.models.base import BaseModel, registro_tabela
+from lucro_admin.infra.models.base import BaseModel, table_registry_base
 
 
-@registro_tabela.mapped_as_dataclass
-class SituacaoPedidoBling(BaseModel):
-    __tablename__ = 'situacoes_pedidos_bling'
+@table_registry_base.mapped_as_dataclass
+class BlingOrderSituation(BaseModel):
+    __tablename__ = 'bling_orders_situation'
 
-    id_situacao: Mapped[int] = mapped_column(init=False, primary_key=True)
+    situation_id: Mapped[int] = mapped_column(init=False, primary_key=True)
 
-    id_situacao_bling: Mapped[int] = mapped_column(unique=True, nullable=False)
+    situation_bling_id: Mapped[int] = mapped_column(
+        unique=True,
+        nullable=False
+    )
 
-    nome_situacao: Mapped[str] = mapped_column(nullable=False)
+    situation_name: Mapped[str] = mapped_column(nullable=False)
 
-    cor_situacao: Mapped[str] = mapped_column(nullable=False)
+    situation_color: Mapped[str] = mapped_column(nullable=False)
 
     status: Mapped[str] = mapped_column(
         Boolean,

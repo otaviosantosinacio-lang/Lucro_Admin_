@@ -8,7 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from lucro_admin.infra.database import get_session
-from lucro_admin.infra.models.usuario import Usuario
+from lucro_admin.infra.models.user import User
 from lucro_admin.settings import DataBaseSettings
 from lucro_admin.utils.time import somandosecs
 
@@ -63,7 +63,7 @@ async def get_current_user(
     except ExpiredSignatureError:
         raise credentials_exception
     user = await session.scalar(
-        select(Usuario).where(Usuario.email == subject_email)
+        select(User).where(User.email == subject_email)
     )
 
     if not user:

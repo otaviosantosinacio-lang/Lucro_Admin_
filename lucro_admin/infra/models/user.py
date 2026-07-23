@@ -3,22 +3,22 @@ from datetime import datetime
 from sqlalchemy import Boolean, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from lucro_admin.infra.models.base import BaseModel, registro_tabela
+from lucro_admin.infra.models.base import BaseModel, table_registry_base
 
 
-@registro_tabela.mapped_as_dataclass
-class Usuario(BaseModel):
-    __tablename__ = 'usuarios'
+@table_registry_base.mapped_as_dataclass
+class User(BaseModel):
+    __tablename__ = 'users'
 
-    id_usuario: Mapped[int] = mapped_column(init=False, primary_key=True)
+    user_id: Mapped[int] = mapped_column(init=False, primary_key=True)
 
-    nome_usuario: Mapped[str] = mapped_column(unique=True, nullable=False)
+    user_name: Mapped[str] = mapped_column(unique=True, nullable=False)
 
     email: Mapped[str] = mapped_column(unique=True, nullable=False)
 
-    senha_hash: Mapped[str] = mapped_column(nullable=False)
+    password: Mapped[str] = mapped_column(nullable=False)
 
-    status_usuario: Mapped[bool] = mapped_column(
+    user_status: Mapped[bool] = mapped_column(
         Boolean,
         init=False,
         nullable=False,

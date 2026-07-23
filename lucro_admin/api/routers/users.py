@@ -13,7 +13,7 @@ from lucro_admin.api.schemas import (
 )
 from lucro_admin.api.security import get_current_user, get_password_hash
 from lucro_admin.infra.database import get_session
-from lucro_admin.infra.models.usuario import Usuario
+from lucro_admin.infra.models.user import User
 
 router = APIRouter(
     prefix='/users',
@@ -21,7 +21,7 @@ router = APIRouter(
 )
 
 T_Session = Annotated[AsyncSession, Depends(get_session)]
-current_user = Annotated[Usuario, Depends(get_current_user)]
+current_user = Annotated[User, Depends(get_current_user)]
 filter_page = Annotated[FilterPage, Query()]
 
 
@@ -29,14 +29,14 @@ filter_page = Annotated[FilterPage, Query()]
 async def create_user(user: UserSchema, session: T_Session):
 
     db_user = await session.scalar(
-        select(Usuario).where(
-            (Usuario.nome_usuario == user.nome_usuario)
-            | (Usuario.email == user.email)
+        select(User).where(
+            (User.user_name == user.user_name)
+            | (User.email == user.email)
         )
     )
 
     if db_user:
-        if db_user.nome_usuario == user.nome_usuario:
+        if db_user.user_name == user.user_name:
             raise HTTPException(
                 status_code=400, detail={'message': 'Username already exists'}
             )
@@ -46,10 +46,10 @@ async def create_user(user: UserSchema, session: T_Session):
                 status_code=400, detail={'message': 'Email already exists'}
             )
 
-    db_user = Usuario(
-        nome_usuario=user.nome_usuario,
+    db_user = User(
+        user_name=user.user_name,
         email=user.email,
-        senha_hash=get_password_hash(user.senha_hash),
+        password=get_password_hash(user.password),
     )
 
     session.add(db_user)
@@ -64,7 +64,7 @@ async def read_users(
     session: T_Session, current_user: current_user, filter_page: filter_page
 ):
     users = await session.scalars(
-        select(Usuario).limit(filter_page.limit).offset(filter_page.offset)
+        select(User).limit(filter_page.limit).offset(filter_page.offset)
     )
 
     return {'users': users}
@@ -78,18 +78,18 @@ async def update_user(
     current_user: current_user,
 ):
 
-    if current_user.id_usuario != user_id:
+    if current_user.user_id != user_id:
         raise HTTPException(status_code=403, detail='Not enough permissions')
 
     valid_userdb = await session.scalar(
-        select(Usuario).where(
-            (Usuario.nome_usuario == user.nome_usuario)
-            | (Usuario.email == user.email)
+        select(User).where(
+            (User.user_name == user.user_name)
+            | (User.email == user.email)
         )
     )
 
     if valid_userdb:
-        if user.nome_usuario == valid_userdb.nome_usuario:
+        if user.user_name == valid_userdb.user_name:
             raise HTTPException(
                 status_code=400, detail={'message': 'Username already exists'}
             )
@@ -98,9 +98,9 @@ async def update_user(
                 status_code=400, detail={'message': 'Email already exists'}
             )
     try:
-        current_user.nome_usuario = user.nome_usuario
+        current_user.user_name = user.user_name
         current_user.email = user.email
-        current_user.senha_hash = get_password_hash(user.senha_hash)
+        current_user.password = get_password_hash(user.password)
 
     except IntegrityError:
         raise HTTPException(
@@ -121,10 +121,10 @@ async def delete_user(
     current_user: current_user,
 ):
 
-    if current_user.id_usuario != user_id:
+    if current_user.user_id != user_id:
         raise HTTPException(status_code=403, detail='Not enough permissions')
 
-    current_user.status_usuario = False
+    current_user.user_status = False
     session.add(current_user)
     await session.commit()
     return {'message': 'User delete'}

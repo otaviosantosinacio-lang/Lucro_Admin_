@@ -5,38 +5,38 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from lucro_admin.infra.models.item_pedido import ItemPedido
-from lucro_admin.infra.models.item_pedido_imposto import ItemPedidoImposto
+from lucro_admin.infra.models.bling_order_situation import BlingOrderSituation
 from lucro_admin.infra.models.marketplace import Marketplace
-from lucro_admin.infra.models.nota_fiscal import NotaFiscal
-from lucro_admin.infra.models.pedido import Pedido
-from lucro_admin.infra.models.produto import Produto
-from lucro_admin.infra.models.situacao_pedidos_bling import SituacaoPedidoBling
-from lucro_admin.infra.models.usuario import Usuario
+from lucro_admin.infra.models.order import Order
+from lucro_admin.infra.models.order_item import OrderItem
+from lucro_admin.infra.models.order_item_tax import OrderItemTax
+from lucro_admin.infra.models.product import Product
+from lucro_admin.infra.models.tax_invoice import TaxInvoice
+from lucro_admin.infra.models.user import User
 
 
 @pytest.mark.asyncio
-async def teste_criar_usuario(session: AsyncSession):
+async def test_create_user(session: AsyncSession):
 
-    usuario = Usuario(
-        nome_usuario='otavio123',
+    user = User(
+        user_name='otavio123',
         email='otavio@lucro_admin.com',
-        senha_hash='otavio@123',
+        password='otavio@123',
     )
 
-    session.add(usuario)
+    session.add(user)
     await session.commit()
 
-    resultado = await session.scalar(
-        select(Usuario).where(Usuario.email == 'otavio@lucro_admin.com')
+    result = await session.scalar(
+        select(User).where(User.email == 'otavio@lucro_admin.com')
     )
 
-    assert resultado is not None
-    assert resultado.nome_usuario == 'otavio123'
+    assert result is not None
+    assert result.user_name == 'otavio123'
 
 
 @pytest.mark.asyncio
-async def teste_criar_situacao_pedido_bling(session: AsyncSession):
+async def test_criar_situacao_pedido_bling(session: AsyncSession):
 
     situacao_pedido = SituacaoPedidoBling(9, 'Atendido', 'Azul')
 

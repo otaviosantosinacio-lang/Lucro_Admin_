@@ -1,21 +1,21 @@
-from lucro_admin.infra.models.base import registro_tabela
-from lucro_admin.infra.models.item_pedido import ItemPedido
-from lucro_admin.infra.models.item_pedido_imposto import ItemPedidoImposto
+from lucro_admin.infra.models.base import table_registry_base
+from lucro_admin.infra.models.bling_order_situation import BlingOrderSituation
 from lucro_admin.infra.models.marketplace import Marketplace
-from lucro_admin.infra.models.nota_fiscal import NotaFiscal
-from lucro_admin.infra.models.pedido import Pedido
-from lucro_admin.infra.models.produto import Produto
-from lucro_admin.infra.models.situacao_pedidos_bling import SituacaoPedidoBling
-from lucro_admin.infra.models.usuario import Usuario
+from lucro_admin.infra.models.order import Order
+from lucro_admin.infra.models.order_item import OrderItem
+from lucro_admin.infra.models.order_item_tax import OrderItemTax
+from lucro_admin.infra.models.product import Product
+from lucro_admin.infra.models.tax_invoice import TaxInvoice
+from lucro_admin.infra.models.user import User
 
 __all__ = [
-    'registro_tabela',
-    'Usuario',
-    'SituacaoPedidoBling',
-    'Produto',
-    'Pedido',
-    'NotaFiscal',
+    'table_registry_base',
+    'User',
+    'BlingOrderSituation',
+    'Product',
+    'Order',
+    'TaxInvoice',
     'Marketplace',
-    'ItemPedidoImposto',
-    'ItemPedido',
+    'OrderItemTax',
+    'OrderItem',
 ]

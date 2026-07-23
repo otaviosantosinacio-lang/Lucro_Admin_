@@ -11,7 +11,7 @@ from lucro_admin.api.security import (
     verify_password,
 )
 from lucro_admin.infra.database import get_session
-from lucro_admin.infra.models.usuario import Usuario
+from lucro_admin.infra.models.user import User
 
 router = APIRouter(prefix='/auth', tags=['Auth'])
 
@@ -25,7 +25,7 @@ async def login_for_access_token(
     form_data: form_data,
 ):
     user = await session.scalar(
-        select(Usuario).where(Usuario.email == form_data.username)
+        select(User).where(User.email == form_data.username)
     )
 
     if not user:
@@ -33,7 +33,7 @@ async def login_for_access_token(
             status_code=401, detail={'message': 'Incorrect email or password'}
         )
 
-    if not verify_password(form_data.password, user.senha_hash):
+    if not verify_password(form_data.password, user.password):
         raise HTTPException(
             status_code=401, detail={'message': 'Incorrect email or password'}
         )
@@ -45,7 +45,7 @@ async def login_for_access_token(
 
 @router.post('/refresh_token')
 async def refresh_access_token(
-    usuario: Annotated[Usuario, Depends(get_current_user)],
+    usuario: Annotated[User, Depends(get_current_user)],
 ):
     new_access_token = create_access_token(data={'sub': usuario.email})
     return {'access_token': new_access_token, 'token_type': 'Bearer'}
