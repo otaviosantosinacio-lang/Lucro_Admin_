@@ -39,7 +39,7 @@ class Order(BaseModel):
 
     marketplace_order_id: Mapped[int] = mapped_column(nullable=False)
 
-    orde_date: Mapped[date] = mapped_column(nullable=False)
+    order_date: Mapped[date] = mapped_column(nullable=False)
 
     value_order: Mapped[Decimal] = mapped_column(nullable=True)
 

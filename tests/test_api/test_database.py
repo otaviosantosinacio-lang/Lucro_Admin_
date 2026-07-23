@@ -36,82 +36,82 @@ async def test_create_user(session: AsyncSession):
 
 
 @pytest.mark.asyncio
-async def test_criar_situacao_pedido_bling(session: AsyncSession):
+async def test_create_bling_order_situation(session: AsyncSession):
 
-    situacao_pedido = SituacaoPedidoBling(9, 'Atendido', 'Azul')
+    order_situation = BlingOrderSituation(9, 'Atendido', 'Azul')
 
-    session.add(situacao_pedido)
+    session.add(order_situation)
     await session.commit()
 
-    resultado = await session.scalar(
-        select(SituacaoPedidoBling).where(
-            SituacaoPedidoBling.id_situacao_bling == 9
+    result = await session.scalar(
+        select(BlingOrderSituation).where(
+            BlingOrderSituation.situation_bling_id == 9
         )
     )
 
-    assert resultado is not None
-    assert resultado.nome_situacao == 'Atendido'
+    assert result is not None
+    assert result.situation_name == 'Atendido'
 
 
 @pytest.mark.asyncio
-async def teste_criar_produto(session: AsyncSession):
+async def test_create_product(session: AsyncSession):
 
-    usuario = Usuario(
-        nome_usuario='otavio123',
+    user = User(
+        user_name='otavio123',
         email='otavio@lucro_admin.com',
-        senha_hash='otavio@123',
+        password='otavio@123',
     )
 
-    produto = Produto(
-        id_produto_bling=13579,
+    product = Product(
+        product_bling_id=13579,
         sku='LADM0001',
-        descricao_produto='gerenciador de lucro',
-        fornecedor='Lucro Admin',
-        preco_custo=Decimal('29.99'),
-        origem=1,
+        product_description='gerenciador de lucro',
+        supplier='Lucro Admin',
+        cost_price=Decimal('29.99'),
+        origin=1,
         ncm='123456',
         cest='456789',
         created_user_id=1,
         updated_user_id=1,
     )
 
-    session.add(usuario)
+    session.add(user)
     await session.flush()
 
-    session.add(produto)
+    session.add(product)
     await session.commit()
 
-    resultado = await session.scalar(
-        select(Produto).where(Produto.id_produto_bling == 13579)
+    result = await session.scalar(
+        select(Product).where(Product.product_bling_id == 13579)
     )
 
-    assert resultado is not None
-    assert resultado.sku == 'LADM0001'
+    assert result is not None
+    assert result.sku == 'LADM0001'
 
 
 @pytest.mark.asyncio
-async def teste_criando_marketplace(session):
+async def test_create_marketplace(session):
 
-    usuario = Usuario(
-        nome_usuario='otavio123',
+    user = User(
+        user_name='otavio123',
         email='otavio@lucro_admin.com',
-        senha_hash='otavio@123',
+        password='otavio@123',
     )
 
     marketplace = Marketplace(
-        nome_marketplace='Lucro Admin Shop',
+        marketplace_name='Lucro Admin Shop',
         created_user_id=1,
         updated_user_id=1,
     )
 
-    session.add(usuario)
+    session.add(user)
     await session.flush()
 
     session.add(marketplace)
     await session.commit()
 
     resultado = await session.scalar(
-        select(Marketplace).where(Marketplace.id_marketplace == 1)
+        select(Marketplace).where(Marketplace.marketplace_id == 1)
     )
 
     assert resultado.nome_marketplace == 'Lucro Admin Shop'
@@ -120,64 +120,64 @@ async def teste_criando_marketplace(session):
 @pytest.mark.asyncio
 async def teste_criando_pedido(session: AsyncSession):
 
-    usuario = Usuario(
-        nome_usuario='otavio123',
+    user = User(
+        user_name='otavio123',
         email='otavio@lucro_admin.com',
-        senha_hash='otavio@123',
+        password='otavio@123',
     )
 
     marketplace = Marketplace(
-        nome_marketplace='Lucro Admin Shop',
+        marketplace_name='Lucro Admin Shop',
         created_user_id=1,
         updated_user_id=1,
     )
 
-    situacao_pedido = SituacaoPedidoBling(9, 'Atendido', 'Azul')
+    order_situation = BlingOrderSituation(9, 'Atendido', 'Azul')
 
-    session.add_all([usuario, marketplace, situacao_pedido])
+    session.add_all([user, marketplace, order_situation])
 
     await session.flush()
 
-    pedido = Pedido(
-        id_bling=120543543,
-        num_bling=12387,
-        id_situacao=1,
-        id_nf_bling=150789,
-        id_marketplace=1,
-        id_pedido_marketplace=20000456382042,
-        data_venda=date(2026, 5, 25),
-        valor_pedido=Decimal('160.00'),
+    order = Order(
+        bling_id=120543543,
+        bling_num=12387,
+        situation_id=1,
+        tax_invoice_bling_id=150789,
+        marketplace_id=1,
+        marketplace_order_id=20000456382042,
+        order_date=date(2026, 5, 25),
+        value_order=Decimal('160.00'),
         created_user_id=1,
         updated_user_id=1,
     )
 
-    session.add(pedido)
+    session.add(order)
     await session.commit()
 
-    resultado = await session.scalar(
-        select(Pedido).where(Pedido.num_bling == 12387)
+    result = await session.scalar(
+        select(Order).where(Order.bling_num == 12387)
     )
 
-    assert resultado is not None
-    assert resultado.id_pedido_marketplace == 20000456382042
+    assert result is not None
+    assert result.marketplace_order_id == 20000456382042
 
 
 @pytest.mark.asyncio
-async def teste_criando_item_pedido(session: AsyncSession):
+async def test_creat_order_item(session: AsyncSession):
 
-    usuario = Usuario(
-        nome_usuario='otavio123',
+    user = User(
+        user_name='otavio123',
         email='otavio@lucro_admin.com',
-        senha_hash='otavio@123',
+        password='otavio@123',
     )
 
-    produto = Produto(
-        id_produto_bling=13579,
+    product = Product(
+        product_bling_id=13579,
         sku='LADM0001',
-        descricao_produto='gerenciador de lucro',
-        fornecedor='Lucro Admin',
-        preco_custo=Decimal('29.99'),
-        origem=1,
+        product_description='gerenciador de lucro',
+        supplier='Lucro Admin',
+        cost_price=Decimal('29.99'),
+        origin=1,
         ncm='123456',
         cest='456789',
         created_user_id=1,
@@ -185,12 +185,12 @@ async def teste_criando_item_pedido(session: AsyncSession):
     )
 
     marketplace = Marketplace(
-        nome_marketplace='Lucro Admin Shop',
+        marketplace_name='Lucro Admin Shop',
         created_user_id=1,
         updated_user_id=1,
     )
 
-    situacao_pedido = SituacaoPedidoBling(9, 'Atendido', 'Azul')
+    order_situation = BlingOrderSituation(9, 'Atendido', 'Azul')
 
     pedido = Pedido(
         id_bling=120543543,
