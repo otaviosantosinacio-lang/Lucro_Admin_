@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from lucro_admin.services.bling.credenciais.service_bling_credentials import (
+from lucro_admin.services.bling.credentials.service_bling_credentials import (
     oAuthRefreshBling,
 )
 from lucro_admin.services.providers.provider import TokenProvider

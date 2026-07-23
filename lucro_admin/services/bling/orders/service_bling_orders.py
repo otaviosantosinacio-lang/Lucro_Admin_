@@ -16,9 +16,9 @@ from lucro_admin.services.service_http_request_base import (
 logger = logging.getLogger('lucroadmin.services.blingpedidos')
 
 
-class Atendidos:
+class Attended:
     """
-    Atendidos -> Obtenção de pedidos na situação de atendido
+    Attended -> Getting orders in the served status
 
     """
 
@@ -35,18 +35,18 @@ class Atendidos:
         self, pagina: int, sit: int, data_inicial: date, data_final: date
     ) -> str:
         """
-        url_endpoint_pag -> Montagem da URL
+        url_endpoint_pag -> URL Assembly
 
-        :param self: Objeto
-        :param pagina: Página para end point
+        :param self: Object
+        :param pagina: Page for endpoint
         :type pagina: int
-        :param sit: Número da situação Bling
+        :param sit: Bling situation number
         :type sit: int
-        :param data_inicial: Pedido que tenham saído a partir desta data
+        :param data_inicial: Orders that were placed from this date
         :type data_inicial: date
-        :param data_final: Pedidos que saíram até essa data
+        :param data_final: Orders placed until this date
         :type data_final: date
-        :return: Endpoint montada corretamente
+        :return: Properly assembled endpoint
         :rtype: str
         """
         url: str = (
@@ -56,7 +56,7 @@ class Atendidos:
         )
         return url
 
-    def get_id_por_pag(self) -> ResultadoGetPaginas:
+    def get_id_by_page(self) -> ResultadoGetPaginas:
         """
         get_id_por_pag -> Orquestrando as requisições para obter ids das vendas
 

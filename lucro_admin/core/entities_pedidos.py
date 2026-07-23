@@ -7,35 +7,34 @@ logger = logging.getLogger('lucroadmin.core.entities')
 
 
 @dataclass
-class SituacaoBling:
+class BlingSituation:
     """
-    SituacaoBling -> Formatação padronizada para situações do pedido dentro do
-    bling.
+    BlingSituation -> Standardized formatting for order situations within Bling
 
     Attributes:
-        cod_sit: Código da situação
+        cod_sit: Situation code
         :type cod_sit: int
-        nome_sit: Nome da Situação (Ex: Atendido)
-        :type nome_sit: str
+        name_sit: Name of the Situation (Ex: Atendido)
+        :type name_sit: str
     """
 
     cod_sit: int
-    nome_sit: str
+    name_sit: str
 
 
 @dataclass
-class ResultadoPagina:
+class PageResult:
     """
-    ResultadoPagina -> Padronizando retorno dos requets para endpoints Bling.
+        PageResult -> Standardizing the return of requests for Bling endpoints.
 
-    Attributes:
-        status: status do retorno da requisição.
-        :type status: Literal [ok, rated_limit, error]
-        data: Dados da requisição.
-        :type data: Any | None = None
-        error: Caso haja erro inserimos nesse atributo para trata-lo.
-        :type error: Any = None
-    """
+        Attributes:
+            status: status of the request return.
+            :type status: Literal [ok, rated_limit, error]
+            data: Data from the request.
+            :type data: Any | None = None
+            error: In case there's an error, we put it in this attribute to handle it.
+            :type error: Any = None
+    """  # noqa: E501
 
     status: Literal['ok', 'rated_limit', 'error']
     data: Any | None = None
@@ -45,105 +44,96 @@ class ResultadoPagina:
 @dataclass
 class ErrorHTTP:
     """
-    ErrorHTTP -> Padronização de erros http, para tratarmos o fallback após
-    execuções ativas
+    ErrorHTTP -> HTTP error standardization, so we can handle the fallback
+    after active executions
 
     Attributes:
-        status -> Utilizamos por padrão o mesmo status da Class
-        ResultadoPagina(ok, rated_limit, error). Para ter mais
-        assertividade recomendo setar já o status obtido no
-        resultado pagina(Ex:status= response.error['status'])
+        status:We use by default the same status from the PageResult Class (ok, rated_limit, error).
         :type status: Literal ['rated_limit', 'error']
-        error: É o mesmo error já configurado na Class RasultadoPagina,
-        ou seja, é o body de retorno da requisição.
+        error: It's the same error already set up in the paginaResultado Class, that is, it's the response body of the request.
         :type error: Any
-        metodo: É o metodo utilizado, ou seja, a def executada que
-        recebeu o erro.
-        :type metodo: str
-        classe: A class ao qual pertence o método
-        :type classe: str
-        local: Arquivo onde está localizado o método.
-        :type local: str
-        endpoint: EndPoint da API em que foi realizada o request
+        method: It's the method used, meaning the executed def that encountered the error.
+        :type method: str
+        class_name: The class to which the method belongs
+        :type class: str
+        module: The file where the method is located.
+        :type module: str
+        endpoint: The API Endpoint where the request was made
         :type endpoint: str
-        data: Data exata do envio deste request
+        data: The exact date of sending this request
         :type data: datetime
-    """
+    """  # noqa: E501
 
     status: Literal['rated_limit', 'error']
     error: Any
-    metodo: str
-    classe: str
-    local: str
+    method: str
+    class_name: str
+    module: str
     endpoint: str
     data: datetime
 
 
 @dataclass
-class ResultadoGetPaginas:
+class GetPagesResult:
     """
-    ResultadoGetPaginas -> Resultado do método get_id_por_pag
+    GetPagesResult -> Result of the get_id_por_pag method
 
     Attributes:
-        vendas_id: Lista com todos Id bling único por venda
-        :type vendas_id: list[int]
-        endpointerror: Lista com especificações da endpoint em que tivemos
-        retorno de erro. Type ErrorHTTP
+        sales_id: List with all unique Bling IDs per sale
+        :type sales_id: list[int]
+        endpointerror: List with specifications of the endpoint where we got an error response. Type ErrorHTTP
         :type endpointerror: list[ErrorHTTP]
-        situacao: Nome da situação em que os pedidos obtidos estão
-        (Ex: Cancelados)
-        :type situacao: str
-    """
+        situation: Name of the situation the obtained orders are in (Ex: Cancelado)
+        :type situation: str
+    """  # noqa: E501
 
-    vendas_id: list[int]
+    sales_id: list[int]
     endpointerro: list[ErrorHTTP]
-    situacao: str
+    situation: str
 
 
 @dataclass
-class ResultadoGetDetalhes:
+class GetDetailsResult:
     """
-    ResultadoGetDetalhes -> Resultado do método get_id_detalhes
+    GetDetailsResult -> Result of the get_id_details method
 
     Attributes:
-        pedidos: Lista com todos pedidos consultados. Type DadosPedidos
-        :type pedidos: list[DadosPedidos]
-        endpointerror: Lista com especificações da endpoint em que tivemos
-        retorno de erro. Type ErrorHTTP
-        :type endpointerror: list[ErrorHTTP]
-        situacao: Nome da situação em que os pedidos obtidos estão
-        (Ex: Cancelados)
-        :type situacao: str
-    """
+        orders: List with all fetched orders. Type OrderData
+        :type orders: list[OrderData]
+        endpointerror: List with specifications of the endpoint where we got an error response. Type HTTPError
+        :type endpointerror: list[HTTPError]
+        situation: Name of the situation the fetched orders are in (Ex: Cancelado)
+        :type situation: str
+    """  # noqa: E501
 
-    pedidos: list[Any]
+    orders: list[Any]
     endpointerror: list[ErrorHTTP]
-    situacao: str
+    situation: str
 
 
 @dataclass
-class DadosPedidos:
+class OrderData:
     """
-    DadosPedidos -> Formatação e organização dos dados do pedido
+    OrderData -> Formatting and organizing the order data
 
     Attributes:
-        id_bling: Id único da venda, esse id é gerado pelo bling
+        id_bling: Unique sale ID, this ID is generated by Bling
         :type id_bling: int
-        num_bling: Número único da venda gerado pelo Bling
+        num_bling: Unique sale number generated by Bling
         :type num_bling: int
-        id_mkt: Número da venda gerado pelo Marketplace
+        id_mkt: Sale number generated by the Marketplace
         :type id_mkt: int
-        data: Data da venda
+        data: Sale date
         :type data: datetime
-        nome_loja: Nome da loja onde foi realizada a venda
-        :type nome_loja: str
-        nf_id: Id único da NF gerado pelo Bling
+        nome_store: Name of the store where the sale was made
+        :type nome_store: str
+        nf_id: Unique invoice ID generated by Bling
         :type nd_id: int
-        valor_pedido: Valor total da venda
-        :type valor_pedido: float
-        itens: Dados de todos itens da venda
-        :type itens: list
-        uf_dest: UF destino da vend
+        value_sale: Total sale amount
+        :type value_sale: float
+        items: Data of all sale items
+        :type items: list
+        uf_dest: Destination state of the sale
         :type uf_dest: str
     """
 
@@ -151,10 +141,10 @@ class DadosPedidos:
     num_bling: int
     id_mkt: int
     data: datetime
-    nome_loja: str
+    name_store: str
     nf_id: int
-    valor_pedido: float
-    itens: list
+    value_sale: float
+    items: list
     uf_dest: str
     servico_trans: str | Any
 
@@ -221,6 +211,7 @@ class IdsPedidoML:
     pack_id: int
     geral: Any
 
+
 @dataclass
 class ShipCommission:
     id: int
@@ -228,9 +219,11 @@ class ShipCommission:
     ship_cost: float
     sku: str
 
+
 @dataclass
 class SaleCosts:
     costs: list[ShipCommission]
+
 
 @dataclass
 class ProdutoCompleto:

@@ -24,10 +24,10 @@ from lucro_admin.infra.repositorio_produtos_pedido import InsertPedidosProdutos
 from lucro_admin.infra.repositorioMercadoLivre.repositorio_mercadolivre import (
     CredenciaisMercadoLivre,
 )
-from lucro_admin.services.bling.credenciais.tokens.providers.bling_provider import (
+from lucro_admin.services.bling.credentials.tokens.providers.bling_provider import (
     BlingProvider,
 )
-from lucro_admin.services.bling.pedidos.provider.provider_pedidos import (
+from lucro_admin.services.bling.orders.provider.provider_pedidos import (
     PedidosProviderBling,
 )
 from lucro_admin.services.mercado_livre.pedidos.service_mercadolivre_pedidos import (

@@ -5,10 +5,10 @@ from typing import Any
 
 import pytest
 
-from lucro_admin.services.bling.credenciais import (
+from lucro_admin.services.bling.credentials import (
     service_bling_credentials as service_module,
 )
-from lucro_admin.services.bling.credenciais.service_bling_credentials import (
+from lucro_admin.services.bling.credentials.service_bling_credentials import (
     oAuthCodeBling,
     oAuthRefreshBling,
 )
@@ -16,9 +16,6 @@ from tests.fakes.repository import FakeRepository
 
 
 class FakeRefreshAdapter:
-    """
-    Simulates the adapter responsible for renewing the access token.
-    """
 
     def __init__(self, response: dict[str, Any]):
         self.response = response
@@ -162,13 +159,6 @@ def test_refresh_flow_should_raise_when_credentials_are_missing(
     missing_field: str,
     repository: FakeRepository,
 ) -> None:
-    """
-    Testa separadamente a ausência de:
-
-    - client_id;
-    - client_secret;
-    - refresh_token.
-    """
 
     setattr(
         repository,
@@ -202,10 +192,6 @@ def test_refresh_flow_should_start_code_flow_when_refresh_fails(
     repository: FakeRepository,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """
-    Quando o refresh retorna um status diferente de 200,
-    o service deve iniciar o fluxo OAuth Code.
-    """
 
     credential = create_fake_credential(
         status_code=HTTPStatus.UNAUTHORIZED,
@@ -263,14 +249,6 @@ def test_code_flow_should_save_and_return_access_token(
     repository: FakeRepository,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """
-    Testa o fluxo OAuth Code completo sem:
-
-    - abrir navegador real;
-    - acessar o Bling;
-    - esperar código real;
-    - acessar banco de dados real.
-    """
 
     credential = create_fake_credential()
 
@@ -348,10 +326,6 @@ def test_code_flow_should_raise_when_state_is_invalid(
     repository: FakeRepository,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """
-    O state retornado precisa ser igual ao state criado
-    antes de abrir a autorização do Bling.
-    """
 
     code_adapter = FakeCodeAdapter()
 
@@ -403,12 +377,6 @@ def test_refresh_flow_should_return_token_when_save_fails(
     repository: FakeRepository,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """
-    Documenta o comportamento atual do service:
-
-    Mesmo quando o repositório não salva os tokens,
-    o service ainda retorna o access token.
-    """
 
     repository.salva_tokens = False
 
@@ -435,13 +403,11 @@ def test_refresh_flow_should_return_token_when_save_fails(
 
     assert result == "new-access-token"
 
-    # O método foi chamado e recebeu os tokens.
     assert repository.saved_tokens == (
         "new-access-token",
         "new-refresh-token",
         datetime(2026, 7, 23, 10, 0),
     )
 
-    # Como simulamos falha, os valores internos não foram atualizados.
     assert repository.access_token == "old-access-token"
     assert repository.refresh_token == "old-refresh-token"

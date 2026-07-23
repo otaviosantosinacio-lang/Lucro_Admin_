@@ -25,7 +25,7 @@ class oAuthCodeMercadoLivre:
         :rtype: bool
         """
         caminho_edge: str = (
-            'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
+        'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
         )
         if os.path.exists(caminho_edge):
             comando = [caminho_edge, url]
