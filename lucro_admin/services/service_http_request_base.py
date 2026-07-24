@@ -1,7 +1,7 @@
 import logging
 from http import HTTPStatus
 
-from lucro_admin.core.entities_pedidos import ResultadoPagina
+from lucro_admin.core.entities_pedidos import PageResult
 
 logger = logging.getLogger('lucroadmin.services.baserequesthttp')
 
@@ -11,7 +11,7 @@ class BaseRequestHTTP:
         self.adapt_pedidos = adapt_pedidos
         self.access_token = access_token
 
-    def organiza_get_request(self, url: str) -> ResultadoPagina:
+    def organiza_get_request(self, url: str) -> PageResult:
         """
 
         url: str
@@ -29,7 +29,7 @@ class BaseRequestHTTP:
                 'BaseRequestHTTP organiza_get_request | Retorno da endpoint %s',
                 response.status_code,
             )
-            return ResultadoPagina(status='ok', data=data)
+            return PageResult(status='ok', data=data)
 
         if response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
             logger.error(
@@ -38,7 +38,7 @@ class BaseRequestHTTP:
                 response.status_code,
                 response.text,
             )
-            return ResultadoPagina(
+            return PageResult(
                 status='rated_limit',
                 error={'url': url, 'status': 429, 'body': response.text},
             )
@@ -48,7 +48,7 @@ class BaseRequestHTTP:
             response.status_code,
             response.text,
         )
-        return ResultadoPagina(
+        return PageResult(
             status='error',
             error={'status': response.status_code, 'body': response.text},
         )

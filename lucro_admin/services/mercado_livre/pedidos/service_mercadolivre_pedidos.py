@@ -4,10 +4,10 @@ from typing import Any
 from lucro_admin.core.entities_pedidos import (
     ComissaoFrete,
     IdsPedidoML,
+    PageResult,
     PedidoCompleto,
     PedidoseProdutosCompletos,
     ProdutoCompleto,
-    ResultadoPagina,
     SaleCosts,
     ShipCommission,
 )
@@ -45,7 +45,7 @@ class ExtraiCustoMercadoLivre:
 
     def extraindo_packid_payid(self, url: str) -> IdsPedidoML:
 
-        response: ResultadoPagina = self.service_base.organiza_get_request(
+        response: PageResult = self.service_base.organiza_get_request(
             url=url
         )
         if response.status == 'ok':
