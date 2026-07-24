@@ -101,9 +101,9 @@ class Attended:
                 erro = ErrorHTTP(
                     status=response.error['status'],
                     error=response.error['body'],
-                    metodo='get_id_por_pag',
-                    classe='Atendidos',
-                    local='service_bling_pedidos.py',
+                    method='get_id_por_pag',
+                    class_name='Atendidos',
+                    module='service_bling_pedidos.py',
                     endpoint=url,
                     data=datetime.now(),
                 )

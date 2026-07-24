@@ -20,7 +20,7 @@ class OrderItemTax(BaseModel):
 
     __table_args__ = (
         UniqueConstraint(
-            'id_item_pedido',
+            'order_item_id',
             'tax_type',
             name='uq_item_pedido_imposto_tipo',
         ),
@@ -56,7 +56,7 @@ class OrderItemTax(BaseModel):
         ForeignKey('users.user_id')
     )
 
-    item_pedido: Mapped['OrderItem'] = relationship(
+    order_item: Mapped['OrderItem'] = relationship(
         foreign_keys=[order_item_id], init=False
     )
 

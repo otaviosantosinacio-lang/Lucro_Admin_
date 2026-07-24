@@ -8,17 +8,17 @@ def test_create_user(client):
     response = client.post(
         '/users',
         json={
-            'nome_usuario': 'testlucroadmin',
+            'user_name': 'testlucroadmin',
             'email': 'test1@lucroadmin.com',
-            'senha_hash': 'lucro_admin_test',
+            'password': 'lucro_admin_test',
         },
     )
 
     assert response.status_code == HTTPStatus.CREATED
 
     assert response.json() == {
-        'id_usuario': 1,
-        'nome_usuario': 'testlucroadmin',
+        'user_id': 1,
+        'user_name': 'testlucroadmin',
         'email': 'test1@lucroadmin.com',
     }
 
@@ -28,9 +28,9 @@ def test_create_user_exists_username(client, user):
     response = client.post(
         '/users',
         json={
-            'nome_usuario': user.nome_usuario,
+            'user_name': user.user_name,
             'email': 'test1@lucroadmin.com',
-            'senha_hash': 'lucro_admin_test',
+            'password': 'lucro_admin_test',
         },
     )
 
@@ -45,9 +45,9 @@ def test_create_user_exists_email(client, user):
     response = client.post(
         '/users',
         json={
-            'nome_usuario': 'lucroadmintest1',
+            'user_name': 'lucroadmintest1',
             'email': user.email,
-            'senha_hash': 'lucro_admin_test',
+            'password': 'lucro_admin_test',
         },
     )
 
@@ -67,19 +67,19 @@ def test_read_user(client, user, token):
 
 def test_update_user(client, user, token):
     response = client.put(
-        f'/users/{user.id_usuario}',
+        f'/users/{user.user_id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
-            'nome_usuario': 'lucroadmintestupdate',
+            'user_name': 'lucroadmintestupdate',
             'email': 'test_update@lucroadmin.com',
-            'senha_hash': 'lucro_admin_test_update',
+            'password': 'lucro_admin_test_update',
         },
     )
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
-        'id_usuario': user.id_usuario,
-        'nome_usuario': 'lucroadmintestupdate',
+        'user_id': user.user_id,
+        'user_name': 'lucroadmintestupdate',
         'email': 'test_update@lucroadmin.com',
     }
 
@@ -89,9 +89,9 @@ def test_update_user_notfound(client, user, token):
         '/users/2',
         headers={'Authorization': f'Bearer {token}'},
         json={
-            'nome_usuario': 'lucroadmintestupdate',
+            'user_name': 'lucroadmintestupdate',
             'email': 'test_update@lucroadmin.com',
-            'senha_hash': 'lucro_admin_test_update',
+            'password': 'lucro_admin_test_update',
         },
     )
 
@@ -101,12 +101,12 @@ def test_update_user_notfound(client, user, token):
 
 def test_update_user_exist_username(client, user, other_user, token):
     response = client.put(
-        f'/users/{user.id_usuario}',
+        f'/users/{user.user_id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
-            'nome_usuario': other_user.nome_usuario,
+            'user_name': other_user.user_name,
             'email': 'test_update@lucroadmin.com',
-            'senha_hash': 'lucro_admin_test_update',
+            'password': 'lucro_admin_test_update',
         },
     )
 
@@ -121,9 +121,9 @@ def test_update_user_exist_email(client, user, other_user, token):
         '/users/1',
         headers={'Authorization': f'Bearer {token}'},
         json={
-            'nome_usuario': 'lucroadmintestupdate',
+            'user_name': 'lucroadmintestupdate',
             'email': user.email,
-            'senha_hash': 'lucro_admin_test_update',
+            'password': 'lucro_admin_test_update',
         },
     )
 
@@ -133,12 +133,12 @@ def test_update_user_exist_email(client, user, other_user, token):
 
 def test_update_user_with_wrong_user(client, token, other_user):
     response = client.put(
-        f'/users/{other_user.id_usuario}',
+        f'/users/{other_user.user_id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
-            'nome_usuario': 'lucroadmintestupdate',
+            'user_name': 'lucroadmintestupdate',
             'email': 'test_update@lucroadmin.com',
-            'senha_hash': 'lucro_admin_test_update',
+            'password': 'lucro_admin_test_update',
         },
     )
 
@@ -148,7 +148,7 @@ def test_update_user_with_wrong_user(client, token, other_user):
 
 def test_delete_user(client, user, token):
     response = client.delete(
-        f'/users/{user.id_usuario}',
+        f'/users/{user.user_id}',
         headers={'Authorization': f'Bearer {token}'},
     )
 
@@ -158,7 +158,7 @@ def test_delete_user(client, user, token):
 
 def test_delete_user_enougth_permission(client, other_user, token):
     response = client.delete(
-        f'/users/{other_user.id_usuario}',
+        f'/users/{other_user.user_id}',
         headers={'Authorization': f'Bearer {token}'},
     )
 

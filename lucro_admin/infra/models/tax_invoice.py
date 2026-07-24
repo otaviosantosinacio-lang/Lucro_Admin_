@@ -42,7 +42,7 @@ class TaxInvoice(BaseModel):
 
     issue_date: Mapped[date | None] = mapped_column(nullable=True)
 
-    value_tax_invoice: Mapped[Decimal | None] = mapped_column(nullable=True)
+    tax_invoice_value: Mapped[Decimal | None] = mapped_column(nullable=True)
 
     bling_tax_invoice_id: Mapped[int | None] = mapped_column(nullable=True)
 
@@ -54,7 +54,7 @@ class TaxInvoice(BaseModel):
         init=False, server_default=func.now(), onupdate=func.now()
     )
 
-    nota_fiscal_pedido: Mapped['Order'] = relationship(
+    tax_invoice_order: Mapped['Order'] = relationship(
         foreign_keys=[order_id], init=False
     )
 

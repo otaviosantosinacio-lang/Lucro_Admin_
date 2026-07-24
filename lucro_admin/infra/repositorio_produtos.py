@@ -20,7 +20,8 @@ class Produtos:
             'Produtos Repo | Iniciando a consulta no banco de dados de todos'
             ' os produtos'
         )
-        query = 'SELECT * FROM produtos'
+        query = 'SELECT id_produto FROM produtos'
         produtos = consultageral(execute=query)
+        produtos_id: list[int | None] = [linha[0] for linha in produtos]
 
-        return produtos
+        return produtos_id

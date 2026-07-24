@@ -11,7 +11,7 @@ from lucro_admin.api.security import get_password_hash
 from lucro_admin.core.imposto.entities_imposto import ProductWithTax
 from lucro_admin.infra import models
 from lucro_admin.infra.database import get_session
-from lucro_admin.infra.models.user import Usuario
+from lucro_admin.infra.models.user import User
 from lucro_admin.settings import DataBaseSettings
 
 
@@ -43,19 +43,19 @@ async def session():
         cursor.close()
 
     async with engine.begin() as conn:
-        await conn.run_sync(models.registro_tabela.metadata.create_all)
+        await conn.run_sync(models.table_registry_base.metadata.create_all)
 
     async with AsyncSession(engine, expire_on_commit=False) as session:
         yield session
 
     async with engine.begin() as conn:
-        await conn.run_sync(models.registro_tabela.metadata.drop_all)
+        await conn.run_sync(models.table_registry_base.metadata.drop_all)
 
 
 @pytest_asyncio.fixture
 async def user(session: AsyncSession):
     password: str = 'lucro_admin_test'
-    user = UserFactory(senha_hash=get_password_hash(password))
+    user = UserFactory(password=get_password_hash(password))
     session.add(user)
     await session.commit()
     await session.refresh(user)
@@ -67,7 +67,7 @@ async def user(session: AsyncSession):
 @pytest_asyncio.fixture
 async def other_user(session: AsyncSession):
     password: str = 'lucro_admin_test'
-    user = UserFactory(senha_hash=get_password_hash(password))
+    user = UserFactory(password=get_password_hash(password))
     session.add(user)
     await session.commit()
     await session.refresh(user)
@@ -88,14 +88,14 @@ def token(client, user):
 
 class UserFactory(factory.Factory):
     class Meta:
-        model = Usuario
+        model = User
 
-    nome_usuario = factory.Sequence(lambda n: f'test{n}')
+    user_name = factory.Sequence(lambda n: f'test{n}')
     email = factory.LazyAttribute(
-        lambda obj: f'{obj.nome_usuario}@lucroadmintest.com'
+        lambda obj: f'{obj.user_name}@lucroadmintest.com'
     )
-    senha_hash = factory.LazyAttribute(
-        lambda obj: f'{obj.nome_usuario}@lucroadmintest.com'
+    password = factory.LazyAttribute(
+        lambda obj: f'{obj.user_name}@lucroadmintest.com'
     )
 
 

@@ -33,7 +33,7 @@ class OrderItem(BaseModel):
     )
 
     product_id: Mapped[int] = mapped_column(
-        ForeignKey('product.product_id'), nullable=False
+        ForeignKey('products.product_id'), nullable=False
     )
 
     quantity: Mapped[int] = mapped_column(nullable=False)
@@ -44,7 +44,7 @@ class OrderItem(BaseModel):
 
     item_shipping: Mapped[Decimal] = mapped_column(nullable=True)
 
-    commission_item: Mapped[Decimal] = mapped_column(nullable=True)
+    item_commission: Mapped[Decimal] = mapped_column(nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         init=False, server_default=func.now()
@@ -62,15 +62,15 @@ class OrderItem(BaseModel):
         ForeignKey('users.user_id'), nullable=False
     )
 
-    pedido_do_item: Mapped['Order'] = relationship(
+    order_item: Mapped['Order'] = relationship(
         foreign_keys=[order_id], init=False
     )
 
-    situacao_pedido: Mapped['BlingOrderSituation'] = relationship(
+    order_situation: Mapped['BlingOrderSituation'] = relationship(
         foreign_keys=[situation_id], init=False
     )
 
-    produto_item_pedido: Mapped['Product'] = relationship(
+    item_product_order: Mapped['Product'] = relationship(
         foreign_keys=[product_id], init=False
     )
 

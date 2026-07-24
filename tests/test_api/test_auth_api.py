@@ -54,12 +54,12 @@ def test_token_expired_after_time(client, user):
 
     with freeze_time('2025-04-01 13:35:00'):
         response = client.put(
-            f'users/{user.id_usuario}',
+            f'users/{user.user_id}',
             headers={'Authorization': f'Bearer {token}'},
             json={
-                'nome_usuario': 'lucroadmintestauth',
+                'user_name': 'lucroadmintestauth',
                 'email': 'lucroadmintestauth',
-                'senha_hash': 'lucro_admin_test_auth',
+                'password': 'lucro_admin_test_auth',
             },
         )
 

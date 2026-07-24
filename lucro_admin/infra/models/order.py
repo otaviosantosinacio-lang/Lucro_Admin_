@@ -28,13 +28,13 @@ class Order(BaseModel):
     bling_num: Mapped[int] = mapped_column(unique=True)
 
     situation_id: Mapped[int] = mapped_column(
-        ForeignKey('bling_orders_situation.id_situacao'), nullable=False
+        ForeignKey('bling_orders_situation.situation_id'), nullable=False
     )
 
     tax_invoice_bling_id: Mapped[int] = mapped_column(nullable=True)
 
     marketplace_id: Mapped[int] = mapped_column(
-        ForeignKey('marketplaces.id_marketplace'), nullable=True
+        ForeignKey('marketplaces.marketplace_id'), nullable=True
     )
 
     marketplace_order_id: Mapped[int] = mapped_column(nullable=False)
@@ -59,11 +59,11 @@ class Order(BaseModel):
         ForeignKey('users.user_id'), nullable=False
     )
 
-    situacao_pedido: Mapped['BlingOrderSituation'] = relationship(
+    order_situation: Mapped['BlingOrderSituation'] = relationship(
         foreign_keys=[situation_id], init=False
     )
 
-    marketplace_pedido: Mapped['Marketplace'] = relationship(
+    order_marketplace: Mapped['Marketplace'] = relationship(
         foreign_keys=[marketplace_id], init=False
     )
 

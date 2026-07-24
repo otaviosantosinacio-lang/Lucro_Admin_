@@ -110,11 +110,11 @@ async def test_create_marketplace(session):
     session.add(marketplace)
     await session.commit()
 
-    resultado = await session.scalar(
+    result = await session.scalar(
         select(Marketplace).where(Marketplace.marketplace_id == 1)
     )
 
-    assert resultado.nome_marketplace == 'Lucro Admin Shop'
+    assert result.marketplace_name == 'Lucro Admin Shop'
 
 
 @pytest.mark.asyncio
@@ -192,62 +192,61 @@ async def test_creat_order_item(session: AsyncSession):
 
     order_situation = BlingOrderSituation(9, 'Atendido', 'Azul')
 
-    pedido = Pedido(
-        id_bling=120543543,
-        num_bling=12387,
-        id_situacao=1,
-        id_nf_bling=150789,
-        id_marketplace=1,
-        id_pedido_marketplace=20000456382042,
-        data_venda=date(2026, 5, 25),
-        valor_pedido=Decimal('160.00'),
+    order = Order(
+        bling_id=120543543,
+        bling_num=12387,
+        situation_id=1,
+        tax_invoice_bling_id=150789,
+        marketplace_id=1,
+        marketplace_order_id=20000456382042,
+        order_date=date(2026, 5, 25),
+        value_order=Decimal('160.00'),
         created_user_id=1,
         updated_user_id=1,
     )
-
-    session.add_all([usuario, marketplace, situacao_pedido, pedido, produto])
+    session.add_all([user, marketplace, order_situation, order, product])
 
     await session.flush()
 
-    item_pedido = ItemPedido(
-        id_pedido=1,
-        id_situacao=1,
-        id_produto=1,
-        quantidade=1,
-        preco_custo=Decimal('59.99'),
-        preco_venda_unitario=Decimal('149.99'),
-        frete_item=Decimal('25.56'),
-        comissao_item=Decimal('14.99'),
+    order_item = OrderItem(
+        order_id=1,
+        situation_id=1,
+        product_id=1,
+        quantity=1,
+        cost_price=Decimal('59.99'),
+        unit_selling_price=Decimal('149.99'),
+        item_shipping=Decimal('25.56'),
+        item_commission=Decimal('14.99'),
         created_user_id=1,
         updated_user_id=1,
     )
 
-    session.add(item_pedido)
+    session.add(order_item)
     await session.commit()
 
-    resultado = await session.scalar(
-        select(ItemPedido).where(ItemPedido.id_situacao == 1)
+    result = await session.scalar(
+        select(OrderItem).where(OrderItem.situation_id == 1)
     )
 
-    assert resultado is not None
-    assert resultado.id_pedido == 1
+    assert result is not None
+    assert result.order_id == 1
 
 
 @pytest.mark.asyncio
-async def teste_criando_item_pedido_imposto(session: AsyncSession):
-    usuario = Usuario(
-        nome_usuario='otavio123',
+async def test_create_order_item_tax(session: AsyncSession):
+    user = User(
+        user_name='otavio123',
         email='otavio@lucro_admin.com',
-        senha_hash='otavio@123',
+        password='otavio@123',
     )
 
-    produto = Produto(
-        id_produto_bling=13579,
+    product = Product(
+        product_bling_id=13579,
         sku='LADM0001',
-        descricao_produto='gerenciador de lucro',
-        fornecedor='Lucro Admin',
-        preco_custo=Decimal('29.99'),
-        origem=1,
+        product_description='gerenciador de lucro',
+        supplier='Lucro Admin',
+        cost_price=Decimal('29.99'),
+        origin=1,
         ncm='123456',
         cest='456789',
         created_user_id=1,
@@ -255,85 +254,89 @@ async def teste_criando_item_pedido_imposto(session: AsyncSession):
     )
 
     marketplace = Marketplace(
-        nome_marketplace='Lucro Admin Shop',
+        marketplace_name='Lucro Admin Shop',
         created_user_id=1,
         updated_user_id=1,
     )
 
-    situacao_pedido = SituacaoPedidoBling(9, 'Atendido', 'Azul')
+    order_situation = BlingOrderSituation(9, 'Atendido', 'Azul')
 
-    pedido = Pedido(
-        id_bling=120543543,
-        num_bling=12387,
-        id_situacao=1,
-        id_nf_bling=150789,
-        id_marketplace=1,
-        id_pedido_marketplace=20000456382042,
-        data_venda=date(2026, 5, 25),
-        valor_pedido=Decimal('160.00'),
+    order = Order(
+        bling_id=120543543,
+        bling_num=12387,
+        situation_id=1,
+        tax_invoice_bling_id=150789,
+        marketplace_id=1,
+        marketplace_order_id=20000456382042,
+        order_date=date(2026, 5, 25),
+        value_order=Decimal('160.00'),
         created_user_id=1,
         updated_user_id=1,
     )
-
-    item_pedido = ItemPedido(
-        id_pedido=1,
-        id_situacao=1,
-        id_produto=1,
-        quantidade=1,
-        preco_custo=Decimal('59.99'),
-        preco_venda_unitario=Decimal('149.99'),
-        frete_item=Decimal('25.56'),
-        comissao_item=Decimal('14.99'),
-        created_user_id=1,
-        updated_user_id=1,
-    )
-
-    session.add_all([
-        usuario,
-        marketplace,
-        situacao_pedido,
-        pedido,
-        produto,
-        item_pedido,
-    ])
 
     await session.flush()
 
-    item_pedido_imposto = ItemPedidoImposto(
-        id_item_pedido=1,
-        tipo_imposto='ICMS',
-        valor_imposto=Decimal('10.00'),
-        origem_calculo='Calculo Manual',
+    order_item = OrderItem(
+        order_id=1,
+        situation_id=1,
+        product_id=1,
+        quantity=1,
+        cost_price=Decimal('59.99'),
+        unit_selling_price=Decimal('149.99'),
+        item_shipping=Decimal('25.56'),
+        item_commission=Decimal('14.99'),
         created_user_id=1,
         updated_user_id=1,
     )
 
-    session.add(item_pedido_imposto)
-    await session.commit()
-
-    resultado = await session.scalar(
-        select(ItemPedidoImposto).where(ItemPedidoImposto.id_item_pedido == 1)
+    session.add_all(
+        [
+            user,
+            marketplace,
+            order_situation,
+            order,
+            product,
+            order_item
+            ]
     )
 
-    assert resultado is not None
-    assert resultado.id_item_pedido_imposto == 1
+    await session.flush()
+
+    order_item_tax = OrderItemTax(
+        order_item_id=1,
+        tax_type='ICMS',
+        tax_value=Decimal('10.00'),
+        calculation_source='Calculo Manual',
+        created_user_id=1,
+        updated_user_id=1,
+    )
+
+    session.add(order_item_tax)
+    await session.commit()
+
+    result = await session.scalar(
+        select(OrderItemTax).where(OrderItemTax.order_item_id == 1)
+    )
+
+    assert result is not None
+    assert result.order_item_tax_id == 1
 
 
 @pytest.mark.asyncio
-async def test_criando_nota_fiscal(session: AsyncSession):
-    usuario = Usuario(
-        nome_usuario='otavio123',
+async def test_create_tax_invoice(session: AsyncSession):
+    user = User(
+        user_name='otavio123',
         email='otavio@lucro_admin.com',
-        senha_hash='otavio@123',
+        password='otavio@123',
     )
 
-    produto = Produto(
-        id_produto_bling=13579,
+    product = Product(
+        product_bling_id=13579,
         sku='LADM0001',
-        descricao_produto='gerenciador de lucro',
-        fornecedor='Lucro Admin',
-        preco_custo=Decimal('29.99'),
-        origem=1,
+        product_description='gerenciador de lucro',
+        supplier='Lucro Admin',
+        cost_price=Decimal('29.99'),
+        origin=1,
         ncm='123456',
         cest='456789',
         created_user_id=1,
@@ -341,48 +344,80 @@ async def test_criando_nota_fiscal(session: AsyncSession):
     )
 
     marketplace = Marketplace(
-        nome_marketplace='Lucro Admin Shop',
+        marketplace_name='Lucro Admin Shop',
         created_user_id=1,
         updated_user_id=1,
     )
 
-    situacao_pedido = SituacaoPedidoBling(9, 'Atendido', 'Azul')
+    order_situation = BlingOrderSituation(9, 'Atendido', 'Azul')
 
-    pedido = Pedido(
-        id_bling=120543543,
-        num_bling=12387,
-        id_situacao=1,
-        id_nf_bling=150789,
-        id_marketplace=1,
-        id_pedido_marketplace=20000456382042,
-        data_venda=date(2026, 5, 25),
-        valor_pedido=Decimal('160.00'),
+    order = Order(
+        bling_id=120543543,
+        bling_num=12387,
+        situation_id=1,
+        tax_invoice_bling_id=150789,
+        marketplace_id=1,
+        marketplace_order_id=20000456382042,
+        order_date=date(2026, 5, 25),
+        value_order=Decimal('160.00'),
         created_user_id=1,
         updated_user_id=1,
     )
-
-    session.add_all([usuario, produto, marketplace, situacao_pedido, pedido])
 
     await session.flush()
 
-    nota_fiscal = NotaFiscal(
-        id_pedido=1,
+    order_item = OrderItem(
+        order_id=1,
+        situation_id=1,
+        product_id=1,
+        quantity=1,
+        cost_price=Decimal('59.99'),
+        unit_selling_price=Decimal('149.99'),
+        item_shipping=Decimal('25.56'),
+        item_commission=Decimal('14.99'),
+        created_user_id=1,
+        updated_user_id=1,
+    )
+
+    order_item_tax = OrderItemTax(
+        order_item_id=1,
+        tax_type='ICMS',
+        tax_value=Decimal('10.00'),
+        calculation_source='Calculo Manual',
+        created_user_id=1,
+        updated_user_id=1,
+    )
+    session.add_all(
+        [
+            user,
+            marketplace,
+            order_situation,
+            order,
+            product,
+            order_item,
+            order_item_tax
+            ]
+    )
+    await session.flush()
+
+    tax_invoice = TaxInvoice(
+        order_id=1,
         url_xml='www.lucroadmin.com/xml/?3456381578910456375930195749382746519305',
         serie=6,
-        data_emissao=date(2026, 6, 3),
-        id_nf_bling=6748420,
+        issue_date=date(2026, 6, 3),
+        bling_tax_invoice_id=6748420,
         created_user_id=1,
         updated_user_id=1,
-        valor_nf=Decimal('56.51'),
-        chave_acesso=None,
+        tax_invoice_value=Decimal('56.51'),
+        key_access=None,
     )
 
-    session.add(nota_fiscal)
+    session.add(tax_invoice)
     await session.commit()
 
-    resultado = await session.scalar(
-        select(NotaFiscal).where(NotaFiscal.id_nf == 1)
+    result = await session.scalar(
+        select(TaxInvoice).where(TaxInvoice.tax_invoice_id == 1)
     )
 
-    assert resultado is not None
-    assert resultado.id_nf == 1
+    assert result is not None
+    assert result.tax_invoice_id == 1
