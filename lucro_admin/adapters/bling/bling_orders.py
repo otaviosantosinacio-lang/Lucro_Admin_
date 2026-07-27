@@ -11,18 +11,18 @@ logger = logging.getLogger('lucroadmin.adapters.bling')
 class Request:
     """
 
-    Base for Bling GET requests
+    Base for Bling requests
 
     """
 
     def __init__(self):
         self.timeout: int = 30
 
-    def request_endpoint(
+    def request_get_endpoint(
         self, url: str, headers: dict[str, str]
     ) -> requests.Response:
         """
-        request_endpoint
+        request_get_endpoint
 
         Individualized basic request for Bling CRUD Get
 
@@ -36,13 +36,41 @@ class Request:
 
         """
         logger.info(
-            'Bling request_pedidos | Sending a request to the endpoint %s',
+            'Bling request_get_endpoint |'
+            ' Sending a request get to the endpoint %s',
             url,
         )
         return requests.get(url=url, headers=headers, timeout=self.timeout)
 
+    def request_path_endpoint(
+            self,
+            url: str,
+            headers: dict[str, str],
+    ) -> requests.Response:
+        """
+            request_patch_endpoint
 
-class GetBling:
+            Individualized basic request for Bling CRUD path
+
+            :param self:
+            :param url: Bling Endpoint
+            :type url: str
+            :param headers: Headers for credential validation
+            :type headers: dict[str, str]
+            :return: Formatted return from the endpoint
+            :rtype: Response
+
+        """
+
+        logger.info(
+            'Bling request_patch_pedidos | '
+            'Sending a request patch to the endpoint %s',
+            url,
+        )
+        return requests.patch(url=url, headers=headers, timeout=self.timeout)
+
+
+class CrudBling:
     def __init__(self):
         self.request = Request()
 
@@ -54,9 +82,9 @@ class GetBling:
         :param url: Bling V3 Endpoint
         :type url: String
 
-        Headers and request to Bling endpoint to return the JSON to the service.
+        Headers and request to Bling endpoint to return the JSON to the service
         """
-        logger.info('Bling get_endpoints_bling | Starting the Request')
+        logger.info('Bling get_endpoint | Starting the Request')
         headers: dict[str, str] = {
             'Authorization': f'Bearer {access_token}',
             'Accept': 'application/json',
@@ -64,10 +92,37 @@ class GetBling:
         }
 
         response = retry_policy.execute(
-            lambda: self.request.request_endpoint(url, headers)
+            lambda: self.request.request_get_endpoint(url, headers)
         )
         logger.warning(
-            'Bling get_endpoints_bling | The request return is %s',
+            'Bling get_endpoints | The request return is %s',
+            response.status_code,
+        )
+        return response
+
+    def patch_endpoint(self, access_token: str, url: str):
+        """
+        :param self: Object
+        :param access_token: Valid access credential
+        :type access_token: string
+        :param url: Bling V3 Endpoint
+        :type url: String
+
+        Headers and request to Bling endpoint to return the JSON to the service
+        """
+
+        logger.info('Bling patch_endpoints | Starting the Request')
+        headers: dict[str, str] = {
+            'Authorization': f'Bearer {access_token}',
+            'Accept': '*/*',
+            'enable-jwt': '1',
+        }
+
+        response = retry_policy.execute(
+            lambda: self.request.request_path_endpoint(url, headers)
+        )
+        logger.warning(
+            'Bling patch_endpoints | The request return is %s',
             response.status_code,
         )
         return response

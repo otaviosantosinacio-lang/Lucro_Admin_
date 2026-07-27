@@ -1,5 +1,5 @@
 import logging
-from http import HTTPStatus
+from xmlrpc.client import ResponseError
 
 from lucro_admin.core.entities_pedidos import BlingSituation
 from lucro_admin.services.service_http_request_base import BaseRequestHTTP
@@ -81,6 +81,7 @@ class OrderSituationBling:
             '%s situations were found and were recorded',
             len(situations_id)
         )
+            return f'Situations retuned {situations}'
 
     def get_bling_situation(self, ids: list[int]):
 
@@ -98,3 +99,23 @@ class OrderSituationBling:
                 )
 
                 situations.append(situation_details)
+
+            elif response.status == 'rated_limit':
+                logger.warning(
+                    'Bling Orders Situation | '
+                    'The request situation id %s, return %s status code',
+                    id, response.status
+                )
+                continue
+
+            else:
+                logger.critical(
+                    'Bling Orders Situation | '
+                    'Response request returning critical status ->'
+                    f'{response.status}',
+                )
+                return None
+
+            return situations
+
+

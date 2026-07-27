@@ -26,7 +26,8 @@ class BaseRequestHTTP:
         if response.status_code == HTTPStatus.OK:
             data = response.json()
             logger.info(
-                'BaseRequestHTTP organiza_get_request | Retorno da endpoint %s',
+                'BaseRequestHTTP organiza_get_request |'
+                ' Retorno da endpoint %s',
                 response.status_code,
             )
             return PageResult(status='ok', data=data)
@@ -52,3 +53,44 @@ class BaseRequestHTTP:
             status='error',
             error={'status': response.status_code, 'body': response.text},
         )
+
+    def organiza_patch_request(self, url: str) -> PageResult:
+        """
+        url: str
+        Padroniza retorno de Api externa.
+        """
+        response = self.adapt_pedidos.patch_endpoint(
+                self.access_token, url
+            )
+
+        if response.status_code == HTTPStatus.NO_CONTENT:
+            data = response.json()
+            logger.info(
+                    'BaseRequestHTTP organiza_get_request |'
+                    ' Retorno da endpoint %s',
+                    response.status_code,
+                )
+            return PageResult(status='ok', data=data)
+
+        elif response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
+            logger.error(
+                    'BaseRequestHTTP organiza_get_request |'
+                    ' Retorno da endpoint %s -> %s ',
+                    response.status_code,
+                    response.text,
+                )
+            return PageResult(
+                    status='rated_limit',
+                    error={'url': url, 'status': 429, 'body': response.text},
+                )
+        else:
+            logger.critical(
+                'BaseRequestHTTP organiza_get_request |'
+                ' Retorno da endpoint %s -> %s ',
+                response.status_code,
+                response.text,
+            )
+            return PageResult(
+                status='error',
+                error={'status': response.status_code, 'body': response.text},
+            )
