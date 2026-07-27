@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from typing import Literal
 from decimal import Decimal
+from typing import Literal
+
 
 @dataclass
 class ConfigSku:

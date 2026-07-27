@@ -20,6 +20,7 @@ class BlingSituation:
 
     cod_sit: int
     name_sit: str
+    color_sit: None | str = None
 
 
 @dataclass
