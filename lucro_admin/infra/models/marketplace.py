@@ -20,7 +20,16 @@ class Marketplace(BaseModel):
         primary_key=True, nullable=False, init=False
     )
 
-    marketplace_name: Mapped[str] = mapped_column(nullable=False, unique=True)
+    marketplace_external_id: Mapped[int] = mapped_column(
+        nullable=False, unique=True
+    )
+
+    external_type: Mapped[str] = mapped_column(
+        nullable=True
+    )
+
+    marketplace_name: Mapped[str] = mapped_column(nullable=False)
+
     status: Mapped[str] = mapped_column(
         Boolean,
         init=False,

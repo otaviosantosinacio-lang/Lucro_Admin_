@@ -3,7 +3,7 @@ from logging.config import dictConfig
 from pathlib import Path
 
 from lucro_admin.adapters.bling.bling_credentials import Refresh
-from lucro_admin.adapters.bling.bling_orders import GetBling
+from lucro_admin.adapters.bling.bling_orders import CrudBling
 from lucro_admin.adapters.mercado_livre.mercado_livre_credentials import (
     RefreshML,
 )
@@ -63,7 +63,7 @@ def main():
 
     # Adapters
     adapter_refresh_bling = Refresh()
-    adapt_pedidos_bling = GetBling()
+    adapt_pedidos_bling = CrudBling()
     adapt_refresh_ML = RefreshML()
     adapt_pedidos_ML = GetMercadoLivre()
 
@@ -84,10 +84,10 @@ def main():
         token_service_bling para chamar o metodo
     """
     # Bling
-    access_token_bling = token_service_bling.valida_access()
+    access_token_bling = token_service_bling.validate_access_token()
 
     # Mercado Livre
-    access_token_ML = token_service_ML.valida_access()
+    access_token_ML = token_service_ML.validate_access_token()
 
     mercadolivre_pedidos = ExtraiCustoMercadoLivre(
         access_token=access_token_ML, adapt_pedido=adapt_pedidos_ML

@@ -2,13 +2,15 @@ import logging
 from datetime import date, datetime
 
 from lucro_admin.core.entities_pedidos import (
-    DadosPedidos,
     ErrorHTTP,
-    ResultadoGetDetalhes,
-    ResultadoGetPaginas,
-    SituacaoBling,
+    GetDetailsResult,
+    GetPagesResult,
+    OrderData,
 )
 from lucro_admin.core.marketplace import nome_marketplace
+from lucro_admin.services.bling.orders.order_situation_bling import (
+    OrderSituationBling,
+)
 from lucro_admin.services.service_http_request_base import (
     BaseRequestHTTP,
 )
@@ -30,6 +32,11 @@ class Attended:
             self.adapt_pedidos, self.access_token
         )
         self.base_url = 'https://api.bling.com.br/Api/v3'
+        self.order_situation = OrderSituationBling(
+            repo_order=self.repo_pedidos,
+            adapt_order=self.adapt_pedidos,
+            access_token=self.access_token
+        )
 
     def url_endpoint_pag(
         self, pagina: int, sit: int, data_inicial: date, data_final: date
@@ -56,7 +63,7 @@ class Attended:
         )
         return url
 
-    def get_id_by_page(self) -> ResultadoGetPaginas:
+    def get_id_by_page(self) -> GetPagesResult:
         """
         get_id_por_pag -> Orquestrando as requisições para obter ids das vendas
 
@@ -65,7 +72,7 @@ class Attended:
         :rtype: ResultadoGetPaginas
         """
         max_pedidos_pag: int = 100
-        sit = self.situacao('Atendido')
+        sit = self.order_situation.situation_data_base('Atendido')
         mais_pagina: bool = True
         pagina = 1
         data_inicial = self.data_inicial_repo()
@@ -119,32 +126,9 @@ class Attended:
                     f'Erro na requisição: {response.status} - {response.error}'
                 )
 
-        return ResultadoGetPaginas(
-            vendas_id=vendas_id, endpointerro=error429, situacao=sit.nome_sit
+        return GetPagesResult(
+            sales_id=vendas_id, endpointerro=error429, situation=sit.name_sit
         )
-
-    def situacao(self, situacao: str) -> SituacaoBling:
-        """
-        situacao -> extrai situações do banco de dados
-
-        :param self: Objeto
-        :param situacao: O nome da situação que queremos adquirir
-        :type situacao: str
-        :return: Situação contendo o nome e id
-        :rtype: SituacaoBling
-        """
-        situacoes = self.repo_pedidos.situacoes()
-        logger.info('Bling Pedidos situacao | Situações %s', situacoes)
-        for sit in situacoes:
-            if sit[1] == situacao:
-                cod_sit = sit[0]
-                nome_sit = sit[1]
-                break
-        logger.info(
-            f'Bling Pedidos situacao | Situação retornada {cod_sit} -> '
-            f'{nome_sit}'
-        )
-        return SituacaoBling(cod_sit=cod_sit, nome_sit=nome_sit)
 
     def data_inicial_repo(self) -> datetime:
         """
@@ -177,6 +161,7 @@ class ProcessaId:
         self.service_base = BaseRequestHTTP(
             self.adapt_pedidos, self.access_token
         )
+        self.base_url = 'https://api.bling.com.br/Api/v3'
 
     def url_id(self, id) -> str:
         """
@@ -187,11 +172,11 @@ class ProcessaId:
         :return: URL endpoint com id
         :rtype: str
         """
-        return f'{base_url}/pedidos/vendas/{id}'
+        return f'{self.base_url}/pedidos/vendas/{id}'
 
     def get_id_detalhes(
         self, ids_list: list[int], situacao
-    ) -> ResultadoGetDetalhes:
+    ) -> GetDetailsResult:
         """
         get_id_detalhes
 
@@ -212,15 +197,15 @@ class ProcessaId:
                 transporte = data.get('transporte') or {}
                 volumes = transporte.get('volumes') or []
 
-                pedido = DadosPedidos(
+                pedido = OrderData(
                     id_bling=id,
                     num_bling=data['numero'],
                     id_mkt=data['numeroLoja'],
                     data=data['data'],
-                    nome_loja=nome_mkt,
+                    name_store=nome_mkt,
                     nf_id=data['notaFiscal']['id'],
-                    valor_pedido=data['total'],
-                    itens=data['itens'],
+                    value_sale=data['total'],
+                    items=data['itens'],
                     uf_dest=data['transporte']['etiqueta']['uf'],
                     servico_trans=volumes[0].get('servico')
                     if volumes
@@ -245,13 +230,13 @@ class ProcessaId:
                 erro = ErrorHTTP(
                     status=response.error['status'],
                     error=response.error['body'],
-                    metodo='get_id_detalhes',
-                    classe='ProcessaId',
-                    local='service_bling_pedidos.py',
+                    method='get_id_detalhes',
+                    class_name='ProcessaId',
+                    module='service_bling_pedidos.py',
                     endpoint=url,
                     data=datetime.now(),
                 )
                 error429.append(erro)
-        return ResultadoGetDetalhes(
-            pedidos=pedidos, endpointerror=error429, situacao=situacao
+        return GetDetailsResult(
+            orders=pedidos, endpointerror=error429, situation=situacao
         )

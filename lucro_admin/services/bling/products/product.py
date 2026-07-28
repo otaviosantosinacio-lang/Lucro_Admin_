@@ -9,7 +9,7 @@ from lucro_admin.services.service_http_request_base import BaseRequestHTTP
 logger = logging.getLogger('lucroadmin.services.blingproducts')
 
 
-class ProdutosRequest:
+class ProductsRequestBling:
     def __init__(
         self,
         access_token,
@@ -75,7 +75,7 @@ class ProdutosRequest:
 
             elif response.status == 'rated_limit':
                 logger.error(
-                    'Bling Produtcts get_products_pag | Request Error %s',
+                    'Bling Products get_products_pag | Request Error %s',
                     response.error,
                 )
                 error: ErrorHTTP = ErrorHTTP(
@@ -91,7 +91,7 @@ class ProdutosRequest:
                 page += 1
             else:
                 logger.critical(
-                    'Bling Produtcts get_products_pag | error request %s',
+                    'Bling Products get_products_pag | error request %s',
                     response.error,
                 )
                 raise Exception(
@@ -100,25 +100,30 @@ class ProdutosRequest:
         new_products_qnt: int = len(new_products)
         if new_products_qnt > 0:
             logger.info(
-                'Bling Produtcts get_products_pag | '
+                'Bling Products get_products_pag | '
                 'Found %s new products',
                 new_products_qnt
                 )
-            self.get_details_product(new_products)
+            products_detail = self.get_details_product(new_products)
+            logger.info(
+                'Bling Products get_products_pag |'
+                'Newly registered products \n %s',
+                products_detail
+            )
         else:
-            return 
+            return 'Not founded new products'
 
     def get_details_product(self, ids_list):
 
         logger.info(
-            'Bling Produtcts get_details_item | '
+            'Bling Produtts get_details_item | '
             'Starting get details '
         )
         new_products: list[Product] = []
         for id in ids_list:
             url: str = f'{self.url_base}/produtos/{id}'
             logger.info(
-                'Bling Produtcts get_details_item | '
+                'Bling Produtts get_details_item | '
                 'Sending request ot endpoint %s',
                 url
             )
@@ -157,3 +162,5 @@ class ProdutosRequest:
                 raise Exception(
                     f'Critical Error: {response.status} - {response.error}'
                 )
+
+        return new_products

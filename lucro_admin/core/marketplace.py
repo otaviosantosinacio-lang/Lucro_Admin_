@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 MARKETPLACE_POR_LOJA = {
     204442078: 'Mercado Livre Full',
     204196269: 'Mercado Livre',
@@ -23,3 +25,10 @@ def nome_marketplace(id_loja: int) -> str:
         :rtype: str
     """
     return MARKETPLACE_POR_LOJA.get(id_loja, 'Loja não identificada')
+
+
+@dataclass
+class Marketplace:
+    external_id: int
+    external_type: str
+    marketplace_name: str

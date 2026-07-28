@@ -1,10 +1,9 @@
 import logging
-from xmlrpc.client import ResponseError
 
 from lucro_admin.core.entities_pedidos import BlingSituation
 from lucro_admin.services.service_http_request_base import BaseRequestHTTP
 
-logger = logging.getLogger('lucroadmin.services.blingpedidos')
+logger = logging.getLogger('lucroadmin.services.ordersituationbling')
 
 
 class OrderSituationBling:
@@ -44,8 +43,9 @@ class OrderSituationBling:
         url: str = f'{self.base_url}/situacoes/modulos/{id}'
         return url
 
-    def get_bling_situations_ids(self):
+    def get_bling_situations_modules(self):
 
+        breakpoint()
         logger.info(
             'Bling Orders Situation | Starting request situation endpoint'
         )
@@ -56,9 +56,8 @@ class OrderSituationBling:
 
         data = response.data.get('data', [])
 
-        situations_id = []
         if response.status == 'ok':
-            situations_id = [id['id'] for id in data]
+            situations_modules = [id['id'] for id in data]
 
         elif response.status == 'rated_limit':
             logger.warning(
@@ -74,12 +73,13 @@ class OrderSituationBling:
                 )
             return None
 
-        if len(situations_id) > 0:
-            situations = self.get_bling_situation(ids=situations_id)
+        if len(situations_modules) > 0:
+            situations = self.get_bling_situation(ids=situations_modules)
             logger.info(
             'Bling Orders Situation | '
-            '%s situations were found and were recorded',
-            len(situations_id)
+            '%s situations modules were found and were recorded ->'
+            ' Complete Situations %s',
+            len(situations), situations
         )
             return f'Situations retuned {situations}'
 
@@ -91,14 +91,14 @@ class OrderSituationBling:
             response = self.service_base.organiza_get_request(url)
             if response.status == 'ok':
                 data = response.data.get('data', [])
+                for situation in data:
+                    situation_details: BlingSituation = BlingSituation(
+                        cod_sit=situation['id'],
+                        name_sit=situation['nome'],
+                        color_sit=situation['cor']
+                    )
 
-                situation_details: BlingSituation = BlingSituation(
-                    cod_sit=data['id'],
-                    name_sit=data['nome'],
-                    color_sit=data['cor']
-                )
-
-                situations.append(situation_details)
+                    situations.append(situation_details)
 
             elif response.status == 'rated_limit':
                 logger.warning(
@@ -118,4 +118,55 @@ class OrderSituationBling:
 
             return situations
 
+    def change_bling_order_situation(
+        self,
+        order_bling_id: int,
+        new_order_situation: str
+        ):
 
+        situation_id = self.situation_data_base(
+            situation=new_order_situation
+        ).cod_sit
+
+        url: str = (f'{self.base_url}/pedidos/vendas/'
+            f'{order_bling_id}/situacoes/{situation_id}'
+        )
+
+        logger.info(
+            'Bling Orders Situation | '
+            'Starting to change the order situation, '
+            'sending request to endpoint %s',
+            url
+            )
+        response = self.service_base.organiza_patch_request(
+            url=url
+        )
+
+        if response.status == 'ok':
+            logger.info(
+                'Bling Orders Situation | '
+                'Order situation successfully changed -> '
+                'Order ID %s -> Changed to %s',
+                order_bling_id, new_order_situation
+            )
+            return response.status
+
+        elif response.status == 'rated_limit':
+            logger.warning(
+                'Bling Orders Situation | '
+                'The limit of requests has been '
+                'reached when changing the situation, %s ->'
+                'Order ID %s -> Changed to %s',
+                response.status, order_bling_id, new_order_situation
+            )
+            return response.status
+
+        else:
+            logger.critical(
+                'Bling Orders Situation | '
+                'Request returned a critical error '
+                'when trying to change the situation, %s ->'
+                'Order ID %s -> Changed to %s',
+                response.error['status'], order_bling_id, new_order_situation
+            )
+            return response.status

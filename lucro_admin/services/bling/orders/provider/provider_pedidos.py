@@ -2,9 +2,9 @@ import logging
 
 from lucro_admin.core.entities_pedidos import (
     Dados_Pedido_imposto,
+    GetDetailsResult,
+    GetPagesResult,
     PedidoseImpostos,
-    ResultadoGetDetalhes,
-    ResultadoGetPaginas,
 )
 from lucro_admin.core.imposto.tax_calculator import TaxCalculator
 from lucro_admin.services.bling.orders.parse_xml import ParseXML
@@ -12,7 +12,7 @@ from lucro_admin.services.bling.orders.provider.provider import (
     PedidosProvider,
 )
 from lucro_admin.services.bling.orders.service_bling_orders import (
-    Atendidos,
+    Attended,
     ProcessaId,
 )
 
@@ -30,7 +30,7 @@ class PedidosProviderBling(PedidosProvider):
         self.adapt_pedidos = adapt_pedidos
         self.repo_pedidos = repo_pedidos
         self.access_token = access_token
-        self.service_id_pag = Atendidos(
+        self.service_id_pag = Attended(
             self.access_token, self.adapt_pedidos, repo_pedidos
         )
         self.service_processa = ProcessaId(
@@ -39,7 +39,7 @@ class PedidosProviderBling(PedidosProvider):
         self.service_xml = ParseXML(self.access_token, self.adapt_pedidos)
         self.calculadora = TaxCalculator()
 
-    def id_pag(self) -> ResultadoGetPaginas:
+    def id_pag(self) -> GetPagesResult:
         """
         Docstring para id_pag
 
@@ -48,22 +48,22 @@ class PedidosProviderBling(PedidosProvider):
         :rtype: ResultadoGetPaginas
 
         """
-        return self.service_id_pag.get_id_por_pag()
+        return self.service_id_pag.get_id_by_page()
 
     def processa_ids(self):
 
-        ids: ResultadoGetPaginas = self.id_pag()
+        ids: GetPagesResult = self.id_pag()
         logger.info('Bling Provider Pedido | Lista retornada %s', ids)
-        situacao = ids.situacao
-        processa_pedido: ResultadoGetDetalhes = (
+        situacao = ids.situation
+        processa_pedido: GetDetailsResult = (
             self.service_processa.get_id_detalhes(
-                ids_list=ids.vendas_id, situacao=situacao
+                ids_list=ids.sales_id, situacao=situacao
             )
         )
         imposto_produto = []
         pedidos_imposto = []
 
-        for pedido in processa_pedido.pedidos:
+        for pedido in processa_pedido.orders:
             logger.info('Bling Provider Pedido | Pedido %s', pedido)
             if pedido.nf_id > 0:
                 logger.info(
@@ -90,7 +90,7 @@ class PedidosProviderBling(PedidosProvider):
                     ' Calculando custos fiscais com a calculadora de impostos'
                 )
                 imposto = self.calculadora.tax_calculator(
-                    items=pedido.itens,
+                    items=pedido.items,
                     id_bling=pedido.id_bling,
                     sit=situacao,
                     uf_dest=pedido.uf_dest,
@@ -110,9 +110,9 @@ class PedidosProviderBling(PedidosProvider):
                 situacao=situacao,
                 id_mkt=pedido.id_mkt,
                 data=pedido.data,
-                nome_loja=pedido.nome_loja,
+                nome_loja=pedido.name_store,
                 nf_id=pedido.nf_id,
-                valor_pedido=pedido.valor_pedido,
+                valor_pedido=pedido.value_sale,
                 servico_trans=pedido.servico_trans,
                 icms=imposto.sale_tax.icms,
                 pis=imposto.sale_tax.pis,

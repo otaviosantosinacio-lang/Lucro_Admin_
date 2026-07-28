@@ -5,7 +5,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from lucro_admin.adapters.bling.bling_orders import GetUrlXML
-from lucro_admin.core.entities_pedidos import ErrorHTTP, ResultadoPagina
+from lucro_admin.core.entities_pedidos import ErrorHTTP, PageResult
 from lucro_admin.core.entities_produtos import ConfigSku
 from lucro_admin.core.imposto.entities_imposto import (
     ErrorParse,
@@ -63,7 +63,7 @@ class ParseXML:
 
         url: str = self.url_nf(pedido.nf_id)
         adapt_xml = GetUrlXML()
-        response: ResultadoPagina = self.service_base.organiza_get_request(url)
+        response: PageResult = self.service_base.organiza_get_request(url)
 
         if response.status == 'ok':
             data = response.data.get('data', [])
@@ -75,7 +75,7 @@ class ParseXML:
             )
             if isinstance(parse, ErrorParse):
                 parse = self.calculadora.tax_calculator(
-                    items=pedido.itens,
+                    items=pedido.items,
                     id_bling=pedido.id_bling,
                     sit=situacao,
                     uf_dest=pedido.uf_dest,
@@ -85,9 +85,9 @@ class ParseXML:
             erro = ErrorHTTP(
                 status=response.error['status'],
                 error=response.error['body'],
-                metodo='get_xml',
-                classe='ParseXML',
-                local='parse_xml.py',
+                method='get_xml',
+                class_name='ParseXML',
+                module='parse_xml.py',
                 endpoint=url,
                 data=datetime.now(),
             )
