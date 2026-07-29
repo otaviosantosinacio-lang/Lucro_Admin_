@@ -17,15 +17,17 @@ class TokenService:
         :return: Valid Access Token
         :rtype: str
         """
+        breakpoint()
         expire = self.provider.get_expire()
-        expired: bool = datetime.now() > expire
+        expired: bool = datetime.now() >= expire
         if expired:
             logger.info(
-                'Bling Token Service | Token expired, starting refresh flow'
+                'Lucro Admin Token Service |'
+                ' Token expired, starting refresh flow'
             )
             access_token: str = self.provider.use_refresh_token()
             return access_token
         else:
-            logger.info('Bling Token Service | Valid token')
+            logger.info('Lucro Admin Token Service | Valid token')
             access_token: str = self.provider.get_access_token()
             return access_token

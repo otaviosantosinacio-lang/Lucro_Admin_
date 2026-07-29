@@ -23,7 +23,6 @@ from lucro_admin.services.service_http_request_base import (
 logger = logging.getLogger('lucroadmin.services.blingpedidos')
 
 
-
 class ParseXML:
     """
     ParseXML -> Parse do XML para extração de impostos

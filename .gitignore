@@ -50,3 +50,5 @@ database.db
 testrapido.py
 json.json
 pathlib_tests.py
+xml.xml
+nf_ml.json
