@@ -7,7 +7,6 @@ from lucro_admin.core.entities_pedidos import (
     PedidoseImpostos,
 )
 from lucro_admin.core.imposto.tax_calculator import TaxCalculator
-from lucro_admin.services.bling.orders.parse_xml import ParseXML
 from lucro_admin.services.bling.orders.provider.provider import (
     PedidosProvider,
 )
@@ -15,6 +14,7 @@ from lucro_admin.services.bling.orders.service_bling_orders import (
     Attended,
     ProcessaId,
 )
+from lucro_admin.services.parse_xml import ParseXML
 
 logger = logging.getLogger('lucroadmin.services')
 

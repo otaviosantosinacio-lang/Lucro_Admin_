@@ -13,7 +13,7 @@ from lucro_admin.core.imposto.entities_imposto import (
 from lucro_admin.core.imposto.regras_fiscais import uf_without_fcp
 from lucro_admin.infra.repositorio_produtos import Produtos
 
-#logger = logging.getLogger('lucroadmin.services.parseXML')
+logger = logging.getLogger('lucroadmin.services.parseXML')
 
 
 class ParseXML:
@@ -22,7 +22,7 @@ class ParseXML:
         self.namespace: str = '{http://www.portalfiscal.inf.br/nfe}'
 
     def parse_xml(
-        self, xml, id_bling, situacao
+        self, xml, order_id, situation
     ) -> TaxReturn | ErrorParse:
         """
         parse_xml -> Extraction of taxes by XML tags
@@ -38,9 +38,9 @@ class ParseXML:
 
         parse_xml = ET.fromstring(xml)
         products = Produtos()
-        '''logger.info(
+        logger.info(
             'Lucro Admin Parse XML| Starting XML data extraction'
-        )'''
+        )
 
         Nfe = parse_xml.find(f'{self.namespace}NFe')
 
@@ -124,8 +124,8 @@ class ParseXML:
             cost_price = products.consulta_custo(SKU=product_info['product'])
             cost_price *= product_info['quantity']
             imposto_produto = ProductWithTax(
-                id_bling=id_bling,
-                order_status=situacao,
+                id_bling=order_id,
+                order_status=situation,
                 sku=product_info['product'],
                 quantity=product_info['quantity'],
                 cost_price=cost_price,
@@ -140,12 +140,12 @@ class ParseXML:
             produtos_com_imposto.append(imposto_produto)
 
         imposto_venda = SalesTaxes.sum_taxes(
-            products_tax=produtos_com_imposto, id_bling=id_bling
+            products_tax=produtos_com_imposto, id_bling=order_id
         )
-        '''logger.info(
+        logger.info(
             'Lucro Admin Parse XML | Product with itemized taxes -> %s',
             produtos_com_imposto,
-        )'''
+        )
         return TaxReturn(
             product_tax=produtos_com_imposto, sale_tax=imposto_venda
         )
