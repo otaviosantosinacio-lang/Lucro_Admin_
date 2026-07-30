@@ -17,7 +17,6 @@ class TokenService:
         :return: Valid Access Token
         :rtype: str
         """
-        breakpoint()
         expire = self.provider.get_expire()
         expired: bool = datetime.now() >= expire
         if expired:

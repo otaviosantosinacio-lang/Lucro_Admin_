@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 import asyncio
+import sys
 
 from lucro_admin.settings import DataBaseSettings
 from lucro_admin.infra import models
@@ -84,6 +85,9 @@ async def run_async_migrations() -> None:
 
 def run_migrations_online():
     asyncio.run(run_async_migrations())
+
+if sys.platform == 'win32':
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 if context.is_offline_mode():
     run_migrations_offline()

@@ -1,21 +1,14 @@
 import logging
-import xml.etree.ElementTree as ET
 from datetime import datetime
-from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from lucro_admin.adapters.bling.bling_orders import GetUrlXML
 from lucro_admin.core.entities_pedidos import ErrorHTTP, PageResult
-from lucro_admin.core.entities_produtos import ConfigSku
 from lucro_admin.core.imposto.entities_imposto import (
-    ErrorParse,
-    ProductWithTax,
-    SalesTaxes,
     TaxReturn,
 )
-from lucro_admin.core.imposto.regras_fiscais import uf_without_fcp
 from lucro_admin.core.imposto.tax_calculator import TaxCalculator
-from lucro_admin.infra.repositorio_produtos import Produtos
+from lucro_admin.services.parse_xml import ParseXML
 from lucro_admin.services.service_http_request_base import (
     BaseRequestHTTP,
 )
@@ -37,7 +30,7 @@ class TaxInvoicesBling:
         self.calculadora = TaxCalculator()
         self.base_url = 'https://api.bling.com.br/Api/v3'
         self.adapter_xml = GetUrlXML()
-
+        self.parse_xml = ParseXML()
     def url_nf(self, id_nf) -> str:
         """
         url_nf
@@ -69,16 +62,9 @@ class TaxInvoicesBling:
             url_xml = data['xml']
             xml = self.adapter_xml.request_xml(url_xml)
             logger.info('Bling get_xml | Xml extraído %s', xml)
-            parse = self.parse_xml(
-                xml=xml, id_bling=pedido.id_bling, situacao=situacao
+            parse = self.parse_xml.parse_xml(
+                xml=xml, order_id=pedido.id_bling, situation=situacao
             )
-            if isinstance(parse, ErrorParse):
-                parse = self.calculadora.tax_calculator(
-                    items=pedido.items,
-                    id_bling=pedido.id_bling,
-                    sit=situacao,
-                    uf_dest=pedido.uf_dest,
-                )
             return parse
         if response.status == 'rated_limit':
             erro = ErrorHTTP(
@@ -95,13 +81,6 @@ class TaxInvoicesBling:
                 ' Erro ao buscar informações na endpoint %s -> %s',
                 url,
                 erro.status,
-            )
-
-            return self.calculadora.tax_calculator(
-                items=pedido.itens,
-                id_bling=pedido.id_bling,
-                sit=situacao,
-                uf_dest=pedido.uf_dest,
             )
 
     def get_xml(self, url):

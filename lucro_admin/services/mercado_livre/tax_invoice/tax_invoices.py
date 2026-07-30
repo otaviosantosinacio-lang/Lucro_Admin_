@@ -48,6 +48,8 @@ class TaxInvoicesMeli:
             taxes_order = self.parse_xml.parse_xml(
                 xml=xml, order_id=order, situation=status)
 
+            meli_taxes.append(taxes_order)
+
     def get_xml(self, xml_location):
 
         url: str = f'{self.base_url}{xml_location}'

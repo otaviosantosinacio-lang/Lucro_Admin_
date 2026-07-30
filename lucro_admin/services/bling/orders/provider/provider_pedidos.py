@@ -7,6 +7,7 @@ from lucro_admin.core.entities_pedidos import (
     PedidoseImpostos,
 )
 from lucro_admin.core.imposto.tax_calculator import TaxCalculator
+from lucro_admin.services.bling.orders.order_tax import TaxInvoicesBling
 from lucro_admin.services.bling.orders.provider.provider import (
     PedidosProvider,
 )
@@ -14,7 +15,6 @@ from lucro_admin.services.bling.orders.service_bling_orders import (
     Attended,
     ProcessaId,
 )
-from lucro_admin.services.parse_xml import ParseXML
 
 logger = logging.getLogger('lucroadmin.services')
 
@@ -36,7 +36,9 @@ class PedidosProviderBling(PedidosProvider):
         self.service_processa = ProcessaId(
             self.access_token, self.adapt_pedidos, self.repo_pedidos
         )
-        self.service_xml = ParseXML(self.access_token, self.adapt_pedidos)
+        self.service_xml = TaxInvoicesBling(
+            self.access_token, self.adapt_pedidos
+        )
         self.calculadora = TaxCalculator()
 
     def id_pag(self) -> GetPagesResult:
@@ -71,7 +73,7 @@ class PedidosProviderBling(PedidosProvider):
                     ' Buscando dados fiscais da nf_id -> %s',
                     pedido.nf_id,
                 )
-                imposto = self.service_xml.get_xml(
+                imposto = self.service_xml.get_taxes_bling(
                     pedido=pedido, situacao=situacao
                 )
                 logger.info(

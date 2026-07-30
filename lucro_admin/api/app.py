@@ -1,6 +1,12 @@
+import asyncio
+import sys
+
 from fastapi import FastAPI
 
 from lucro_admin.api.routers import auth, users
+
+if sys.platform == 'win32':
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 app = FastAPI(title='Lucro Admin API')
 app.include_router(users.router)
