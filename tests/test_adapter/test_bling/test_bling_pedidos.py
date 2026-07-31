@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 import requests
 
-from lucro_admin.adapters.bling.bling_orders import GetBling, GetUrlXML
+from lucro_admin.adapters.bling.bling_orders import GetUrlXML, CrudBling
 from tests.fakes.http import FakeResponse
 
 
@@ -24,7 +24,7 @@ def test_get_endpoint_sucess(monkeypatch):
 
     monkeypatch.setattr(requests, 'get', fake_get)
 
-    client = GetBling()
+    client = CrudBling()
     url = 'https://api.bling.com.br/Api/v3'
     result = client.get_endpoint(
         access_token='access_token_test',
