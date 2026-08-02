@@ -1,7 +1,7 @@
 FROM python:3.14-slim
 ENV POETRY_VIRTUALENVS_CREATE=false
 
-WORKDIR lucro_admin/
+WORKDIR /app/
 COPY . .
 
 RUN pip install poetry
@@ -11,5 +11,5 @@ RUN poetry install --no-interaction --no-ansi --without dev
 
 EXPOSE 8000
 
-CMD poetry run uvicorn --host 0.0.0.0 lucro_admin.app:app
+CMD ["uvicorn", "lucro_admin.api.app:app", "--host", "0.0.0.0"]
 
