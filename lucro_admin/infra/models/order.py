@@ -23,15 +23,15 @@ class Order(BaseModel):
 
     order_id: Mapped[int] = mapped_column(init=False, primary_key=True)
 
-    bling_id: Mapped[int] = mapped_column(unique=True)
+    external_id: Mapped[int] = mapped_column(unique=True)
 
-    bling_num: Mapped[int] = mapped_column(unique=True)
+    origin_id: Mapped[int] = mapped_column(unique=True)
 
     situation_id: Mapped[int] = mapped_column(
         ForeignKey('bling_orders_situation.situation_id'), nullable=False
     )
 
-    tax_invoice_bling_id: Mapped[int] = mapped_column(nullable=True)
+    external_invoice_id: Mapped[int] = mapped_column(nullable=True)
 
     marketplace_id: Mapped[int] = mapped_column(
         ForeignKey('marketplaces.marketplace_id'), nullable=True

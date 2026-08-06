@@ -4,6 +4,8 @@ from lucro_admin.infra.models.marketplace import Marketplace
 from lucro_admin.infra.models.order import Order
 from lucro_admin.infra.models.order_item import OrderItem
 from lucro_admin.infra.models.order_item_tax import OrderItemTax
+from lucro_admin.infra.models.pipeline_stage import PipelineStage
+from lucro_admin.infra.models.pippeline_status import PipelineStatus
 from lucro_admin.infra.models.product import Product
 from lucro_admin.infra.models.tax_invoice import TaxInvoice
 from lucro_admin.infra.models.user import User
@@ -18,4 +20,6 @@ __all__ = [
     'Marketplace',
     'OrderItemTax',
     'OrderItem',
+    'PipelineStage',
+    'PipelineStatus'
 ]

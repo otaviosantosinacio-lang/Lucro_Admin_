@@ -19,7 +19,7 @@ class Product(BaseModel):
 
     product_id: Mapped[int] = mapped_column(init=False, primary_key=True)
 
-    product_bling_id: Mapped[int] = mapped_column(unique=True, nullable=False)
+    external_product_id: Mapped[int] = mapped_column(unique=True, nullable=False)
 
     sku: Mapped[str] = mapped_column(unique=True, nullable=True)
 
