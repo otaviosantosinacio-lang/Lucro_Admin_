@@ -15,7 +15,7 @@ from lucro_admin.infra.logging.contexto import (
     correlation_id,
     generate_correlation_id,
 )
-from lucro_admin.infra.repositorio_bling import (
+from lucro_admin.infra.repository_credentials import (
     CredenciaisDB_bling,
     DadosGerais,
 )

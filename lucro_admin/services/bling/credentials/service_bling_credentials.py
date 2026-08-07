@@ -4,6 +4,7 @@ from http import HTTPStatus
 
 from lucro_admin.adapters.bling.bling_credentials import Code
 from lucro_admin.core.entities_credential import Credential
+from lucro_admin.settings import BlingSettings
 from lucro_admin.utils.code_state import code_string
 from lucro_admin.utils.cript_state import cript_state
 
@@ -16,8 +17,10 @@ class oAuthCodeBling:
     oAuthCodeBling -> Flow orchestration for exchanging the Code for Tokens
     """
 
-    def __init__(self, repository):
-        self.repository = repository
+    def __init__(self):
+        self.settings_credentials = BlingSettings()
+        self.adapter_code = Code()
+        self.repository = 
 
     def oAuthCode_flow_bling(self) -> str:
         """
@@ -29,15 +32,17 @@ class oAuthCodeBling:
         """
         logger.info('Bling oAuth Code | Starting the flow with the code')
 
-        client_id: str = self.repository.get_client_id()
-        client_secret: str = self.repository.get_client_secret()
+        client_id: str = self.settings_credentials.CLIENT_ID()
+        client_secret: str = self.settings_credentials.CLIENT_SECRET()
 
-        adapt_code = Code()
         if not client_id or not client_secret:
             raise Exception('Credentials not found')
 
         state: str = cript_state()
-        url: str = adapt_code.generate_url_request(client_id, state=state)
+        url: str = self.adapter_code.generate_url_request(
+            client_id,
+            state=state
+            )
 
         webbrowser.open(url)
 
@@ -55,7 +60,7 @@ class oAuthCodeBling:
 
         logger.info('Bling oAuth Code | Code saved and state validated')
 
-        tokens_dict = adapt_code.exchange_code_for_tokens(
+        tokens_dict = self.adapter_code.exchange_code_for_tokens(
             client_id, client_secret, code
         )
         tokens: Credential = Credential.from_api_response(tokens_dict)
