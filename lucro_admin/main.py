@@ -15,15 +15,8 @@ from lucro_admin.infra.logging.contexto import (
     correlation_id,
     generate_correlation_id,
 )
-from lucro_admin.infra.repository_credentials import (
-    CredenciaisDB_bling,
-    DadosGerais,
-)
 from lucro_admin.infra.repositorio_pedidos import InsertPedidos
 from lucro_admin.infra.repositorio_produtos_pedido import InsertPedidosProdutos
-from lucro_admin.infra.repositorioMercadoLivre.repositorio_mercadolivre import (
-    CredenciaisMercadoLivre,
-)
 from lucro_admin.services.bling.credentials.tokens.providers.bling_provider import (
     BlingProvider,
 )
@@ -55,9 +48,6 @@ def main():
     logger.info('Iniciando o fluxo principal da aplicação')
 
     # Repositórios
-    repo_credent_bling = CredenciaisDB_bling()
-    repo_pedidos_bling = DadosGerais()
-    repo_credent_ML = CredenciaisMercadoLivre()
     repo_pedidos = InsertPedidos()
     repo_pedidos_produtos = InsertPedidosProdutos()
 
@@ -69,10 +59,10 @@ def main():
 
     # Providers
     bling_provider_credenciais = BlingProvider(
-        repo_credent_bling, adapter_refresh_bling
+        adapter_refresh_bling
     )
     mercadolivre_provider_credenciais = MLProvider(
-        repo_credent_ML, adapt_refresh_ML
+        adapt_refresh_ML
     )
 
     # Token Services

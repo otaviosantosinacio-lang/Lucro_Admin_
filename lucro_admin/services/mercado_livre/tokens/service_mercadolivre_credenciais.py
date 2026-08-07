@@ -6,13 +6,18 @@ from lucro_admin.adapters.mercado_livre.mercado_livre_credentials import Code
 from lucro_admin.core.entities_credential import Credential
 from lucro_admin.utils.code_state import code_string
 from lucro_admin.utils.cript_state import cript_state
+from lucro_admin.infra.repository_credentials import SaveCredentials
+from lucro_admin.settings import MeliSettings
 
 logger = logging.getLogger('lucroadmin.services.mercadolivre')
 
 
 class oAuthCodeMercadoLivre:
-    def __init__(self, repositorio):
-        self.repositorio = repositorio
+    def __init__(self):
+        self.repositorio = SaveCredentials('ml.env')
+        self.credentials = MeliSettings()
+        self.base_url = 'https://auth.mercadolivre.com.br'
+        self.adapter = Code()
 
     def abrindo_edge(self, url: str) -> bool:
         """
@@ -46,7 +51,7 @@ class oAuthCodeMercadoLivre:
         :return: URL montada
         :rtype: str
         """
-        url: str = f'https://auth.mercadolivre.com.br/authorization?response_type=code&client_id={client_id}&redirect_uri={redirect_url}&state={state}'
+        url: str = f'{self.base_url}/authorization?response_type=code&client_id={client_id}&redirect_uri={redirect_url}&state={state}'
         return url
 
     def fluxo_oAuth_code_mercadolivre(self) -> str:
@@ -57,15 +62,13 @@ class oAuthCodeMercadoLivre:
         :return: Access Token válido
         :rtype: str
         """
-        client_id: str = self.repositorio.get_client_id()
-        client_secret: str = self.repositorio.get_client_secret()
+        client_id: str = self.credentials.CLIENT_ID
+        client_secret: str = self.credentials.CLIENT_SECRET
         if not client_id or not client_secret:
             logger.exception(
                 'Mercado Livre oAuth Code | Credenciais não encontradas'
             )
             raise Exception('Credenciais não encontradas')
-
-        adapt_code = Code()
 
         redirect_url: str = 'https://www.albhastore.com.br'
         state: str = cript_state()
@@ -89,7 +92,7 @@ class oAuthCodeMercadoLivre:
 
         logger.info('Mercado Livre oAuth Code | Code salvo e state validado')
 
-        tokens_dict: dict[str, int] = adapt_code.exchange_code_for_tokens(
+        tokens_dict: dict[str, int] = self.adapter.exchange_code_for_tokens(
             client_id=client_id,
             client_secret=client_secret,
             code=code,
@@ -97,8 +100,10 @@ class oAuthCodeMercadoLivre:
         )
         tokens: Credential = Credential.from_api_response(tokens_dict)
 
-        atualiza: bool = self.repositorio.salva_token(
-            tokens.access_token, tokens.refresh_token, tokens.expire
+        atualiza: bool = self.repositorio.save_credentials(
+            access_token=tokens.access_token,
+            refresh_token=tokens.refresh_token,
+            expire=tokens.expire
         )
 
         if not atualiza:
@@ -118,9 +123,10 @@ class oAuthRefreshMercadoLivre:
 
     """
 
-    def __init__(self, repositorio, adapt_refresh):
-        self.repositorio = repositorio
+    def __init__(self, adapt_refresh):
         self.adapt_refresh = adapt_refresh
+        self.repositorio = SaveCredentials('ml.env')
+        self.credentials = MeliSettings()
 
     def fluxo_refresh_token(self) -> str | None:
         """
@@ -135,9 +141,9 @@ class oAuthRefreshMercadoLivre:
         )
 
         logger.info('Mercado Livre oAuth Refresh | Buscando credenciais')
-        client_id: str = self.repositorio.get_client_id()
-        client_secret: str = self.repositorio.get_client_secret()
-        refresh_token: str = self.repositorio.get_refresh_token()
+        client_id: str = self.credentials.CLIENT_ID
+        client_secret: str = self.credentials.CLIENT_SECRET
+        refresh_token: str = self.credentials.REFRESH_TOKEN
 
         if not client_id or not client_secret or not refresh_token:
             logger.exception(
@@ -159,8 +165,10 @@ class oAuthRefreshMercadoLivre:
             tokens: Credential = Credential.from_api_response(tokens_dict)
 
         if tokens.response_status_code == 200:
-            atualiza = self.repositorio.salva_token(
-                tokens.access_token, tokens.refresh_token, tokens.expire
+            atualiza = self.repositorio.save_credentials(
+                access_token=tokens.access_token,
+                refresh_token=tokens.refresh_token,
+                expire=tokens.expire
             )
             if atualiza:
                 logger.info(
@@ -177,7 +185,7 @@ class oAuthRefreshMercadoLivre:
                 'MErcado Livre oAuth Refresh | Erro na requisição: %s',
                 tokens.response_status_code,
             )
-            fluxo_code = oAuthCodeMercadoLivre(repositorio=self.repositorio)
+            fluxo_code = oAuthCodeMercadoLivre()
             logger.warning(
                 'Mercado Livre oAuth Refresh | Foi necessário forçar o inicio do fluxo code'
             )

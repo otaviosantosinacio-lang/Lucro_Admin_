@@ -4,6 +4,7 @@ from http import HTTPStatus
 
 from lucro_admin.adapters.bling.bling_credentials import Code
 from lucro_admin.core.entities_credential import Credential
+from lucro_admin.infra.repository_credentials import SaveCredentials
 from lucro_admin.settings import BlingSettings
 from lucro_admin.utils.code_state import code_string
 from lucro_admin.utils.cript_state import cript_state
@@ -20,7 +21,7 @@ class oAuthCodeBling:
     def __init__(self):
         self.settings_credentials = BlingSettings()
         self.adapter_code = Code()
-        self.repository = 
+        self.repository = SaveCredentials('bling.env')
 
     def oAuthCode_flow_bling(self) -> str:
         """
@@ -32,8 +33,8 @@ class oAuthCodeBling:
         """
         logger.info('Bling oAuth Code | Starting the flow with the code')
 
-        client_id: str = self.settings_credentials.CLIENT_ID()
-        client_secret: str = self.settings_credentials.CLIENT_SECRET()
+        client_id: str = self.settings_credentials.CLIENT_ID
+        client_secret: str = self.settings_credentials.CLIENT_SECRET
 
         if not client_id or not client_secret:
             raise Exception('Credentials not found')
@@ -64,8 +65,10 @@ class oAuthCodeBling:
             client_id, client_secret, code
         )
         tokens: Credential = Credential.from_api_response(tokens_dict)
-        update = self.repository.salva_token(
-            tokens.access_token, tokens.refresh_token, tokens.expire
+        update = self.repository.save_credentials(
+            access_token=tokens.access_token,
+            refresh_token=tokens.refresh_token,
+            expire=tokens.expire
         )
 
         if not update:
@@ -86,9 +89,10 @@ class oAuthRefreshBling:
     valid Access Token
     """
 
-    def __init__(self, repository, adapt_refresh):
-        self.repository = repository
+    def __init__(self, adapt_refresh):
+        self.repository = SaveCredentials('bling.env')
         self.adapt_refresh = adapt_refresh
+        self.settings_credentials = BlingSettings()
 
     def refresh_token_flow_bling(self) -> str:
         """
@@ -101,11 +105,11 @@ class oAuthRefreshBling:
         logger.info(
             'Bling oAuth Refresh | Starting flow with the Refresh Token'
         )
-
+        breakpoint()
         logger.info('Bling oAuth Refresh | Searching for credentials')
-        client_id: str = self.repository.get_client_id()
-        client_secret: str = self.repository.get_client_secret()
-        refresh_token: str = self.repository.get_refresh_token()
+        client_id: str = self.settings_credentials.CLIENT_ID
+        client_secret: str = self.settings_credentials.CLIENT_SECRET
+        refresh_token: str = self.settings_credentials.REFRESH_TOKEN
 
         if not client_id or not client_secret or not refresh_token:
             raise Exception('Credentials not found')
@@ -121,7 +125,7 @@ class oAuthRefreshBling:
             tokens: Credential = Credential.from_api_response(tokens_dict)
 
         if tokens.response_status_code == HTTPStatus.OK:
-            update = self.repository.salva_token(
+            update = self.repository.save_credentials(
                 tokens.access_token, tokens.refresh_token, tokens.expire
             )
             if update:
@@ -138,7 +142,7 @@ class oAuthRefreshBling:
                 'Bling oAuth Refresh | Request error: %s',
                 tokens.response_status_code,
             )
-            fluxo_code = oAuthCodeBling(self.repository)
+            fluxo_code = oAuthCodeBling()
             logger.warning(
                 'Bling oAuth Refresh |'
                 ' Foi necessário forçar o inicio do fluxo code'

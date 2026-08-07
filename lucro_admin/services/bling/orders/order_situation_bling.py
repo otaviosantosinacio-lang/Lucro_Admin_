@@ -12,8 +12,12 @@ class OrderSituationBling:
         self.repo_order = repo_order
         self.adapt_order = adapt_order
         self.access_token = access_token
-        self.service_base = BaseRequestHTTP(self.adapt_order, self.access_token)
+        self.service_base = BaseRequestHTTP(
+            self.adapt_order,
+            self.access_token
+        )
         self.base_url = 'https://api.bling.com.br/Api/v3'
+        self.repo_situation = 
 
     def situation_data_base(self, situation: str) -> BlingSituation:
         """

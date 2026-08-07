@@ -1,21 +1,38 @@
 import logging
+from dataclasses import asdict
+from sqlalchemy import text
 
+from lucro_admin.infra.database import get_session as session
 from lucro_admin.infra.executa_database import executa_insert_pedidos
 
 logger = logging.getLogger('lucroadmin.infra.pedidos')
 
 
 class InsertPedidos:
+
+    def __init__(self):
+        self.session = session
+
     def insert_pedidos(self, pedidos):
         logger.info('Pedidos Repo | Iniciando a inserção dos pedidos')
         for pedido in pedidos:
-            query = """
-            INSERT INTO pedidos_venda
-            (id_bling, num_bling, situacao, id_nf,
-            id_loja, loja, data, icms,
-            pis, cofins, icms_dest, fcp,
-            total_imposto, frete, comissao,
-            lucro, custo_total_produtos, valor_pedido) VALUES %s"""
+            query = text("""
+            INSERT INTO pedidos_venda(
+                id_bling, num_bling, situacao, 
+                id_nf, id_loja, loja, data,
+                icms, pis, cofins, icms_dest,
+                fcp, total_imposto, frete, comissao,
+                lucro, custo_total_produtos, valor_pedido
+                ) 
+                VALUES (
+                    :id_bling,
+                    :num_bling,
+                    :situacao,
+                    :nf_id,
+                    :id_mkt,
+                    :nome_loja,
+                    :data,
+                )""")
             values = [
                 (
                     pedido.id_bling,
@@ -38,4 +55,6 @@ class InsertPedidos:
                     pedido.valor_pedido,
                 )
             ]
-            insert = executa_insert_pedidos(execute=query, params=values)
+
+            try:
+                self.session.execute

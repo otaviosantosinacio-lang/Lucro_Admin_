@@ -5,33 +5,36 @@ from lucro_admin.services.mercado_livre.tokens.service_mercadolivre_credenciais 
     oAuthRefreshMercadoLivre,
 )
 from lucro_admin.services.providers.provider import TokenProvider
+from lucro_admin.settings import MeliSettings
 
 logger = logging.getLogger('lucroadmin.services.provider')
 
 
 class MLProvider(TokenProvider):
-    def __init__(self, repositorio, adapter_refresh):
-        self.repositorio = repositorio
+    def __init__(self, adapter_refresh):
+        self.credentials = MeliSettings()
         self.adapter_refresh = adapter_refresh
 
     def get_access_token(self) -> str:
         logger.info(
         'Mercado Livre Provider | Buscando no Banco de Dados o access token.'
         )
-        return self.repositorio.get_access_token()
+        return self.credentials.ACCESS_TOKEN
 
     def get_expire(self) -> datetime:
         logger.info(
             'Mercado Livre Provider | Buscando no Banco de Dados o expire.'
         )
-        return self.repositorio.get_expire()
+        expire_str = self.credentials.EXPIRE
+        expire_date = datetime.fromisoformat(expire_str)
+        return expire_date
 
     def use_refresh_token(self) -> str | None:
         logger.info(
         'Mercado Livre Provider | Iniciando o fluxo de uso do refresh token.'
         )
         fluxo_refresh = oAuthRefreshMercadoLivre(
-            self.repositorio, self.adapter_refresh
+            self.adapter_refresh
         )
         access_token: str | None = fluxo_refresh.fluxo_refresh_token()
         logger.info(
