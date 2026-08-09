@@ -1,6 +1,10 @@
 import logging
 
-from lucro_admin.core.entities_pedidos import BlingSituation
+from lucro_admin.core.entities_pedidos import BlingSituation, BlingSituationDB
+from lucro_admin.infra.database_.session import SessionLocal
+from lucro_admin.infra.repository_bling_order_situation import (
+    BlingOrderSituation,
+)
 from lucro_admin.services.service_http_request_base import BaseRequestHTTP
 
 logger = logging.getLogger('lucroadmin.services.ordersituationbling')
@@ -8,8 +12,7 @@ logger = logging.getLogger('lucroadmin.services.ordersituationbling')
 
 class OrderSituationBling:
 
-    def __init__(self, repo_order, adapt_order, access_token):
-        self.repo_order = repo_order
+    def __init__(self, adapt_order, access_token):
         self.adapt_order = adapt_order
         self.access_token = access_token
         self.service_base = BaseRequestHTTP(
@@ -17,9 +20,8 @@ class OrderSituationBling:
             self.access_token
         )
         self.base_url = 'https://api.bling.com.br/Api/v3'
-        self.repo_situation = 
 
-    def situation_data_base(self, situation: str) -> BlingSituation:
+    async def situation_data_base(self, situation: str) -> BlingSituationDB:
         """
         situacao_data_base -> extracts situations from the database
 
@@ -29,27 +31,29 @@ class OrderSituationBling:
         :return: Situation containing the name and id
         :rtype: BlingSituation
         """
-        situations = self.repo_order.situacoes()
-        logger.info('Bling Orders Situation | Situations %s', situations)
-        for sit in situations:
-            if sit[1] == situation:
-                cod_sit = sit[0]
-                name_sit = sit[1]
-                break
-        logger.info(
-            f'Bling Orders Situation | Return Situation {cod_sit} -> '
-            f'{name_sit}'
-        )
-        return BlingSituation(cod_sit=cod_sit, name_sit=name_sit)
+        async with SessionLocal() as session:
+            repository = BlingOrderSituation(session=session)
+
+            result = await repository.extract_situation(
+                situation_name=situation
+            )
+
+            situation_data: BlingSituationDB = BlingSituationDB(
+                situation_id=result[0][0],
+                situation_bling_id=result[0][1],
+                situation_name=result[0][2],
+                situation_color=result[0][3]
+            )
+
+            return situation_data
 
     def build_url_situation(self, id: int) -> str:
 
         url: str = f'{self.base_url}/situacoes/modulos/{id}'
         return url
 
-    def get_bling_situations_modules(self):
+    async def get_bling_situations_modules(self):
 
-        breakpoint()
         logger.info(
             'Bling Orders Situation | Starting request situation endpoint'
         )
@@ -85,7 +89,12 @@ class OrderSituationBling:
             ' Complete Situations %s',
             len(situations), situations
         )
-            return f'Situations retuned {situations}'
+            async with SessionLocal() as session:
+                repository = BlingOrderSituation(session=session)
+
+                await repository.insert_situations(situations=situations)
+                await session.commit()
+                await session.close()
 
     def get_bling_situation(self, ids: list[int]):
 
@@ -97,9 +106,9 @@ class OrderSituationBling:
                 data = response.data.get('data', [])
                 for situation in data:
                     situation_details: BlingSituation = BlingSituation(
-                        cod_sit=situation['id'],
-                        name_sit=situation['nome'],
-                        color_sit=situation['cor']
+                        situation_bling_id=situation['id'],
+                        situation_name=situation['nome'],
+                        situation_color=situation['cor']
                     )
 
                     situations.append(situation_details)
@@ -122,18 +131,18 @@ class OrderSituationBling:
 
             return situations
 
-    def change_bling_order_situation(
+    async def change_bling_order_situation(
         self,
         order_bling_id: int,
         new_order_situation: str
         ):
 
-        situation_id = self.situation_data_base(
+        situation_id = await self.situation_data_base(
             situation=new_order_situation
-        ).cod_sit
+        )
 
         url: str = (f'{self.base_url}/pedidos/vendas/'
-            f'{order_bling_id}/situacoes/{situation_id}'
+            f'{order_bling_id}/situacoes/{situation_id.situation_bling_id}'
         )
 
         logger.info(

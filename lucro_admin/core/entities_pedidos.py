@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Literal
 
 logger = logging.getLogger('lucroadmin.core.entities')
@@ -18,11 +18,16 @@ class BlingSituation:
         :type name_sit: str
     """
 
-    cod_sit: int
-    name_sit: str
-    color_sit: str | None = None
+    situation_bling_id: int
+    situation_name: str
+    situation_color: str | None = None
 
-
+@dataclass
+class BlingSituationDB:
+    situation_id: int
+    situation_bling_id: int
+    situation_name: str
+    situation_color: str | None = None
 @dataclass
 class PageResult:
     """
@@ -91,6 +96,15 @@ class GetPagesResult:
     sales_id: list[int]
     endpointerro: list[ErrorHTTP]
     situation: str
+
+@dataclass
+class OrderPage:
+    external_id: int
+    origin_id: int
+    situation_id: int
+    marketplace_id: int
+    marketplace_order_id: str
+    order_date: date
 
 
 @dataclass

@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 logger = logging.getLogger('lucroadmin.services.bling')
 
@@ -18,7 +18,7 @@ class TokenService:
         :rtype: str
         """
         expire = self.provider.get_expire()
-        expired: bool = datetime.now() >= expire
+        expired: bool = datetime.now(timezone.utc) >= expire
         if expired:
             logger.info(
                 'Lucro Admin Token Service |'

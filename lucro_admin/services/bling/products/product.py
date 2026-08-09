@@ -3,7 +3,8 @@ from datetime import datetime
 
 from lucro_admin.core.entities_pedidos import ErrorHTTP, PageResult
 from lucro_admin.core.entities_produtos import Product
-from lucro_admin.infra.repositorio_produtos import Produtos
+from lucro_admin.infra.database_.session import SessionLocal
+from lucro_admin.infra.repository_products import Products
 from lucro_admin.services.service_http_request_base import BaseRequestHTTP
 
 logger = logging.getLogger('lucroadmin.services.blingproducts')
@@ -20,7 +21,6 @@ class ProductsRequestBling:
         self.service_base = BaseRequestHTTP(
             adapt_pedidos=self.adapt_pedidos, access_token=self.access_token
         )
-        self.repository = Produtos()
         self.url_base = 'https://api.bling.com.br/Api/v3'
 
     def url_products_endpoint_pag(self, page: int) -> str:
@@ -37,9 +37,8 @@ class ProductsRequestBling:
 
         return url
 
-    def get_produtos_pag(self):
+    async def get_produtos_pag(self):
 
-        products_db = self.repository.consulta_todos_produtos()
         page: int = 1
         more_page: bool = True
         page_limit_return: int = 100
@@ -61,12 +60,18 @@ class ProductsRequestBling:
                 url=url
             )
 
+            logger.info(
+                'Bling Product get_products_pag |'
+                ' response request %s',
+                response
+            )
+
+            breakpoint()
             if response.status == 'ok':
                 data: dict = response.data.get('data', [])
                 id_page: list[int] = [product['id'] for product in data]
                 for id in id_page:
-                    if id not in products_db:
-                        new_products.append(id)
+                    new_products.append(id)
 
                 if len(id_page) < page_limit_return:
                     more_page = False
@@ -110,6 +115,12 @@ class ProductsRequestBling:
                 'Newly registered products \n %s',
                 products_detail
             )
+            async with SessionLocal() as session:
+                repository = Products(session)
+
+                await repository.insert_products(products_detail)
+
+                await session.commit()
         else:
             return 'Not founded new products'
 
@@ -133,7 +144,7 @@ class ProductsRequestBling:
             if response.status == 'ok':
                 data = response.data.get('data', [])
                 product: Product = Product(
-                    product_bling_id=data['id'],
+                    external_product_id=data['id'],
                     sku=data['codigo'],
                     product_description=data['nome'],
                     supplier=data['fornecedor']['contato']['nome'],

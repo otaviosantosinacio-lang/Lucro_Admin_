@@ -11,7 +11,6 @@ from lucro_admin.core.imposto.entities_imposto import (
     TaxReturn,
 )
 from lucro_admin.core.imposto.regras_fiscais import uf_without_fcp
-from lucro_admin.infra.repositorio_produtos import Produtos
 
 logger = logging.getLogger('lucroadmin.services.parseXML')
 

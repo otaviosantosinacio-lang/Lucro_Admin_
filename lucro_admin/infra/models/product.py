@@ -4,7 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, func
+from sqlalchemy import BigInteger, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lucro_admin.infra.models.base import BaseModel, table_registry_base
@@ -20,10 +20,12 @@ class Product(BaseModel):
     product_id: Mapped[int] = mapped_column(init=False, primary_key=True)
 
     external_product_id: Mapped[int] = mapped_column(
-        unique=True, nullable=False
+        BigInteger,
+        unique=True,
+        nullable=False
     )
 
-    sku: Mapped[str] = mapped_column(unique=True, nullable=True)
+    sku: Mapped[str] = mapped_column(nullable=True)
 
     product_description: Mapped[str]
 

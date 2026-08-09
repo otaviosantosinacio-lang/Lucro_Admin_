@@ -8,7 +8,6 @@ from lucro_admin.core.imposto.entities_imposto import (
     TaxReturn,
 )
 from lucro_admin.core.imposto.regras_fiscais import icms_aliq, uf_without_fcp
-from lucro_admin.infra.repositorio_produtos import Produtos
 
 logger = logging.getLogger('lucroadmin.core.taxcalculator')
 
@@ -47,8 +46,6 @@ class TaxCalculator:
             'Tax Calculator | Starting the tax calculation'
             ' for the order items'
         )
-
-        products = Produtos()
 
         products_with_tax = []
 

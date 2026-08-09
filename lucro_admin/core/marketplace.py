@@ -29,6 +29,7 @@ def nome_marketplace(id_loja: int) -> str:
 
 @dataclass
 class Marketplace:
-    external_id: int
+    marketplace_external_id: int
     external_type: str
     marketplace_name: str
+    status: bool

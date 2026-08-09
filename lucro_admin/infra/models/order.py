@@ -4,7 +4,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, func
+from sqlalchemy import BigInteger, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lucro_admin.infra.models.base import BaseModel, table_registry_base
@@ -23,7 +23,10 @@ class Order(BaseModel):
 
     order_id: Mapped[int] = mapped_column(init=False, primary_key=True)
 
-    external_id: Mapped[int] = mapped_column(unique=True)
+    external_id: Mapped[int] = mapped_column(
+        BigInteger,
+        unique=True
+        )
 
     origin_id: Mapped[int] = mapped_column(unique=True)
 
@@ -37,7 +40,7 @@ class Order(BaseModel):
         ForeignKey('marketplaces.marketplace_id'), nullable=True
     )
 
-    marketplace_order_id: Mapped[int] = mapped_column(nullable=False)
+    marketplace_order_id: Mapped[str] = mapped_column(nullable=False)
 
     order_date: Mapped[date] = mapped_column(nullable=False)
 

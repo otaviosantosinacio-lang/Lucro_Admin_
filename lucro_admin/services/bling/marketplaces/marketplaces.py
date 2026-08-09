@@ -2,6 +2,8 @@ import logging
 
 from lucro_admin.core.entities_pedidos import PageResult
 from lucro_admin.core.marketplace import Marketplace
+from lucro_admin.infra.database_.session import SessionLocal
+from lucro_admin.infra.repository_marketplaces import Marketplaces
 from lucro_admin.services.service_http_request_base import BaseRequestHTTP
 
 logger = logging.getLogger('lucroadmin.services.blingmarketplaces')
@@ -22,9 +24,8 @@ class MarketplaceBling:
         )
         self.base_url = 'https://api.bling.com.br/Api/v3'
 
-    def get_marketplaces(self):
+    async def get_marketplaces(self):
 
-        breakpoint()
         page: int = 1
         more_page: bool = True
         marketplaces = []
@@ -47,14 +48,19 @@ class MarketplaceBling:
                     data
                 )
                 for mkt in data:
+                    if mkt['situacao'] == 1:
+                        status: bool = True
+                    else:
+                        status: bool = False
+
                     marketplaces.append(
                         Marketplace(
-                            external_id=mkt['id'],
+                            marketplace_external_id=mkt['id'],
                             external_type=mkt['tipo'],
-                            marketplace_name=mkt['descricao']
+                            marketplace_name=mkt['descricao'],
+                            status=status
                         )
                     )
-                breakpoint()
                 if len(data) < 100:
                     more_page = False
 
@@ -74,8 +80,17 @@ class MarketplaceBling:
                 )
                 return None
 
+        async with SessionLocal() as session:
+            repository = Marketplaces(session=session)
+
+            await repository.insert_marketplaces(
+                marketplaces=marketplaces
+                )
+
+            await session.commit()
+
         logger.info(
-                    'Bling Marketplaces |'
+                    'Bling Marketplaces | '
                     'Returned marketplaces %s',
                     marketplaces
                 )

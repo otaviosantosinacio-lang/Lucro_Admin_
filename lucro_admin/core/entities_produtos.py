@@ -56,7 +56,7 @@ class Produto:
 
 @dataclass
 class Product:
-    product_bling_id: int
+    external_product_id: int
     sku: str
     product_description: str
     supplier: str

@@ -4,10 +4,13 @@ from datetime import date, datetime
 from lucro_admin.core.entities_pedidos import (
     ErrorHTTP,
     GetDetailsResult,
-    GetPagesResult,
     OrderData,
+    OrderPage,
 )
 from lucro_admin.core.marketplace import nome_marketplace
+from lucro_admin.infra.database_.session import SessionLocal
+from lucro_admin.infra.repository_marketplaces import Marketplaces
+from lucro_admin.infra.repository_orders import Orders
 from lucro_admin.services.bling.orders.order_situation_bling import (
     OrderSituationBling,
 )
@@ -24,16 +27,14 @@ class Attended:
 
     """
 
-    def __init__(self, access_token, adapt_pedidos, repo_pedidos):
+    def __init__(self, access_token, adapt_pedidos):
         self.access_token = access_token
-        self.repo_pedidos = repo_pedidos
         self.adapt_pedidos = adapt_pedidos
         self.service_base = BaseRequestHTTP(
             self.adapt_pedidos, self.access_token
         )
         self.base_url = 'https://api.bling.com.br/Api/v3'
         self.order_situation = OrderSituationBling(
-            repo_order=self.repo_pedidos,
             adapt_order=self.adapt_pedidos,
             access_token=self.access_token
         )
@@ -57,13 +58,13 @@ class Attended:
         :rtype: str
         """
         url: str = (
-            f'{self.base_url}/pedidos/vendas?pagina={pagina}&limite=20&'
-            f'idsSituacoes%5B%5D={sit}&dataInicial={data_inicial}'
+            f'{self.base_url}/pedidos/vendas?pagina={pagina}&limite=100&'
+            f'idsSituacoes%5B%5D={sit}&dataInicial=2026-07-01'
             f'&dataFinal={data_final}'
         )
         return url
 
-    def get_id_by_page(self) -> GetPagesResult:
+    async def get_id_by_page(self):
         """
         get_id_por_pag -> Orquestrando as requisições para obter ids das vendas
 
@@ -71,64 +72,95 @@ class Attended:
         :return: Ids das vendas
         :rtype: ResultadoGetPaginas
         """
-        max_pedidos_pag: int = 100
-        sit = self.order_situation.situation_data_base('Atendido')
-        mais_pagina: bool = True
-        pagina = 1
-        data_inicial = self.data_inicial_repo()
-        if data_inicial is None:
-            data_inicial = datetime.now().date()
+        limit_orders: int = 100
+        sit = await self.order_situation.situation_data_base('Atendido')
+        more_page: bool = True
+        page = 1
+        async with SessionLocal() as session:
+            repository = Orders(session=session)
+            repository_mkt = Marketplaces(session=session)
+            repo_initial_date = await repository.last_date_order()
 
-        data_final = datetime.now().date
-        vendas_id = []
-        error429 = []
+            initial_date = repo_initial_date[0][0]
+            if initial_date is None:
+                initial_date = datetime.now().date()
 
-        while mais_pagina:
-            url = self.url_endpoint_pag(
-                pagina, sit.cod_sit, data_inicial, data_final
-            )
-            logger.info('Bling Pedidos get_id_por_pag | Url montada %s', url)
-            response = self.service_base.organiza_get_request(url)
+            end_date = datetime.now().date()
+            orders = []
+            error429 = []
 
-            if response.status == 'ok':
-                data = response.data.get('data', [])
-                id = [item['id'] for item in data]
-                vendas_id.extend(id)
+            while more_page:
+                url = self.url_endpoint_pag(
+                    page, sit.situation_bling_id, initial_date, end_date
+                )
+                logger.info(
+                    'Bling Orders get_id_por_pag | '
+                    'Url montada %s', url
+                )
+                response = self.service_base.organiza_get_request(url)
 
-                if len(data) < max_pedidos_pag:
-                    mais_pagina = False
+                if response.status == 'ok':
+                    data = response.data.get('data', [])
+                    for sale in data:
+                        if sale['loja']['id'] == 0:
+                            marketplace_id = await repository_mkt.get_marketplace(
+                            1
+                            )
+                        else:
+                            marketplace_id = await repository_mkt.get_marketplace(
+                                sale['loja']['id']
+                            )
+                        order: OrderPage = OrderPage(
+                            external_id=sale['id'],
+                            origin_id=sale['numero'],
+                            situation_id=sit.situation_id,
+                            marketplace_id=marketplace_id[0][0],
+                            marketplace_order_id=sale['numeroLoja'],
+                            order_date=sale['data']
+                        )
+                        logger.info(
+                        'Bling Orders get_id_por_pag | '
+                        'Order %s', 
+                    )
+
+                        orders.append(order)
+
+                    if len(data) < limit_orders:
+                        more_page = False
+                    else:
+                        page += 1
+
+                elif response.status == 'rated_limit':
+                    logger.error(
+                        'Bling Pedidos get_id_por_pag | Erro na requisição %s',
+                        response.error,
+                    )
+                    erro = ErrorHTTP(
+                        status=response.error['status'],
+                        error=response.error['body'],
+                        method='get_id_by_pag',
+                        class_name='Attended',
+                        module='service_bling_orders.py',
+                        endpoint=url,
+                        data=datetime.now(),
+                    )
+                    error429.append(erro)
+                    page += 1
+
                 else:
-                    pagina += 1
-
-            elif response.status == 'rated_limit':
-                logger.error(
-                    'Bling Pedidos get_id_por_pag | Erro na requisição %s',
-                    response.error,
-                )
-                erro = ErrorHTTP(
-                    status=response.error['status'],
-                    error=response.error['body'],
-                    method='get_id_por_pag',
-                    class_name='Atendidos',
-                    module='service_bling_pedidos.py',
-                    endpoint=url,
-                    data=datetime.now(),
-                )
-                error429.append(erro)
-                pagina += 1
-
-            else:
-                logger.critical(
-                    'Bling Pedidos get_id_por_pag | Erro na requisição %s',
-                    response.error,
-                )
-                raise Exception(
+                    logger.critical(
+                        'Bling Pedidos get_id_por_pag | Erro na requisição %s',
+                        response.error,
+                    )
+                    raise Exception(
                     f'Erro na requisição: {response.status} - {response.error}'
-                )
+                    )
 
-        return GetPagesResult(
-            sales_id=vendas_id, endpointerro=error429, situation=sit.name_sit
-        )
+            await repository.insert_order(orders=orders)
+
+            await session.commit()
+            await session.close()
+
 
     def data_inicial_repo(self) -> datetime:
         """

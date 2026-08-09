@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from logging.config import dictConfig
 from pathlib import Path
@@ -15,14 +16,19 @@ from lucro_admin.infra.logging.contexto import (
     correlation_id,
     generate_correlation_id,
 )
-from lucro_admin.infra.repositorio_pedidos import InsertPedidos
-from lucro_admin.infra.repositorio_produtos_pedido import InsertPedidosProdutos
 from lucro_admin.services.bling.credentials.tokens.providers.bling_provider import (
     BlingProvider,
+)
+from lucro_admin.services.bling.marketplaces.marketplaces import (
+    MarketplaceBling,
+)
+from lucro_admin.services.bling.orders.order_situation_bling import (
+    OrderSituationBling,
 )
 from lucro_admin.services.bling.orders.provider.provider_pedidos import (
     PedidosProviderBling,
 )
+from lucro_admin.services.bling.orders.service_bling_orders import Attended
 from lucro_admin.services.mercado_livre.pedidos.service_mercadolivre_pedidos import (
     ExtraiCustoMercadoLivre,
 )
@@ -30,7 +36,7 @@ from lucro_admin.services.mercado_livre.tokens.ml_provider import MLProvider
 from lucro_admin.services.token_service import TokenService
 
 
-def main():
+async def main():
     """
     Iniciando a aplicação, estamos configurando os objetos
     que serão necessário para seguir com a aplicação.
@@ -38,7 +44,7 @@ def main():
     a outros pacotes do app
     """
 
-    breakpoint()
+
     Path('logs').mkdir(exist_ok=True)
     cid = generate_correlation_id()
     correlation_id.set(cid)
@@ -47,9 +53,7 @@ def main():
     logger = logging.getLogger('lucroadmin.main')
     logger.info('Iniciando o fluxo principal da aplicação')
 
-    # Repositórios
-    repo_pedidos = InsertPedidos()
-    repo_pedidos_produtos = InsertPedidosProdutos()
+    # Service Bling Orders
 
     # Adapters
     adapter_refresh_bling = Refresh()
@@ -79,7 +83,14 @@ def main():
     # Mercado Livre
     access_token_ML = token_service_ML.validate_access_token()
 
-    mercadolivre_pedidos = ExtraiCustoMercadoLivre(
+
+    orders_bling = Attended(access_token_bling, adapt_pedidos_bling)
+
+    order_page = await orders_bling.get_id_by_page()
+
+    
+
+'''    mercadolivre_pedidos = ExtraiCustoMercadoLivre(
         access_token=access_token_ML, adapt_pedido=adapt_pedidos_ML
     )
     bling_provider_pedidos = PedidosProviderBling(
@@ -96,8 +107,8 @@ def main():
         custos_ml.produtos
     )
 
-    logger.info('Fluxo finalizado')
+    logger.info('Fluxo finalizado')'''
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
