@@ -19,6 +19,7 @@ from lucro_admin.infra.logging.contexto import (
 from lucro_admin.services.bling.credentials.tokens.providers.bling_provider import (
     BlingProvider,
 )
+from lucro_admin.services.bling.logistics.logistics_bling import Logistics
 from lucro_admin.services.bling.marketplaces.marketplaces import (
     MarketplaceBling,
 )
@@ -84,9 +85,9 @@ async def main():
     access_token_ML = token_service_ML.validate_access_token()
 
 
-    orders_bling = Attended(access_token_bling, adapt_pedidos_bling)
+    logistics = Logistics(access_token_bling, adapt_pedidos_bling)
 
-    order_page = await orders_bling.get_id_by_page()
+    logistics_bling = logistics.logistic_page()
 
     
 

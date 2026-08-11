@@ -108,7 +108,7 @@ class OrderPage:
 
 
 @dataclass
-class GetDetailsResult:
+class OrderDetail:
     """
     GetDetailsResult -> Result of the get_id_details method
 
@@ -121,9 +121,9 @@ class GetDetailsResult:
         :type situation: str
     """  # noqa: E501
 
-    orders: list[Any]
-    endpointerror: list[ErrorHTTP]
-    situation: str
+    order_id: int
+    external_invoice_id: int
+    value_order: float
 
 
 @dataclass

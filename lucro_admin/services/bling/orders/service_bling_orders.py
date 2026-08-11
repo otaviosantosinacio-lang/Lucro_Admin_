@@ -3,8 +3,8 @@ from datetime import date, datetime
 
 from lucro_admin.core.entities_pedidos import (
     ErrorHTTP,
-    GetDetailsResult,
     OrderData,
+    OrderDetail,
     OrderPage,
 )
 from lucro_admin.core.marketplace import nome_marketplace
@@ -162,37 +162,23 @@ class Attended:
             await session.close()
 
 
-    def data_inicial_repo(self) -> datetime:
-        """
-        data_inicial_repo -> Extraindo data do ultimo pedido registrado
-        no banco de dados
-
-        :param self: Objeto
-        :return: Data do ultimo pedido
-        :rtype: datetime
-        """
-        logger.info('Bling data inicio | Chamando repositório')
-        data_inicio = self.repo_pedidos.data_ultimo_pedido()
-        logger.info(
-            'Bling data inicio | Retorno do repositório %s', data_inicio
-        )
-        return data_inicio
-
-
-class ProcessaId:
+class OrderDetails:
     """
-    ProcessaId ->
-    Processas os ids passados para obtenção de maiores detalhes da venda
+    OrderDetails ->
+    You process the provided IDs to obtain further details about the sale.
 
     """
 
-    def __init__(self, access_token, adapt_pedidos, repo_pedidos):
+    def __init__(self, access_token, adapt_pedidos):
         self.access_token = access_token
         self.adapt_pedidos = adapt_pedidos
-        self.repo_pedidos = repo_pedidos
         self.service_base = BaseRequestHTTP(
             self.adapt_pedidos, self.access_token
         )
+        self.order_situation = OrderSituationBling(
+            adapt_order=self.adapt_pedidos,
+            access_token=self.access_token
+                )
         self.base_url = 'https://api.bling.com.br/Api/v3'
 
     def url_id(self, id) -> str:
@@ -206,9 +192,7 @@ class ProcessaId:
         """
         return f'{self.base_url}/pedidos/vendas/{id}'
 
-    def get_id_detalhes(
-        self, ids_list: list[int], situacao
-    ) -> GetDetailsResult:
+    async def get_id_details(self) -> OrderDetail:
         """
         get_id_detalhes
 
@@ -218,57 +202,64 @@ class ProcessaId:
         """
         error429 = []
         pedidos = []
-        for id in ids_list:
-            url = self.url_id(id)
-            response = self.service_base.organiza_get_request(url)
+        sit = await self.order_situation.situation_data_base('Atendido')
+        async with SessionLocal() as session:
+            repository = Orders(session=session)
 
-            if response.status == 'ok':
-                data = response.data.get('data', [])
-                id_loja = data['loja']['id']
-                nome_mkt = nome_marketplace(id_loja)
-                transporte = data.get('transporte') or {}
-                volumes = transporte.get('volumes') or []
+            more_page: bool = False
+            offset = 0
+            while more_page:
+                ids = await repository.orders_without_details(
+                    offset=offset,
+                    situation_id=sit.situation_id
+                )
+                for id in ids:
+                    url = self.url_id(id[1])
+                    response = self.service_base.organiza_get_request(url)
 
-                pedido = OrderData(
-                    id_bling=id,
-                    num_bling=data['numero'],
-                    id_mkt=data['numeroLoja'],
-                    data=data['data'],
-                    name_store=nome_mkt,
-                    nf_id=data['notaFiscal']['id'],
-                    value_sale=data['total'],
-                    items=data['itens'],
-                    uf_dest=data['transporte']['etiqueta']['uf'],
-                    servico_trans=volumes[0].get('servico')
-                    if volumes
-                    else 'SEM_SERVIÇO',
-                )
-                logger.info(
-                    'Bling Service get_id_detalhes | Dados do pedido %s',
-                    pedido,
-                )
-                pedidos.append(pedido)
+                    if response.status == 'ok':
+                        data = response.data.get('data', [])
+                        id_loja = data['loja']['id']
+                        nome_mkt = nome_marketplace(id_loja)
+                        transporte = data.get('transporte') or {}
+                        volumes = transporte.get('volumes') or []
 
-                logger.info(
-                    'Bling Service get_id_detalhes | Endpoint %s / Retorno %s',
-                    url,
-                    response.data,
-                )
-            elif response.status == 'rated_limit':
-                logger.error(
-                    'Bling Pedidos get_id_detalhes | Erro na requisição %s',
-                    response.error,
-                )
-                erro = ErrorHTTP(
-                    status=response.error['status'],
-                    error=response.error['body'],
-                    method='get_id_detalhes',
-                    class_name='ProcessaId',
-                    module='service_bling_pedidos.py',
-                    endpoint=url,
-                    data=datetime.now(),
-                )
-                error429.append(erro)
-        return GetDetailsResult(
-            orders=pedidos, endpointerror=error429, situation=situacao
-        )
+                        pedido: OrderDetail = OrderDetail(
+                            nf_id=data['notaFiscal']['id'],
+                            value_sale=data['total'],
+                            items=data['itens'],
+                            uf_dest=data['transporte']['etiqueta']['uf'],
+                            servico_trans=volumes[0].get('servico')
+                            if volumes
+                            else 'SEM_SERVIÇO',
+                        )
+                        logger.info(
+                            'Bling Service get_id_detalhes | '
+                            'Dados do pedido %s',
+                            pedido,
+                        )
+                        pedidos.append(pedido)
+
+                        logger.info(
+                            'Bling Service get_id_detalhes | '
+                            'Endpoint %s / Retorno %s',
+                            url,
+                            response.data,
+                        )
+                    elif response.status == 'rated_limit':
+                        logger.error(
+                            'Bling Pedidos get_id_detalhes | '
+                            'Erro na requisição %s',
+                            response.error,
+                        )
+                        erro = ErrorHTTP(
+                            status=response.error['status'],
+                            error=response.error['body'],
+                            method='get_id_detalhes',
+                            class_name='ProcessaId',
+                            module='service_bling_pedidos.py',
+                            endpoint=url,
+                            data=datetime.now(),
+                        )
+                        error429.append(erro)
+                    return

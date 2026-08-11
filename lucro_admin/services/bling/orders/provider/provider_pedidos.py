@@ -2,8 +2,8 @@ import logging
 
 from lucro_admin.core.entities_pedidos import (
     Dados_Pedido_imposto,
-    GetDetailsResult,
     GetPagesResult,
+    OrderDetail,
     PedidoseImpostos,
 )
 from lucro_admin.core.imposto.tax_calculator import TaxCalculator
@@ -13,7 +13,7 @@ from lucro_admin.services.bling.orders.provider.provider import (
 )
 from lucro_admin.services.bling.orders.service_bling_orders import (
     Attended,
-    ProcessaId,
+    OrderPage,
 )
 
 logger = logging.getLogger('lucroadmin.services')

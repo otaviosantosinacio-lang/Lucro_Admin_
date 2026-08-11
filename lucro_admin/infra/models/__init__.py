@@ -8,6 +8,7 @@ from lucro_admin.infra.models.pipeline_execution import PipelineExecution
 from lucro_admin.infra.models.pipeline_stage import PipelineStage
 from lucro_admin.infra.models.pipeline_status import PipelineStatus
 from lucro_admin.infra.models.product import Product
+from lucro_admin.infra.models.service_logistics import ServiceLogistics
 from lucro_admin.infra.models.tax_invoice import TaxInvoice
 from lucro_admin.infra.models.user import User
 
@@ -23,5 +24,6 @@ __all__ = [
     'OrderItem',
     'PipelineStage',
     'PipelineStatus',
-    'PipelineExecution'
+    'PipelineExecution',
+    'ServiceLogistics'
 ]

@@ -28,6 +28,31 @@ class Orders():
 
         return data
 
+    async def orders_without_details(self, offset, situation_id, limit=100):
+
+        query = text(
+            '''
+                SELECT order_id, external_id
+                FROM orders
+                ORDER BY order_id
+                WHERE value_order is NULL and situation_id = :situation_id
+                LIMIT :limit
+                OFFSET :offset
+            '''
+        )
+
+        values = {
+            'situation_id': situation_id,
+            'offset': offset,
+            'limit': limit,
+        }
+
+        result = await self.session.execute(query, values)
+
+        data = result.fetchall()
+
+        return data
+
     async def insert_order(self, orders):
 
         query = text(

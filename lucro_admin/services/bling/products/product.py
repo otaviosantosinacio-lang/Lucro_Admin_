@@ -68,7 +68,7 @@ class ProductsRequestBling:
 
             breakpoint()
             if response.status == 'ok':
-                data: dict = response.data.get('data', [])
+                data: dict = response.data.get('data' [],)
                 id_page: list[int] = [product['id'] for product in data]
                 for id in id_page:
                     new_products.append(id)

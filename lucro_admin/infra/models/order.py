@@ -14,6 +14,7 @@ if TYPE_CHECKING:
         BlingOrderSituation,
     )
     from lucro_admin.infra.models.marketplace import Marketplace
+    from lucro_admin.infra.models.service_logistics import ServiceLogistics
     from lucro_admin.infra.models.user import User
 
 
@@ -42,6 +43,13 @@ class Order(BaseModel):
 
     marketplace_order_id: Mapped[str] = mapped_column(nullable=False)
 
+    uf_dest: Mapped[str] = mapped_column(nullable=True)
+
+    service_logistics_id: Mapped[int] = mapped_column(
+        ForeignKey('services_logistics.service_id'),
+        nullable=True
+    )
+
     order_date: Mapped[date] = mapped_column(nullable=False)
 
     value_order: Mapped[Decimal] = mapped_column(nullable=True)
@@ -68,6 +76,11 @@ class Order(BaseModel):
 
     order_marketplace: Mapped['Marketplace'] = relationship(
         foreign_keys=[marketplace_id], init=False
+    )
+
+    service_logistics: Mapped['ServiceLogistics'] = relationship(
+        foreign_keys=[service_logistics_id],
+        init=False
     )
 
     created_user: Mapped['User'] = relationship(
