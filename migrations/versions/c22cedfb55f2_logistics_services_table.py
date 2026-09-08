@@ -34,7 +34,7 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['created_user_id'], ['users.user_id'], name=op.f('fk_services_logistics_created_user_id_users')),
     sa.ForeignKeyConstraint(['updated_user_id'], ['users.user_id'], name=op.f('fk_services_logistics_updated_user_id_users')),
     sa.PrimaryKeyConstraint('service_id', name=op.f('pk_services_logistics')),
-    sa.UniqueConstraint('service_name', name=op.f('uq_services_logistics_service_name'))
+    sa.UniqueConstraint('external_service_id', name=op.f('uq_services_logistics_external_service_id'))
     )
     op.add_column('orders', sa.Column('uf_dest', sa.String(), nullable=True))
     op.add_column('orders', sa.Column('service_logistics_id', sa.Integer(), nullable=True))

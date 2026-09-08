@@ -30,6 +30,8 @@ class Marketplace(BaseModel):
 
     marketplace_name: Mapped[str] = mapped_column(nullable=False)
 
+    slug: Mapped[str] = mapped_column(nullable=True)
+
     status: Mapped[str] = mapped_column(
         Boolean,
         init=False,

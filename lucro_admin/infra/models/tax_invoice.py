@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
@@ -13,23 +13,19 @@ if TYPE_CHECKING:
     from lucro_admin.infra.models.order import Order
     from lucro_admin.infra.models.user import User
 
-
 @table_registry_base.mapped_as_dataclass
 class TaxInvoice(BaseModel):
     __tablename__ = 'tax_invoice'
 
-    tax_invoice_id: Mapped[int] = mapped_column(init=False, primary_key=True)
+    tax_invoice_id: Mapped[int] = mapped_column(
+        init=False,
+        primary_key=True
+    )
 
     order_id: Mapped[int] = mapped_column(
-        ForeignKey('orders.order_id'), nullable=False, unique=True
-    )
-
-    created_user_id: Mapped[int] = mapped_column(
-        ForeignKey('users.user_id'), nullable=False
-    )
-
-    updated_user_id: Mapped[int] = mapped_column(
-        ForeignKey('users.user_id'), nullable=False
+        ForeignKey('orders.order_id'),
+        nullable=False,
+        unique=True
     )
 
     url_xml: Mapped[str | None] = mapped_column(nullable=True)
@@ -40,18 +36,26 @@ class TaxInvoice(BaseModel):
         unique=True, nullable=True
     )
 
-    issue_date: Mapped[date | None] = mapped_column(nullable=True)
+    issue_date: Mapped[datetime | None] = mapped_column(nullable=True)
 
     tax_invoice_value: Mapped[Decimal | None] = mapped_column(nullable=True)
-
-    bling_tax_invoice_id: Mapped[int | None] = mapped_column(nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         init=False, server_default=func.now()
     )
 
+    created_user_id: Mapped[int] = mapped_column(
+        ForeignKey('users.user_id'),
+        nullable=False
+    )
+
     updated_at: Mapped[datetime] = mapped_column(
         init=False, server_default=func.now(), onupdate=func.now()
+    )
+
+    updated_user_id: Mapped[int] = mapped_column(
+        ForeignKey('users.user_id'),
+        nullable=False
     )
 
     tax_invoice_order: Mapped['Order'] = relationship(

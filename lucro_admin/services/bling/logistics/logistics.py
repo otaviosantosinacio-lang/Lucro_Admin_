@@ -1,16 +1,16 @@
 import logging
 from datetime import datetime
 
-from lucro_admin.core.entities_pedidos import ErrorHTTP, PageResult
 from lucro_admin.core.entities_logistics import RegisterLogistic
+from lucro_admin.core.entities_pedidos import ErrorHTTP, PageResult
 from lucro_admin.infra.database_.session import SessionLocal
-from lucro_admin.infra.repository_products import Products
+from lucro_admin.infra.repository_logistics import Logistics
 from lucro_admin.services.service_http_request_base import BaseRequestHTTP
 
 logger = logging.getLogger('lucroadmin.services.bling.logistics')
 
 
-class Logistics():
+class LogisticsBling():
 
     def __init__(
         self,
@@ -30,7 +30,7 @@ class Logistics():
 
         return url
 
-    def logistic_page(self):
+    async def logistic_page(self):
 
         more_page: bool = True
         page = 1
@@ -81,9 +81,9 @@ class Logistics():
                     f'Request Error: {response.status} - {response.error}'
                 )
 
-        logistics_detail = self.logistic_services(logistics_id)
+        logistics_detail = await self.logistic_services(logistics_id)
 
-    def logistic_services(self, logistics_id):
+    async def logistic_services(self, logistics_id):
 
         logger.info(
                 'Bling Logistics Services | '
@@ -100,8 +100,6 @@ class Logistics():
             response = self.service_base.organiza_get_request(url)
 
             if response.status == 'ok':
-                breakpoint()
-                print(response.data)
                 data = response.data.get('data', [])
                 logistic_name: str = data['tipoIntegracao']
                 for service in data['servicos']:
@@ -113,6 +111,7 @@ class Logistics():
                             status=service['ativo'],
                         )
                     )
+
             elif response.status == 'rated_limit':
                 logger.error(
                     'Bling Logistics| Request Error %s',
@@ -136,3 +135,16 @@ class Logistics():
                 raise Exception(
                     f'Request Error: {response.status} - {response.error}'
                 )
+
+        async with SessionLocal() as session:
+            repository = Logistics(session=session)
+
+            await repository.insert_logistics(logistics_services)
+
+            logger.info(
+                'Bling Logistics | Added %s new logistics',
+                len(logistics_services),
+            )
+
+            await session.commit()
+            await session.close()

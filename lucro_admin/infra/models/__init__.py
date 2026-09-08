@@ -1,5 +1,7 @@
 from lucro_admin.infra.models.base import table_registry_base
 from lucro_admin.infra.models.bling_order_situation import BlingOrderSituation
+from lucro_admin.infra.models.fulfillment_product import FullProduct
+from lucro_admin.infra.models.integration import Integrations
 from lucro_admin.infra.models.marketplace import Marketplace
 from lucro_admin.infra.models.order import Order
 from lucro_admin.infra.models.order_item import OrderItem
@@ -8,7 +10,6 @@ from lucro_admin.infra.models.pipeline_execution import PipelineExecution
 from lucro_admin.infra.models.pipeline_stage import PipelineStage
 from lucro_admin.infra.models.pipeline_status import PipelineStatus
 from lucro_admin.infra.models.product import Product
-from lucro_admin.infra.models.service_logistics import ServiceLogistics
 from lucro_admin.infra.models.tax_invoice import TaxInvoice
 from lucro_admin.infra.models.user import User
 
@@ -25,5 +26,6 @@ __all__ = [
     'PipelineStage',
     'PipelineStatus',
     'PipelineExecution',
-    'ServiceLogistics'
+    'FullProduct',
+    'Integrations'
 ]

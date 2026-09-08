@@ -10,10 +10,10 @@ from sqlalchemy.exc import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
-logger = logging.getLogger('lucroadmin.infra.repository.bling_situations')
+logger = logging.getLogger('lucroadmin.infra.repository.order_item_tax')
 
 
-class BlingOrderSituation():
+class OrderItemTax:
 
     def __init__(self, session: AsyncSession):
         self.session = session
@@ -22,33 +22,71 @@ class BlingOrderSituation():
         #           INSERT
         # ==========================
 
-    async def insert_situations(self, situations):
+    async def insert_tax_items(self, items_tax):
 
         query = text(
             '''
-                INSERT INTO bling_orders_situation(
-                    situation_bling_id,
-                    situation_name,
-                    situation_color
+                INSERT INTO order_item_tax(
+                    order_item_id,
+                    tax_type,
+                    tax_value,
+                    calculation_source,
+                    created_user_id,
+                    updated_user_id
                 )
                 VALUES(
-                    :situation_bling_id,
-                    :situation_name,
-                    :situation_color
+                    :order_item_id,
+                    :tax_type,
+                    :tax_value,
+                    :calculation_source,
+                    1,
+                    1
                 )
-                ON CONFLICT (situation_bling_id) DO NOTHING;
+            ON CONFLICT ON CONSTRAINT uq_item_pedido_imposto_tipo DO NOTHING;
             '''
         )
 
-        values = [asdict(situation) for situation in situations]
+        values = [asdict(item_tax)for item_tax in items_tax]
+
+        await self.session.execute(query, values)
+
+    async def searching_xml(
+            self,
+            offset: int,
+            integration_id: int,
+            limit=100
+    ):
+
+        query = text(
+            '''
+                SELECT DISTINCT
+                    ti.order_id,
+                    ti.url_xml
+                FROM tax_invoice ti
+                INNER JOIN order_item oi
+                    ON ti.order_id = oi.order_id
+                LEFT JOIN order_item_tax oit
+                    ON oi.order_item_id = oit.order_item_id
+                INNER JOIN orders o
+                    ON ti.order_id = o.order_id
+                WHERE oit.order_item_id IS NULL
+                    AND o.integration_invoice_id = :integration
+                ORDER BY ti.order_id
+                OFFSET :offset
+                LIMIT :limit
+            '''
+        )
+
+        values = {
+            'integration': integration_id,
+            'offset': offset,
+            'limit': limit
+        }
 
         try:
-
-            await self.session.execute(query, values)
-            logger.info(
-                'Bling Orders Situation | '
-                'New Bling orders situations added'
-            )
+            result = await self.session.execute(query, values)
+            data = result.fetchall()
+            return data
 
         except OperationalError as conn_error:
             await self.session.rollback()
@@ -89,24 +127,35 @@ class BlingOrderSituation():
         #           SELECT
         # ==========================
 
-    async def extract_situation(self, situation_name):
-
+    async def searching_order_item(self, order_id):
         query = text(
-                '''
-                SELECT situation_id, situation_bling_id,
-                    situation_name, situation_color
-                FROM bling_orders_situation
-                WHERE situation_name = :situation_name
-                '''
+            '''
+                SELECT
+                    oi.order_item_id,
+                    oi.order_id,
+                    p.sku,
+                    fp.fulfillment_sku
+                FROM order_item oi
+                INNER JOIN orders o
+                    ON oi.order_id = o.order_id
+                INNER JOIN products p
+                    ON oi.product_id = p.product_id
+                LEFT JOIN fulfillment_product fp
+                    ON p.product_id = fp.product_id
+                    AND o.marketplace_id = fp.marketplace_id
+                WHERE oi.order_id = :order_id
+            '''
         )
 
-        values = {'situation_name': situation_name}
+        values = {
+            'order_id': order_id
+        }
 
         try:
             result = await self.session.execute(query, values)
             data = result.fetchall()
-
             return data
+
         except OperationalError as conn_error:
             await self.session.rollback()
             logger.critical('Lucro Admin Repository | '

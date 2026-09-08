@@ -1,10 +1,8 @@
 import logging
 
 from lucro_admin.core.entities_pedidos import (
-    Dados_Pedido_imposto,
     GetPagesResult,
     OrderDetail,
-    PedidoseImpostos,
 )
 from lucro_admin.core.imposto.tax_calculator import TaxCalculator
 from lucro_admin.services.bling.orders.order_tax import TaxInvoicesBling
@@ -13,7 +11,7 @@ from lucro_admin.services.bling.orders.provider.provider import (
 )
 from lucro_admin.services.bling.orders.service_bling_orders import (
     Attended,
-    OrderPage,
+    OrderDetails,
 )
 
 logger = logging.getLogger('lucroadmin.services')
@@ -31,7 +29,7 @@ class PedidosProviderBling(PedidosProvider):
         self.repo_pedidos = repo_pedidos
         self.access_token = access_token
         self.service_id_pag = Attended(
-            self.access_token, self.adapt_pedidos, repo_pedidos
+            self.access_token, self.adapt_pedidos
         )
         self.service_processa = ProcessaId(
             self.access_token, self.adapt_pedidos, self.repo_pedidos

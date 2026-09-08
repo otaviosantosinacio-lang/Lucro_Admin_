@@ -14,7 +14,6 @@ class RequestMercadoLivre:
         self.time_out = 20
 
     def request_endpoint_mercadolivre(self, url: str, headers: dict[str, str]):
-
         logger.info(
             'Mercado Livre Request | Sending request to the endpoint %s',
             url,
@@ -45,6 +44,7 @@ class GetMercadoLivre:
         logger.info(
             'Mercado Livre get_endpoints_mercadolivre | Starting Request'
         )
+
         headers: dict[str, str] = {
             'Authorization': f'Bearer {access_token}',
             'Accept': 'application/json',
@@ -54,7 +54,8 @@ class GetMercadoLivre:
             lambda: self.request_ml.request_endpoint_mercadolivre(url, headers)
         )
         logger.info(
-            'Bling get_endpoints_bling | The request response is %s',
+            'Mercado Livre get_endpoints_mercadolivre | '
+            'The request response is %s',
             response.status_code,
         )
 

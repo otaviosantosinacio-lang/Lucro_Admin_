@@ -37,3 +37,40 @@ class Credential:
             ),  # Convert int for datetime
             response_status_code=response_data['response_status_code'],
         )
+
+@dataclass
+class CredentialTiny:
+    """
+    CredentialTiny
+
+    Attributes:
+        access_token: Current access token (Bearer)
+        refresh_token: Token with a loger expiration
+        expire: Date/time/seconds of when the access token expires
+        response_status_code: HTTP status for error handling
+    """
+
+    access_token: str
+    expire_access: int | datetime
+    refresh_token: str
+    expire_refresh: int | datetime
+    state: str
+    response_status_code: int
+
+    @classmethod
+    def from_api_response(cls, response_data: dict) -> 'CredentialTiny':
+        """
+        access_tConverts API return (with expiry in seconds) to Credentials
+        """
+        return cls(
+            access_token=response_data['access_token'],
+            expire_access=somandosecs(
+                response_data['expire_access']
+            ),
+            refresh_token=response_data['refresh_token'],
+            expire_refresh=somandosecs(
+                response_data['expire_refresh']
+            ),  # Convert int for datetime
+            state=response_data['state'],
+            response_status_code=response_data['response_status_code'],
+        )

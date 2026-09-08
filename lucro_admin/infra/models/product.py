@@ -17,7 +17,10 @@ if TYPE_CHECKING:
 class Product(BaseModel):
     __tablename__ = 'products'
 
-    product_id: Mapped[int] = mapped_column(init=False, primary_key=True)
+    product_id: Mapped[int] = mapped_column(
+        init=False,
+        primary_key=True
+    )
 
     external_product_id: Mapped[int] = mapped_column(
         BigInteger,
@@ -25,7 +28,10 @@ class Product(BaseModel):
         nullable=False
     )
 
-    sku: Mapped[str] = mapped_column(nullable=True)
+    sku: Mapped[str] = mapped_column(
+        nullable=False,
+        unique=True
+        )
 
     product_description: Mapped[str]
 
@@ -44,7 +50,8 @@ class Product(BaseModel):
     )
 
     created_user_id: Mapped[int] = mapped_column(
-        ForeignKey('users.user_id'), nullable=True
+        ForeignKey('users.user_id'),
+        nullable=True
     )
 
     updated_at: Mapped[datetime] = mapped_column(

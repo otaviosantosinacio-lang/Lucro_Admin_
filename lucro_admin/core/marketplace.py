@@ -1,20 +1,25 @@
 from dataclasses import dataclass
 
-MARKETPLACE_POR_LOJA = {
-    204442078: 'Mercado Livre Full',
-    204196269: 'Mercado Livre',
-    204524203: 'Amazon FBA Classic',
-    204348449: 'Amazon DBA',
-    204911672: 'Shein',
-    205075855: 'Sicredi',
-    204367139: 'Loja Integrada',
-    204351182: 'MagaLu',
-    204433176: 'Shopee',
-    204342864: 'Venda Direta',
+slug_marketplace_ = {
+    'MercadoLivre': 'mercado_livre',
+    'Amazon': 'amazon',
+    'LojaFisica': 'loja_fisica',
+    'Api': 'api',
+    'Olist': 'olist',
+    'ViaVarejo': 'via_varejo',
+    'IntegraCommerce': 'magalu',
+    'LojaIntegrada': 'loja_integrada',
+    'AmazonFulfillment': 'amazon_fba',
+    'AmazonFBAClassic': 'amazon_fba_classic',
+    'Shopee': 'shopee',
+    'Shein': 'shein',
+    'Sicredi': 'sicredi',
+    'TikTok': 'tik_tok',
+    'MadeiraMadeira': 'madeira_madeira'
 }
 
 
-def nome_marketplace(id_loja: int) -> str:
+def slug_marketplace(external_type: int) -> str:
     """
         nome_marketplace -> O bling nos retorna a loja como um código, por isso
     devemos trata-la para visualizarmos por nome.
@@ -24,7 +29,7 @@ def nome_marketplace(id_loja: int) -> str:
         :return: Nome da loja (Ex: Mercado Livre).
         :rtype: str
     """
-    return MARKETPLACE_POR_LOJA.get(id_loja, 'Loja não identificada')
+    return slug_marketplace_.get(external_type, 'Loja não identificada')
 
 
 @dataclass
@@ -33,3 +38,4 @@ class Marketplace:
     external_type: str
     marketplace_name: str
     status: bool
+    slug: str

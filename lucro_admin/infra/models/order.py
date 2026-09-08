@@ -13,10 +13,9 @@ if TYPE_CHECKING:
     from lucro_admin.infra.models.bling_order_situation import (
         BlingOrderSituation,
     )
+    from lucro_admin.infra.models.integration import Integrations
     from lucro_admin.infra.models.marketplace import Marketplace
-    from lucro_admin.infra.models.service_logistics import ServiceLogistics
     from lucro_admin.infra.models.user import User
-
 
 @table_registry_base.mapped_as_dataclass
 class Order(BaseModel):
@@ -29,13 +28,23 @@ class Order(BaseModel):
         unique=True
         )
 
+    integration_order_id: Mapped[int] = mapped_column(
+        ForeignKey('integrations.integration_id'),
+        nullable=True
+    )
+
     origin_id: Mapped[int] = mapped_column(unique=True)
 
     situation_id: Mapped[int] = mapped_column(
         ForeignKey('bling_orders_situation.situation_id'), nullable=False
     )
 
-    external_invoice_id: Mapped[int] = mapped_column(nullable=True)
+    external_invoice_id: Mapped[int] = mapped_column(BigInteger, nullable=True)
+
+    integration_invoice_id: Mapped[int] = mapped_column(
+        ForeignKey('integrations.integration_id'),
+        nullable=True
+    )
 
     marketplace_id: Mapped[int] = mapped_column(
         ForeignKey('marketplaces.marketplace_id'), nullable=True
@@ -45,8 +54,7 @@ class Order(BaseModel):
 
     uf_dest: Mapped[str] = mapped_column(nullable=True)
 
-    service_logistics_id: Mapped[int] = mapped_column(
-        ForeignKey('services_logistics.service_id'),
+    transport: Mapped[str] = mapped_column(
         nullable=True
     )
 
@@ -78,15 +86,18 @@ class Order(BaseModel):
         foreign_keys=[marketplace_id], init=False
     )
 
-    service_logistics: Mapped['ServiceLogistics'] = relationship(
-        foreign_keys=[service_logistics_id],
-        init=False
-    )
-
     created_user: Mapped['User'] = relationship(
         foreign_keys=[created_user_id], init=False
     )
 
     updated_user: Mapped['User'] = relationship(
         foreign_keys=[updated_user_id], init=False
+    )
+
+    order_integration: Mapped['Integrations'] = relationship(
+        foreign_keys=[integration_order_id], init=False
+    )
+
+    invoice_integration: Mapped['Integrations'] = relationship(
+        foreign_keys=[integration_invoice_id], init=False
     )

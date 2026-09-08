@@ -1,12 +1,7 @@
 import logging
 
 from lucro_admin.core.entities_produtos import ConfigSku
-from lucro_admin.core.imposto.entities_imposto import (
-    OrderItem,
-    ProductWithTax,
-    SalesTaxes,
-    TaxReturn,
-)
+from lucro_admin.core.imposto.entities_imposto import OrderItem
 from lucro_admin.core.imposto.regras_fiscais import icms_aliq, uf_without_fcp
 
 logger = logging.getLogger('lucroadmin.core.taxcalculator')
@@ -26,7 +21,7 @@ class TaxCalculator:
 
     def tax_calculator(
         self, items, id_bling, sit, uf_dest
-    ) -> TaxReturn:
+    ):
         """
         tax_calculator
 
@@ -42,7 +37,7 @@ class TaxCalculator:
         :rtype: TaxReturn
         """
 
-        logger.info(
+        '''logger.info(
             'Tax Calculator | Starting the tax calculation'
             ' for the order items'
         )
@@ -121,7 +116,7 @@ class TaxCalculator:
         )
         return TaxReturn(
             product_tax=products_with_tax, sale_tax=taxes_sale
-        )
+        )'''
 
 
 def icms_tax(item_value, uf_dest) -> float:

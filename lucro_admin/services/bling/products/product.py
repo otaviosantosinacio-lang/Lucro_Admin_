@@ -68,7 +68,7 @@ class ProductsRequestBling:
 
             breakpoint()
             if response.status == 'ok':
-                data: dict = response.data.get('data' [],)
+                data: dict = response.data.get('data', [])
                 id_page: list[int] = [product['id'] for product in data]
                 for id in id_page:
                     new_products.append(id)
@@ -143,18 +143,22 @@ class ProductsRequestBling:
 
             if response.status == 'ok':
                 data = response.data.get('data', [])
-                product: Product = Product(
-                    external_product_id=data['id'],
-                    sku=data['codigo'],
-                    product_description=data['nome'],
-                    supplier=data['fornecedor']['contato']['nome'],
-                    cost_price=data['fornecedor']['precoCusto'],
-                    origin=data['tributacao']['origem'],
-                    ncm=data['tributacao']['ncm'],
-                    cest=data['tributacao']['cest']
-                )
+                breakpoint()
+                if data['codigo'] != '':
+                    new_products.append(Product(
+                        external_product_id=data['id'],
+                        sku=data['codigo'],
+                        product_description=data['nome'],
+                        supplier=data['fornecedor']['contato']['nome'],
+                        cost_price=data['fornecedor']['precoCusto'],
+                        origin=data['tributacao']['origem'],
+                        ncm=data['tributacao']['ncm'],
+                        cest=data['tributacao']['cest']
+                        )
+                    )
+                else:
+                    continue
 
-                new_products.append(product)
 
             elif response.status == 'rated_limit':
                 logger.error(
@@ -175,3 +179,6 @@ class ProductsRequestBling:
                 )
 
         return new_products
+
+    async def get_product_inventory(self):
+        ...

@@ -2,15 +2,13 @@ import logging
 from typing import Any
 
 from lucro_admin.core.entities_pedidos import (
-    ComissaoFrete,
     IdsPedidoML,
+    ItemComissionShip,
     PageResult,
-    PedidoCompleto,
-    PedidoseProdutosCompletos,
-    ProdutoCompleto,
     SaleCosts,
-    ShipCommission,
 )
+from lucro_admin.infra.database_.session import SessionLocal
+from lucro_admin.infra.repository_order_item import OrderItem
 from lucro_admin.services.mercado_pago.service_mercadopago import (
     MercadoPagoCustos,
 )
@@ -48,145 +46,133 @@ class ExtraiCustoMercadoLivre:
         response: PageResult = self.service_base.organiza_get_request(
             url=url
         )
+
         if response.status == 'ok':
             return IdsPedidoML(
                 comissao=response.data['order_items'][0]['sale_fee'],
                 pay_id=response.data['payments'][0]['id'],
                 pack_id=response.data['pack_id'],
                 geral=response.data,
+                status=response.status
             )
 
-    def get_sale_costs(self, pedidos):
+        else:
+            return IdsPedidoML(
+                comissao=0.0,
+                pay_id=0,
+                pack_id=0,
+                geral=response.data,
+                status=response.status
+            )
+
+    async def get_sale_costs(self):
 
         logger.info(
-        'Mercado Livre IDs | Iniciando a extração de ids necessários da Ordem'
+        'Mercado Livre Costs | '
+        'Starting the extraction of necessary IDs from the Order.'
         )
+        async with SessionLocal() as session:
+            repository = OrderItem(session=session)
+            offset: int = 7
+            more_page: bool = True
+            item_costs = []
+            while more_page:
+                orders = await repository.item_without_commission_meli(
+                    offset=offset
+                )
 
-        pedidos_completo = []
-        produtos_completos = []
-        name_market = ['Mercado Livre Full', 'Mercado Livre']
-
-        for pedido in pedidos.pedidos:
-            breakpoint()
-            if pedido.nome_loja not in name_market:
-                continue
-            costs = self.get_commision_ship_cost(pedido)
-            for product in pedidos.impostos_produto:
-                if pedido.id_bling == product.id_bling:
-                    for product_cost in costs:
-                        if product_cost.sku == product.sku:
-                            produto_completo = ProdutoCompleto(
-                                id_bling=product.id_bling,
-                                situacao_pedido=product.situacao_pedido,
-                                sku=product.sku,
-                                quantidade=product.quantidade,
-                                preco_custo=product.preco_custo,
-                                valor=product.valor,
-                                icms=product.icms,
-                                pis=product.pis,
-                                cofins=product.cofins,
-                                difal=product.difal,
-                                fcp=product.fcp,
-                                total_imposto=product.total,
-                                frete=product_cost.ship_cost,
-                                comissao=product_cost.commission,
-                            )
-                            produtos_completos.append(
-                                produto_completo
-                            )
-                frete_total += frete
-                comissao_total += comissao
-                if pedido.servico_trans == 'Mercado Envios Flex':
-                    frete = 12.99
-                    custos_venda: ComissaoFrete = ComissaoFrete(
-                        id_bling=pedido.id_bling,
-                        comissao=comissao_total,
-                        frete=frete,
+                for order in orders:
+                    order_items = await repository.searching_order_item(
+                        order_id=order[0]
                     )
+                    print(order)
+                    print(order_items)
+                    costs = self.get_commision_ship_cost(
+                        meli_order=order[1],
+                        order_id=order[0],
+                        order_items=order_items
+                    )
+                    if costs is None:
+                        continue
+                    for item in costs:
+                        if order[2] == 'Mercado Envios Flex':
+                            shipping: float = 12.99
+                            item.item_shipping = shipping
+                            item_costs.append(item)
+                        else:
+                            item_costs.append(item)
+
+                if len(orders) < 100:
+                    more_page = False
                 else:
-                    custos_venda: ComissaoFrete = ComissaoFrete(
-                        id_bling=pedido.id_bling,
-                        comissao=comissao_total,
-                        frete=frete_total,
-                    )
-            lucro = (
-                pedido.valor_pedido
-                - pedido.custo_produto
-                - pedido.total
-                - custos_venda.comissao
-                - custos_venda.frete
-            )
-            pedido_total: PedidoCompleto = PedidoCompleto(
-                id_bling=pedido.id_bling,
-                num_bling=pedido.num_bling,
-                situacao=pedido.situacao,
-                id_mkt=pedido.id_mkt,
-                data=pedido.data,
-                nome_loja=pedido.nome_loja,
-                nf_id=pedido.nf_id,
-                valor_pedido=pedido.valor_pedido,
-                icms=pedido.icms,
-                pis=pedido.pis,
-                cofins=pedido.cofins,
-                difal=pedido.difal,
-                fcp=pedido.fcp,
-                total_imposto=pedido.total,
-                custo_produto=pedido.custo_produto,
-                comissao=custos_venda.comissao,
-                frete=custos_venda.frete,
-                lucro=lucro,
-            )
-            pedidos_completo.append(pedido_total)
-        return PedidoseProdutosCompletos(
-            pedidos=pedidos_completo, produtos=produtos_completos
-        )
+                    offset += 100
 
-    def get_commision_ship_cost(self, pedido) -> SaleCosts:
+            await repository.update_shipping_commission(item_costs)
 
-        id_venda: int = pedido.id_mkt
-        url: str = endpoint_order(id_venda=id_venda)
-        logger.info('Mercado Livre Custos | EndPoint da ordem %s', url)
+            await session.commit()
+
+    def get_commision_ship_cost(
+        self,
+        meli_order,
+        order_id,
+        order_items
+        ):
+
+        url: str = endpoint_order(id_venda=meli_order)
+
+        logger.info('Mercado Livre Costs | EndPoint order %s', url)
+
         response: IdsPedidoML = self.extraindo_packid_payid(url=url)
-        logger.info('Mercado Livre Custos | Retorno -> %s', response)
+
+        logger.info('Mercado Livre Costs | Return -> %s', response)
         commission_ship_cost: SaleCosts | Any = []
-        if response.pack_id != None:
-            ids = self.get_ids_por_pack(id_pack=response.pack_id)
+        if response.status != 'ok':
+            return None
+
+        if response.pack_id is not None:
+            ids = self.get_ids_pack(id_pack=response.pack_id)
+
             if ids['status'] == 'ok':
                 for id in ids['ids']:
-                    id_venda = id['id']
-                    url: str = endpoint_order(id_venda=id_venda)
-                    response_idvenda: ResultadoPagina = (
+                    id_order = id['id']
+                    url: str = endpoint_order(id_venda=id_order)
+
+                    response_idvenda: PageResult = (
                         self.service_base.organiza_get_request(url=url)
                     )
+
                     commission = response_idvenda.data['order_items'][0][
                         'sale_fee'
                     ]
+
                     ship_cost = self.get_ship_cost(
                         response_idvenda.data['shipping']['id']
                     )
-                    commission_ship_cost.append(
-                        ShipCommission(
-                            id=id_venda,
-                            commission=commission,
-                            ship_cost=ship_cost,
-                            sku=response_idvenda.data['order_items'][0][
+
+                    for item in order_items:
+                        if item[2] == response_idvenda.data['order_items'][0][
                                         'item'
-                                        ]['seller_sku']
-                        )
-                    )
+                                        ]['seller_sku']:
+                            commission_ship_cost.append(
+                                ItemComissionShip(
+                                order_item_id=item[0],
+                                item_shipping=ship_cost,
+                                item_commission=commission,
+                                )
+                            )
+                        else:
+                            continue
         else:
             commission = response.comissao
             ship_cost: float = self.get_ship_cost(
                         response.geral['shipping']['id']
                         )
             commission_ship_cost.append(
-                ShipCommission(
-                    id=id_venda,
-                    commission=commission,
-                    ship_cost=ship_cost,
-                    sku=response.geral['order_items'][0][
-                                'item'
-                                ]['seller_sku'])
+                ItemComissionShip(
+                    order_item_id=order_items[0][0],
+                    item_shipping=ship_cost,
+                    item_commission=commission,
+                )
             )
         return commission_ship_cost
 
@@ -197,7 +183,7 @@ class ExtraiCustoMercadoLivre:
         custo_frete = response.data['senders'][0]['cost']
         return custo_frete
 
-    def get_ids_por_pack(self, id_pack):
+    def get_ids_pack(self, id_pack):
 
         url = endpoint_pack(id_pack=id_pack)
 

@@ -45,3 +45,31 @@ class SaveCredentials():
         )
 
         return True
+
+    def save_credentials_tiny(
+            self,
+            access_token: str,
+            expire_access: int | datetime,
+            refresh_token: str,
+            expire_refresh:  int | datetime
+        ):
+
+        logger.info(
+            'Repository Credentials | '
+            'Starting save a new credentials of external api.'
+            )
+
+        expire_access_str = str(expire_access)
+        expire_refresh_str = str(expire_refresh)
+        self.valid_env()
+        set_key(self.env_file, 'ACCESS_TOKEN', access_token)
+        set_key(self.env_file, 'REFRESH_TOKEN', refresh_token)
+        set_key(self.env_file, 'EXPIRE_ACCESS', expire_access_str)
+        set_key(self.env_file, 'EXPIRE_REFRESH', expire_refresh_str)
+
+        logger.info(
+            'Repository Credentials | '
+            'Finished save a new credentials of external api.'
+        )
+
+        return True

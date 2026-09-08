@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, func
+from sqlalchemy import BigInteger, Boolean, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from lucro_admin.infra.models.base import BaseModel, table_registry_base
@@ -10,7 +10,10 @@ from lucro_admin.infra.models.base import BaseModel, table_registry_base
 class User(BaseModel):
     __tablename__ = 'users'
 
-    user_id: Mapped[int] = mapped_column(init=False, primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        init=False,
+        primary_key=True
+        )
 
     user_name: Mapped[str] = mapped_column(unique=True, nullable=False)
 

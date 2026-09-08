@@ -10,10 +10,10 @@ from sqlalchemy.exc import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
-logger = logging.getLogger('lucroadmin.infra.repository.orders')
+logger = logging.getLogger('lucroadmin.infra.repository.order_item')
 
 
-class Orders():
+class OrderItem:
 
     def __init__(self, session: AsyncSession):
         self.session = session
@@ -22,42 +22,38 @@ class Orders():
         #           INSERT
         # ==========================
 
-    async def insert_order(self, orders):
-
+    async def insert_ordem_item(self, order_items):
         query = text(
             '''
-                INSERT INTO orders(
-                    external_id,
-                    origin_id,
+                INSERT INTO order_item (
+                    order_id,
                     situation_id,
-                    marketplace_id,
-                    marketplace_order_id,
-                    order_date,
+                    product_id,
+                    quantity,
+                    cost_price,
+                    unit_selling_price,
                     created_user_id,
                     updated_user_id
                 )
                 VALUES(
-                    :external_id,
-                    :origin_id,
+                    :order_id,
                     :situation_id,
-                    :marketplace_id,
-                    :marketplace_order_id,
-                    :order_date,
+                    :product_id,
+                    :quantity,
+                    :cost_price,
+                    :unit_selling_price,
                     1,
                     1
                 )
-                ON CONFLICT (external_id) DO NOTHING;
             '''
         )
 
+        values = [asdict(order_item) for order_item in order_items]
+
         try:
-            values = [asdict(order) for order in orders]
             await self.session.execute(query, values)
-            logger.info(
-                            'Lucro_Admin Orders | '
-                            'New %s orders added',
-                            len(values)
-                        )
+            logger.info('Lucro Admin Repository |'
+            ' Database transaction completed.')
 
         except OperationalError as conn_error:
             await self.session.rollback()
@@ -98,24 +94,23 @@ class Orders():
         #           UPDATE
         # ==========================
 
-    async def insert_order_details(self, order_details):
-
+    async def update_shipping_commission(self, items):
         query = text(
             '''
-                UPDATE orders
+                UPDATE order_item
                     SET
-                        external_invoice_id = :external_invoice_id,
-                        value_order = :value_order,
-                        uf_dest = :uf_dest,
-                        transport = :transport,
-                        updated_user_id = 1
-                WHERE order_id = :order_id
+                        item_shipping = :item_shipping,
+                        item_commission = :item_commission
+                WHERE order_item_id = :order_item_id
             '''
         )
 
+        values = [asdict(item) for item in items]
+
         try:
-            values = [asdict(detail) for detail in order_details]
             await self.session.execute(query, values)
+            logger.info('Lucro Admin Repository |'
+            ' Database transaction completed.')
 
         except OperationalError as conn_error:
             await self.session.rollback()
@@ -147,17 +142,38 @@ class Orders():
         #           SELECT
         # ==========================
 
-    async def last_date_order(self):
-
+    async def item_without_commission_meli(
+            self,
+            offset,
+            limit=100
+            ):
         query = text(
             '''
-                SELECT MAX(order_date)::DATE as last_order
-                FROM orders
-
+                SELECT
+                    o.order_id,
+                    o.marketplace_order_id,
+                    o.transport,
+                    mkt.slug
+                FROM orders o
+                INNER JOIN marketplaces mkt
+                    ON o.marketplace_id = mkt.marketplace_id
+                LEFT JOIN order_item oi
+                    ON o.order_id = oi.order_id
+                WHERE oi.item_commission IS NULL
+                    AND mkt.slug = 'mercado_livre'
+                ORDER BY o.order_id
+                OFFSET :offset
+                LIMIT :limit
             '''
         )
+
+        values = {
+            'offset': offset,
+            'limit': limit
+        }
+
         try:
-            result = await self.session.execute(query)
+            result = await self.session.execute(query, values)
             data = result.fetchall()
             return data
 
@@ -196,28 +212,35 @@ class Orders():
             )
             raise
 
-    async def orders_without_details(self, offset, situation_id, limit=100):
-
+    async def searching_order_item(self, order_id):
         query = text(
             '''
-                SELECT order_id, external_id
-                FROM orders
-                WHERE value_order is NULL and situation_id = :situation_id
-                ORDER BY order_id
-                LIMIT :limit
-                OFFSET :offset
+                SELECT
+                    oi.order_item_id,
+                    oi.order_id,
+                    p.sku,
+                    fp.fulfillment_sku
+                FROM order_item oi
+                INNER JOIN orders o
+                    ON oi.order_id = o.order_id
+                INNER JOIN products p
+                    ON oi.product_id = p.product_id
+                LEFT JOIN fulfillment_product fp
+                    ON p.product_id = fp.product_id
+                    AND o.marketplace_id = fp.marketplace_id
+                WHERE oi.order_id = :order_id
             '''
         )
 
         values = {
-            'situation_id': situation_id,
-            'offset': offset,
-            'limit': limit,
+            'order_id': order_id
         }
 
         try:
             result = await self.session.execute(query, values)
+
             data = result.fetchall()
+
             return data
 
         except OperationalError as conn_error:

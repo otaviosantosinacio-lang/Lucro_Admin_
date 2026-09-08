@@ -30,7 +30,9 @@ class Code:
 
         :param self:
         :param url: Endpoint Bling
-        :param headers: Headers para validação obtenção das credenciais
+        :param headers: Headereturn requests.post(
+            url=url, headers=headers, data=data, timeout=self.timeout
+        )rs para validação obtenção das credenciais
         :param data: Passando code em um Body
         """
         return requests.post(

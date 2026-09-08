@@ -1,7 +1,7 @@
 import logging
 
 from lucro_admin.core.entities_pedidos import PageResult
-from lucro_admin.core.marketplace import Marketplace
+from lucro_admin.core.marketplace import Marketplace, slug_marketplace
 from lucro_admin.infra.database_.session import SessionLocal
 from lucro_admin.infra.repository_marketplaces import Marketplaces
 from lucro_admin.services.service_http_request_base import BaseRequestHTTP
@@ -50,17 +50,21 @@ class MarketplaceBling:
                 for mkt in data:
                     if mkt['situacao'] == 1:
                         status: bool = True
+
                     else:
                         status: bool = False
 
+                    slug = slug_marketplace(mkt['tipo'])
                     marketplaces.append(
                         Marketplace(
                             marketplace_external_id=mkt['id'],
                             external_type=mkt['tipo'],
                             marketplace_name=mkt['descricao'],
-                            status=status
+                            status=status,
+                            slug=slug
                         )
                     )
+
                 if len(data) < 100:
                     more_page = False
 

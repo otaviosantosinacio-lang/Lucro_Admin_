@@ -10,10 +10,10 @@ from sqlalchemy.exc import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
-logger = logging.getLogger('lucroadmin.infra.repository.bling_situations')
+logger = logging.getLogger('lucroadmin.infra.repository.order_tax')
 
 
-class BlingOrderSituation():
+class OrderTax:
 
     def __init__(self, session: AsyncSession):
         self.session = session
@@ -22,33 +22,39 @@ class BlingOrderSituation():
         #           INSERT
         # ==========================
 
-    async def insert_situations(self, situations):
+    async def insert_tax_invoice(self, invoices):
 
         query = text(
             '''
-                INSERT INTO bling_orders_situation(
-                    situation_bling_id,
-                    situation_name,
-                    situation_color
+                INSERT INTO tax_invoice(
+                    order_id,
+                    url_xml,
+                    serie,
+                    key_access,
+                    issue_date,
+                    tax_invoice_value,
+                    created_user_id,
+                    updated_user_id
                 )
                 VALUES(
-                    :situation_bling_id,
-                    :situation_name,
-                    :situation_color
+                    :order_id,
+                    :url_xml,
+                    :serie,
+                    :key_access,
+                    :issue_date,
+                    :tax_invoice_value,
+                    1,
+                    1
                 )
-                ON CONFLICT (situation_bling_id) DO NOTHING;
             '''
         )
 
-        values = [asdict(situation) for situation in situations]
+        values = [asdict(invoice) for invoice in invoices]
 
         try:
-
             await self.session.execute(query, values)
-            logger.info(
-                'Bling Orders Situation | '
-                'New Bling orders situations added'
-            )
+            logger.info('Lucro Admin Repository |'
+            ' Database transaction completed.')
 
         except OperationalError as conn_error:
             await self.session.rollback()
@@ -89,24 +95,39 @@ class BlingOrderSituation():
         #           SELECT
         # ==========================
 
-    async def extract_situation(self, situation_name):
+    async def searching_invoice_ids(
+            self,
+            offset,
+            situation,
+            limit=100,
+    ):
 
         query = text(
-                '''
-                SELECT situation_id, situation_bling_id,
-                    situation_name, situation_color
-                FROM bling_orders_situation
-                WHERE situation_name = :situation_name
-                '''
+            '''
+                SELECT
+                    o.order_id,
+                    o.external_invoice_id
+                FROM orders o
+                LEFT JOIN tax_invoice ti
+                    ON o.order_id = ti.order_id
+                WHERE o.integration_invoice_id = 1
+                    AND ti.order_id IS NULL
+                ORDER BY o.order_id
+                OFFSET :offset
+                LIMIT :limit
+            '''
         )
 
-        values = {'situation_name': situation_name}
+        values = {
+            'offset': offset,
+            'limit': limit
+        }
 
         try:
             result = await self.session.execute(query, values)
             data = result.fetchall()
-
             return data
+
         except OperationalError as conn_error:
             await self.session.rollback()
             logger.critical('Lucro Admin Repository | '

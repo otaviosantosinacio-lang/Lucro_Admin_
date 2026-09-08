@@ -105,7 +105,6 @@ class oAuthRefreshBling:
         logger.info(
             'Bling oAuth Refresh | Starting flow with the Refresh Token'
         )
-        breakpoint()
         logger.info('Bling oAuth Refresh | Searching for credentials')
         client_id: str = self.settings_credentials.CLIENT_ID
         client_secret: str = self.settings_credentials.CLIENT_SECRET

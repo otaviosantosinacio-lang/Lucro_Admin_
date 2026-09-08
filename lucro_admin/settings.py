@@ -35,6 +35,21 @@ class BlingSettings(BaseSettings):
     EXPIRE: str
 
 
+class TinySettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file='tiny.env',
+        env_file_encoding='utf-8'
+    )
+
+    CLIENT_ID: str
+    CLIENT_SECRET: str
+    ACCESS_TOKEN: str
+    REFRESH_TOKEN: str
+    EXPIRE_ACCESS: str
+    EXPIRE_REFRESH: str
+    REDIRECT_URI: str
+
+
 class MeliSettings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file='ml.env',

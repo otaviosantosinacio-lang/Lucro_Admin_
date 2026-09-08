@@ -2,6 +2,12 @@ import logging
 from dataclasses import asdict
 
 from sqlalchemy import text
+from sqlalchemy.exc import (
+    DataError,
+    IntegrityError,
+    OperationalError,
+    SQLAlchemyError,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger('lucroadmin.infra.repository.marketplaces')
@@ -13,6 +19,10 @@ class Marketplaces():
             session: AsyncSession
     ):
         self.session = session
+
+        # ==========================
+        #           INSERT
+        # ==========================
 
     async def insert_marketplaces(self, marketplaces):
 
@@ -45,14 +55,45 @@ class Marketplaces():
                             'Lucro_Admin Marketplaces | '
                             'New Marketplaces added'
                         )
-        except Exception as error:
-            logger.warning(
-                'Lucro_Admin Marketplaces | '
-                'Error saving the new marketplaces ->'
-                ' Erro: %s',
-                error
-                    )
+
+        except OperationalError as conn_error:
+            await self.session.rollback()
+            logger.critical('Lucro Admin Repository | '
+            'Database connection error. -> Error = %s',
+            conn_error
+            )
             raise
+
+        except IntegrityError as integ_error:
+            await self.session.rollback()
+            logger.critical('Lucro Admin Repository | '
+            'Data integrity violation (Duplicate record or invalid FK). '
+            '-> Error = %s',
+            integ_error
+            )
+            raise
+
+        except SQLAlchemyError as db_error:
+            await self.session.rollback()
+            logger.critical('Lucro Admin Repository | '
+            'Unexpected error in the database. '
+            '-> Error = %s',
+            db_error
+            )
+            raise
+
+        except Exception as unexpected_error:
+            await self.session.rollback()
+            logger.critical('Lucro Admin Repository | '
+            'Unmapped systemic error. '
+            '-> Error = %s',
+            unexpected_error
+            )
+            raise
+
+        # ==========================
+        #           SELECT
+        # ==========================
 
     async def get_marketplace(self, marketplace_id):
 
@@ -65,9 +106,42 @@ class Marketplaces():
         )
 
         values = {'marketplace_external_id': marketplace_id}
+        try:
+            result = await self.session.execute(query, values)
+            data = result.fetchall()
+            return data
 
-        result = await self.session.execute(query, values)
+        except OperationalError as conn_error:
+            await self.session.rollback()
+            logger.critical('Lucro Admin Repository | '
+            'Database connection error. -> Error = %s',
+            conn_error
+            )
+            raise
 
-        data = result.fetchall()
+        except DataError as data_error:
+            await self.session.rollback()
+            logger.critical('Lucro Admin Repository | '
+            'Type error in the data sent in the query. '
+            '-> Error = %s',
+            data_error
+            )
+            raise
 
-        return data
+        except SQLAlchemyError as db_error:
+            await self.session.rollback()
+            logger.critical('Lucro Admin Repository | '
+            'Unexpected error in the database. '
+            '-> Error = %s',
+            db_error
+            )
+            raise
+
+        except Exception as unexpected_error:
+            await self.session.rollback()
+            logger.critical('Lucro Admin Repository | '
+            'Unmapped systemic error. '
+            '-> Error = %s',
+            unexpected_error
+            )
+            raise

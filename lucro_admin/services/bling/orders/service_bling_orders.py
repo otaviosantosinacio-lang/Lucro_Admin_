@@ -3,14 +3,16 @@ from datetime import date, datetime
 
 from lucro_admin.core.entities_pedidos import (
     ErrorHTTP,
-    OrderData,
+    ItemList,
     OrderDetail,
+    OrderItemInsert,
     OrderPage,
 )
-from lucro_admin.core.marketplace import nome_marketplace
 from lucro_admin.infra.database_.session import SessionLocal
 from lucro_admin.infra.repository_marketplaces import Marketplaces
+from lucro_admin.infra.repository_order_item import OrderItem
 from lucro_admin.infra.repository_orders import Orders
+from lucro_admin.infra.repository_products import Products
 from lucro_admin.services.bling.orders.order_situation_bling import (
     OrderSituationBling,
 )
@@ -59,7 +61,7 @@ class Attended:
         """
         url: str = (
             f'{self.base_url}/pedidos/vendas?pagina={pagina}&limite=100&'
-            f'idsSituacoes%5B%5D={sit}&dataInicial=2026-07-01'
+            f'idsSituacoes%5B%5D={sit}&dataInicial={data_inicial}'
             f'&dataFinal={data_final}'
         )
         return url
@@ -159,7 +161,6 @@ class Attended:
             await repository.insert_order(orders=orders)
 
             await session.commit()
-            await session.close()
 
 
 class OrderDetails:
@@ -192,7 +193,7 @@ class OrderDetails:
         """
         return f'{self.base_url}/pedidos/vendas/{id}'
 
-    async def get_id_details(self) -> OrderDetail:
+    async def get_id_details(self):
         """
         get_id_detalhes
 
@@ -201,12 +202,12 @@ class OrderDetails:
         :type ids_list: list[int]
         """
         error429 = []
-        pedidos = []
+        orders_detail = []
+        items = []
         sit = await self.order_situation.situation_data_base('Atendido')
         async with SessionLocal() as session:
             repository = Orders(session=session)
-
-            more_page: bool = False
+            more_page: bool = True
             offset = 0
             while more_page:
                 ids = await repository.orders_without_details(
@@ -215,41 +216,49 @@ class OrderDetails:
                 )
                 for id in ids:
                     url = self.url_id(id[1])
+                    logger.info(
+                    'Bling Orders get_id_details | '
+                    'Url montada %s', url
+                )
                     response = self.service_base.organiza_get_request(url)
-
                     if response.status == 'ok':
                         data = response.data.get('data', [])
-                        id_loja = data['loja']['id']
-                        nome_mkt = nome_marketplace(id_loja)
                         transporte = data.get('transporte') or {}
                         volumes = transporte.get('volumes') or []
 
-                        pedido: OrderDetail = OrderDetail(
-                            nf_id=data['notaFiscal']['id'],
-                            value_sale=data['total'],
-                            items=data['itens'],
+                        order: OrderDetail = OrderDetail(
+                            order_id=id[0],
+                            external_invoice_id=data['notaFiscal']['id'],
+                            value_order=data['total'],
                             uf_dest=data['transporte']['etiqueta']['uf'],
-                            servico_trans=volumes[0].get('servico')
+                            transport=volumes[0].get('servico')
                             if volumes
                             else 'SEM_SERVIÇO',
                         )
-                        logger.info(
-                            'Bling Service get_id_detalhes | '
-                            'Dados do pedido %s',
-                            pedido,
+                        items.append(
+                            ItemList(
+                                order_id=id[0],
+                                situation_id=sit.situation_id,
+                                items=data['itens'],
+                            )
                         )
-                        pedidos.append(pedido)
+                        logger.info(
+                            'Bling Service Order Details | '
+                            'Order data %s',
+                            order,
+                        )
+                        orders_detail.append(order)
 
                         logger.info(
-                            'Bling Service get_id_detalhes | '
-                            'Endpoint %s / Retorno %s',
+                            'Bling Service Order Details | '
+                            'Endpoint %s / Response %s',
                             url,
                             response.data,
                         )
                     elif response.status == 'rated_limit':
                         logger.error(
-                            'Bling Pedidos get_id_detalhes | '
-                            'Erro na requisição %s',
+                            'Bling Pedidos Order Detail | '
+                            'Request Error %s',
                             response.error,
                         )
                         erro = ErrorHTTP(
@@ -262,4 +271,47 @@ class OrderDetails:
                             data=datetime.now(),
                         )
                         error429.append(erro)
-                    return
+                if len(ids) < 100:
+                    more_page = False
+                else:
+                    offset += 100
+
+            await repository.insert_order_details(orders_detail)
+
+            await self.order_items(items=items, session=session)
+
+            await session.commit()
+
+            await session.close()
+
+            return
+
+    async def order_items(self, items, session):
+        repository = OrderItem(session)
+        product_repo = Products(session)
+        order_items_insert = []
+        for item_list in items:
+            for item in item_list.items:
+                product = await product_repo.consult_product_with_sku(
+                    sku=item['codigo']
+                )
+                if product == []:
+                    product = await product_repo.consult_product_with_full_sku(
+                        full_sku=item['codigo']
+                    )
+                order_items_insert.append(
+                    OrderItemInsert(
+                        order_id=item_list.order_id,
+                        situation_id=item_list.situation_id,
+                        product_id=product[0][0],
+                        quantity=item['quantidade'],
+                        cost_price=product[0][2],
+                        unit_selling_price=item['valor']
+                    )
+                )
+        logger.info(
+            'Bling Orders Order Item | '
+            'Order Items added %s',
+            len(order_items_insert),
+        )
+        await repository.insert_ordem_item(order_items_insert)
