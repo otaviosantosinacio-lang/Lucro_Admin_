@@ -1,6 +1,7 @@
 import logging
 from datetime import date, datetime
 
+from lucro_admin.adapters.bling.bling_orders import CrudBling
 from lucro_admin.core.entities_pedidos import (
     ErrorHTTP,
     ItemList,
@@ -8,17 +9,21 @@ from lucro_admin.core.entities_pedidos import (
     OrderItemInsert,
     OrderPage,
 )
-from lucro_admin.infra.database_.session import SessionLocal
+from lucro_admin.infra.database import SessionLocal
 from lucro_admin.infra.repository_marketplaces import Marketplaces
 from lucro_admin.infra.repository_order_item import OrderItem
 from lucro_admin.infra.repository_orders import Orders
 from lucro_admin.infra.repository_products import Products
+from lucro_admin.services.bling.credentials.providers.bling_provider import (
+    BlingProvider,
+)
 from lucro_admin.services.bling.orders.order_situation_bling import (
     OrderSituationBling,
 )
 from lucro_admin.services.service_http_request_base import (
     BaseRequestHTTP,
 )
+from lucro_admin.services.token_service import TokenService
 
 logger = logging.getLogger('lucroadmin.services.blingpedidos')
 
@@ -29,9 +34,11 @@ class Attended:
 
     """
 
-    def __init__(self, access_token, adapt_pedidos):
-        self.access_token = access_token
-        self.adapt_pedidos = adapt_pedidos
+    def __init__(self):
+        self.provider = BlingProvider()
+        self.token_service = TokenService(self.provider)
+        self.access_token = self.token_service.validate_access_token()
+        self.adapt_pedidos = CrudBling()
         self.service_base = BaseRequestHTTP(
             self.adapt_pedidos, self.access_token
         )
@@ -80,7 +87,7 @@ class Attended:
         page = 1
         async with SessionLocal() as session:
             repository = Orders(session=session)
-            repository_mkt = Marketplaces(session=session)
+            repo_mkt = Marketplaces(session=session)
             repo_initial_date = await repository.last_date_order()
 
             initial_date = repo_initial_date[0][0]
@@ -105,11 +112,11 @@ class Attended:
                     data = response.data.get('data', [])
                     for sale in data:
                         if sale['loja']['id'] == 0:
-                            marketplace_id = await repository_mkt.get_marketplace(
+                            marketplace_id = await repo_mkt.get_marketplace(
                             1
                             )
                         else:
-                            marketplace_id = await repository_mkt.get_marketplace(
+                            marketplace_id = await repo_mkt.get_marketplace(
                                 sale['loja']['id']
                             )
                         order: OrderPage = OrderPage(
@@ -122,7 +129,7 @@ class Attended:
                         )
                         logger.info(
                         'Bling Orders get_id_por_pag | '
-                        'Order %s', 
+                        'Order %s',
                     )
 
                         orders.append(order)

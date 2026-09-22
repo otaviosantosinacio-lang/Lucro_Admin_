@@ -2,7 +2,7 @@ import logging
 
 from lucro_admin.core.entities_pedidos import PageResult
 from lucro_admin.core.marketplace import Marketplace, slug_marketplace
-from lucro_admin.infra.database_.session import SessionLocal
+from lucro_admin.infra.database import SessionLocal
 from lucro_admin.infra.repository_marketplaces import Marketplaces
 from lucro_admin.services.service_http_request_base import BaseRequestHTTP
 

@@ -5,7 +5,7 @@ from typing import Any
 from lucro_admin.adapters.bling.bling_orders import GetUrlXML
 from lucro_admin.core.entities_pedidos import ErrorHTTP
 from lucro_admin.core.imposto.entities_imposto import InsertTaxInvoice
-from lucro_admin.infra.database_.session import SessionLocal
+from lucro_admin.infra.database import SessionLocal
 from lucro_admin.infra.repository_order_tax import OrderTax
 from lucro_admin.services.bling.orders.order_situation_bling import (
     OrderSituationBling,

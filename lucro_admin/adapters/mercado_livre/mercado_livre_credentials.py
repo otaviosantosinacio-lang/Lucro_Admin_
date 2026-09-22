@@ -15,6 +15,7 @@ class Code:
     def __init__(self):
         self.timeout = 30
 
+    @retry_policy
     def code_request(self, headers, data) -> requests.Response:
 
         return requests.post(
@@ -49,9 +50,7 @@ class Code:
             base_url,
         )
 
-        response = retry_policy.execute(
-            lambda: self.code_request(headers, data)
-        )
+        response = self.code_request(headers, data)
 
         if response.status_code == HTTPStatus.OK:
             logger.info(
@@ -105,6 +104,7 @@ class RefreshML:
     def __init__(self):
         self.timeout = 20
 
+    @retry_policy
     def refresh_request(
         self, url: str, headers: dict[str, str], data: str
     ) -> requests.Response:
@@ -139,10 +139,10 @@ class RefreshML:
             base_url,
         )
 
-        response = retry_policy.execute(
-            lambda: self.refresh_request(
-                url=base_url, headers=headers, data=data
-            )
+        response = self.refresh_request(
+            url=base_url,
+            headers=headers,
+            data=data
         )
 
         if response.status_code == HTTPStatus.OK:

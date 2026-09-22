@@ -2,7 +2,7 @@ import logging
 
 from lucro_admin.adapters.bling.bling_orders import GetUrlXML
 from lucro_admin.core.imposto.entities_imposto import ErrorParse
-from lucro_admin.infra.database_.session import SessionLocal
+from lucro_admin.infra.database import SessionLocal
 from lucro_admin.infra.repository_order_item_tax import OrderItemTax
 from lucro_admin.services.parse_xml import ParseXML
 

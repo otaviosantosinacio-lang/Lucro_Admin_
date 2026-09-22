@@ -84,7 +84,7 @@ async def run_async_migrations() -> None:
     await connectable.dispose()
 
 def run_migrations_online():
-    asyncio.run(run_async_migrations())
+    asyncio.run(run_async_migrations(), loop_factory=asyncio.SelectorEventLoop)
 
 if context.is_offline_mode():
     run_migrations_offline()

@@ -21,20 +21,8 @@ class Code:
 
     base_url: str = 'https://api.bling.com.br/Api/v3'
 
+    @retry_policy
     def code_request(self, url, headers, data):
-        """
-        code_request
-            Request para obtenção das credenciais bling.
-            No retorno teremos as credênciais Access Token, Refresh Token e
-            Expire
-
-        :param self:
-        :param url: Endpoint Bling
-        :param headers: Headereturn requests.post(
-            url=url, headers=headers, data=data, timeout=self.timeout
-        )rs para validação obtenção das credenciais
-        :param data: Passando code em um Body
-        """
         return requests.post(
             url=url, headers=headers, data=data, timeout=self.timeout
         )
@@ -97,9 +85,7 @@ class Code:
         )
 
         # Sending request to the endpoint
-        response = retry_policy.execute(
-            lambda: self.code_request(url, headers, data)
-        )
+        response = self.code_request(url, headers, data)
 
         # Checking response
         if response.status_code == HTTPStatus.OK:
@@ -157,6 +143,7 @@ class Refresh:
     def __init__(self):
         self.timeout = 30
 
+    @retry_policy
     def refresh_request(self, url: str, headers: dict[str, str], data: str):
         """
         refresh_request
@@ -223,9 +210,7 @@ class Refresh:
             url,
         )
 
-        response = retry_policy.execute(
-            lambda: self.refresh_request(url=url, headers=headers, data=data)
-        )
+        response = self.refresh_request(url=url, headers=headers, data=data)
         # If the return is successful, we configure it according
         # to the established dataclass.
         if response.status_code == HTTPStatus.OK:

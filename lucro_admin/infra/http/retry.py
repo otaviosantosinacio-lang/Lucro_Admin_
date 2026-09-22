@@ -1,5 +1,6 @@
 import logging
 import time
+from functools import wraps
 from typing import Any, Callable, Iterable
 
 logger = logging.getLogger('lucroadmin.infra.retry')
@@ -25,6 +26,12 @@ class RetryPolicy:
         self.exponencial_factor = exponential_factor
         self.status_retry = set(status_retry)
         self.success_delay = success_delay
+
+    def __call__(self, func: Callable[..., Any]):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            return self.execute(lambda: func(*args, **kwargs))
+        return wrapper
 
     def execute(self, func: Callable[[], Any]):
         """

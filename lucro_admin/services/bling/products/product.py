@@ -3,7 +3,7 @@ from datetime import datetime
 
 from lucro_admin.core.entities_pedidos import ErrorHTTP, PageResult
 from lucro_admin.core.entities_produtos import Product
-from lucro_admin.infra.database_.session import SessionLocal
+from lucro_admin.infra.database import SessionLocal
 from lucro_admin.infra.repository_products import Products
 from lucro_admin.services.service_http_request_base import BaseRequestHTTP
 

@@ -18,6 +18,7 @@ class Request:
     def __init__(self):
         self.timeout: int = 30
 
+    @retry_policy
     def request_get_endpoint(
         self, url: str, headers: dict[str, str]
     ) -> requests.Response:
@@ -42,6 +43,7 @@ class Request:
         )
         return requests.get(url=url, headers=headers, timeout=self.timeout)
 
+    @retry_policy
     def request_path_endpoint(
             self,
             url: str,
@@ -91,9 +93,8 @@ class CrudBling:
             'enable-jwt': '1',
         }
 
-        response = retry_policy.execute(
-            lambda: self.request.request_get_endpoint(url, headers)
-        )
+        response = self.request.request_get_endpoint(url, headers)
+
         logger.warning(
             'Bling get_endpoints | The request return is %s',
             response.status_code,
@@ -118,9 +119,8 @@ class CrudBling:
             'enable-jwt': '1',
         }
 
-        response = retry_policy.execute(
-            lambda: self.request.request_path_endpoint(url, headers)
-        )
+        response = self.request.request_path_endpoint(url, headers)
+
         logger.warning(
             'Bling patch_endpoints | The request return is %s',
             response.status_code,
@@ -137,6 +137,7 @@ class GetUrlXML:
     def __init__(self):
         self.timeout: int = 30
 
+    @retry_policy
     def request_xml_endpoint(self, url):
         """
         request_xml_endpoint
@@ -158,7 +159,7 @@ class GetUrlXML:
         :param url: EndPoint XML
         :type url: str
         """
-        response = retry_policy.execute(lambda: self.request_xml_endpoint(url))
+        response = self.request_xml_endpoint(url)
         logger.info('XML EndPoint | Return HTTP %s', response.status_code)
 
         return response.text

@@ -14,6 +14,7 @@ class Code:
     def __init__(self):
         self.timeout = 30
 
+    @retry_policy
     def code_request(self, url, headers, data):
         return requests.post(
             url=url, headers=headers, data=data, timeout=self.timeout
@@ -47,9 +48,7 @@ class Code:
         )
 
         # Sending request to the endpoint
-        response = retry_policy.execute(
-                    lambda: self.code_request(url, headers, data)
-                )
+        response = self.code_request(url, headers, data)
 
         # Checking response
         if response.status_code == HTTPStatus.OK:
@@ -110,6 +109,7 @@ class RefreshTiny:
     def __init__(self):
         self.timeout = 30
 
+    @retry_policy
     def refresh_request(self, url: str, headers: dict[str, str], data: str):
         """
             refresh_request
@@ -154,9 +154,7 @@ class RefreshTiny:
             url,
         )
 
-        response = retry_policy.execute(
-            lambda: self.refresh_request(url=url, headers=headers, data=data)
-        )
+        response = self.refresh_request(url=url, headers=headers, data=data)
 
         # If the return is successful, we configure it according
         # to the established dataclass.

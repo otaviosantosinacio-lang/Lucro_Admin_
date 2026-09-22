@@ -17,7 +17,7 @@ from lucro_admin.infra.logging.contexto import (
     correlation_id,
     generate_correlation_id,
 )
-from lucro_admin.services.bling.credentials.tokens.providers.bling_provider import (
+from lucro_admin.services.bling.credentials.providers.bling_provider import (
     BlingProvider,
 )
 from lucro_admin.services.bling.marketplaces.marketplaces import (
@@ -31,7 +31,7 @@ from lucro_admin.services.bling.orders.order_tax import TaxInvoicesBling
 from lucro_admin.services.bling.orders.provider.provider_pedidos import (
     PedidosProviderBling,
 )
-from lucro_admin.services.bling.orders.service_bling_orders import (
+from lucro_admin.services.bling.orders.orders import (
     Attended,
     OrderDetails,
 )
@@ -53,7 +53,6 @@ async def main():
     Esta def não solicita nenhum atributo pois é ela quem fará as requisições
     a outros pacotes do app
     """
-
 
     Path('logs').mkdir(exist_ok=True)
     cid = generate_correlation_id()

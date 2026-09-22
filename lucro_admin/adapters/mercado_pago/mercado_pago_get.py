@@ -12,6 +12,7 @@ class RequestMercadoPago:
     def __init__(self):
         self.time_out = 20
 
+    @retry_policy
     def request_endpoint(self, url: str, headers: dict[str, str]):
 
         logger.info(
@@ -49,9 +50,8 @@ class GetMercadoPago:
             'Authorization': f'Bearer {access_token}',
         }
 
-        response = retry_policy.executa(
-            lambda: self.request_mp.request_endpoint(url, headers)
-        )
+        response = self.request_mp.request_endpoint(url, headers)
+
         logger.info(
             'Bling get_endpoints_bling | Retorno da requisição é %s',
             response.status_code,

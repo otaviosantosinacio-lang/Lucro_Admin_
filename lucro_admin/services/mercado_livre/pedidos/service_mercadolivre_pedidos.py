@@ -7,7 +7,7 @@ from lucro_admin.core.entities_pedidos import (
     PageResult,
     SaleCosts,
 )
-from lucro_admin.infra.database_.session import SessionLocal
+from lucro_admin.infra.database import SessionLocal
 from lucro_admin.infra.repository_order_item import OrderItem
 from lucro_admin.services.mercado_pago.service_mercadopago import (
     MercadoPagoCustos,

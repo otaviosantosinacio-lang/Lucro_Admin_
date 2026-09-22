@@ -13,13 +13,16 @@ class RequestMercadoLivre:
     def __init__(self):
         self.time_out = 20
 
+    @retry_policy
     def request_endpoint_mercadolivre(self, url: str, headers: dict[str, str]):
         logger.info(
             'Mercado Livre Request | Sending request to the endpoint %s',
             url,
         )
         response = requests.get(
-            url=url, headers=headers, timeout=self.time_out
+            url=url,
+            headers=headers,
+            timeout=self.time_out
         )
 
         return response
@@ -50,9 +53,8 @@ class GetMercadoLivre:
             'Accept': 'application/json',
         }
 
-        response = retry_policy.execute(
-            lambda: self.request_ml.request_endpoint_mercadolivre(url, headers)
-        )
+        response = self.request_ml.request_endpoint_mercadolivre(url, headers)
+
         logger.info(
             'Mercado Livre get_endpoints_mercadolivre | '
             'The request response is %s',

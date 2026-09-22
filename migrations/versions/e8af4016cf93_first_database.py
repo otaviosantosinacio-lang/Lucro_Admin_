@@ -1,8 +1,8 @@
-"""First data base on orieted pipelines
+"""First Database
 
-Revision ID: 1100a98cce7b
+Revision ID: e8af4016cf93
 Revises: 
-Create Date: 2026-08-06 22:40:26.401945
+Create Date: 2026-09-18 14:22:19.407690
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '1100a98cce7b'
+revision: str = 'e8af4016cf93'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -31,6 +31,13 @@ def upgrade() -> None:
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('situation_id', name=op.f('pk_bling_orders_situation')),
     sa.UniqueConstraint('situation_bling_id', name=op.f('uq_bling_orders_situation_situation_bling_id'))
+    )
+    op.create_table('integrations',
+    sa.Column('integration_id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(), nullable=False),
+    sa.Column('type', sa.String(), nullable=False),
+    sa.PrimaryKeyConstraint('integration_id', name=op.f('pk_integrations')),
+    sa.UniqueConstraint('name', name=op.f('uq_integrations_name'))
     )
     op.create_table('pipeline_stage',
     sa.Column('stage_id', sa.Integer(), nullable=False),
@@ -61,6 +68,7 @@ def upgrade() -> None:
     sa.Column('marketplace_external_id', sa.Integer(), nullable=False),
     sa.Column('external_type', sa.String(), nullable=True),
     sa.Column('marketplace_name', sa.String(), nullable=False),
+    sa.Column('slug', sa.String(), nullable=True),
     sa.Column('status', sa.Boolean(), server_default='true', nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('created_user_id', sa.Integer(), nullable=False),
@@ -73,8 +81,8 @@ def upgrade() -> None:
     )
     op.create_table('products',
     sa.Column('product_id', sa.Integer(), nullable=False),
-    sa.Column('external_product_id', sa.Integer(), nullable=False),
-    sa.Column('sku', sa.String(), nullable=True),
+    sa.Column('external_product_id', sa.BigInteger(), nullable=False),
+    sa.Column('sku', sa.String(), nullable=False),
     sa.Column('product_description', sa.String(), nullable=False),
     sa.Column('supplier', sa.String(), nullable=False),
     sa.Column('cost_price', sa.Numeric(), nullable=False),
@@ -91,14 +99,34 @@ def upgrade() -> None:
     sa.UniqueConstraint('external_product_id', name=op.f('uq_products_external_product_id')),
     sa.UniqueConstraint('sku', name=op.f('uq_products_sku'))
     )
+    op.create_table('fulfillment_product',
+    sa.Column('product_full_id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('marketplace_id', sa.Integer(), nullable=False),
+    sa.Column('product_id', sa.Integer(), nullable=False),
+    sa.Column('fulfillment_sku', sa.String(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_user_id', sa.Integer(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_user_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['created_user_id'], ['users.user_id'], name=op.f('fk_fulfillment_product_created_user_id_users')),
+    sa.ForeignKeyConstraint(['marketplace_id'], ['marketplaces.marketplace_id'], name=op.f('fk_fulfillment_product_marketplace_id_marketplaces')),
+    sa.ForeignKeyConstraint(['product_id'], ['products.product_id'], name=op.f('fk_fulfillment_product_product_id_products')),
+    sa.ForeignKeyConstraint(['updated_user_id'], ['users.user_id'], name=op.f('fk_fulfillment_product_updated_user_id_users')),
+    sa.PrimaryKeyConstraint('product_full_id', name=op.f('pk_fulfillment_product')),
+    sa.UniqueConstraint('fulfillment_sku', name=op.f('uq_fulfillment_product_fulfillment_sku'))
+    )
     op.create_table('orders',
     sa.Column('order_id', sa.Integer(), nullable=False),
-    sa.Column('external_id', sa.Integer(), nullable=False),
+    sa.Column('external_id', sa.BigInteger(), nullable=False),
+    sa.Column('integration_order_id', sa.Integer(), nullable=True),
     sa.Column('origin_id', sa.Integer(), nullable=False),
     sa.Column('situation_id', sa.Integer(), nullable=False),
-    sa.Column('external_invoice_id', sa.Integer(), nullable=True),
+    sa.Column('external_invoice_id', sa.BigInteger(), nullable=True),
+    sa.Column('integration_invoice_id', sa.Integer(), nullable=True),
     sa.Column('marketplace_id', sa.Integer(), nullable=True),
-    sa.Column('marketplace_order_id', sa.Integer(), nullable=False),
+    sa.Column('marketplace_order_id', sa.String(), nullable=False),
+    sa.Column('uf_dest', sa.String(), nullable=True),
+    sa.Column('transport', sa.String(), nullable=True),
     sa.Column('order_date', sa.Date(), nullable=False),
     sa.Column('value_order', sa.Numeric(), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
@@ -106,6 +134,8 @@ def upgrade() -> None:
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['created_user_id'], ['users.user_id'], name=op.f('fk_orders_created_user_id_users')),
+    sa.ForeignKeyConstraint(['integration_invoice_id'], ['integrations.integration_id'], name=op.f('fk_orders_integration_invoice_id_integrations')),
+    sa.ForeignKeyConstraint(['integration_order_id'], ['integrations.integration_id'], name=op.f('fk_orders_integration_order_id_integrations')),
     sa.ForeignKeyConstraint(['marketplace_id'], ['marketplaces.marketplace_id'], name=op.f('fk_orders_marketplace_id_marketplaces')),
     sa.ForeignKeyConstraint(['situation_id'], ['bling_orders_situation.situation_id'], name=op.f('fk_orders_situation_id_bling_orders_situation')),
     sa.ForeignKeyConstraint(['updated_user_id'], ['users.user_id'], name=op.f('fk_orders_updated_user_id_users')),
@@ -149,16 +179,15 @@ def upgrade() -> None:
     op.create_table('tax_invoice',
     sa.Column('tax_invoice_id', sa.Integer(), nullable=False),
     sa.Column('order_id', sa.Integer(), nullable=False),
-    sa.Column('created_user_id', sa.Integer(), nullable=False),
-    sa.Column('updated_user_id', sa.Integer(), nullable=False),
     sa.Column('url_xml', sa.String(), nullable=True),
     sa.Column('serie', sa.Integer(), nullable=True),
     sa.Column('key_access', sa.String(), nullable=True),
-    sa.Column('issue_date', sa.Date(), nullable=True),
+    sa.Column('issue_date', sa.DateTime(), nullable=True),
     sa.Column('tax_invoice_value', sa.Numeric(), nullable=True),
-    sa.Column('bling_tax_invoice_id', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_user_id', sa.Integer(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['created_user_id'], ['users.user_id'], name=op.f('fk_tax_invoice_created_user_id_users')),
     sa.ForeignKeyConstraint(['order_id'], ['orders.order_id'], name=op.f('fk_tax_invoice_order_id_orders')),
     sa.ForeignKeyConstraint(['updated_user_id'], ['users.user_id'], name=op.f('fk_tax_invoice_updated_user_id_users')),
@@ -193,10 +222,12 @@ def downgrade() -> None:
     op.drop_table('pipeline_execution')
     op.drop_table('order_item')
     op.drop_table('orders')
+    op.drop_table('fulfillment_product')
     op.drop_table('products')
     op.drop_table('marketplaces')
     op.drop_table('users')
     op.drop_table('pipeline_status')
     op.drop_table('pipeline_stage')
+    op.drop_table('integrations')
     op.drop_table('bling_orders_situation')
     # ### end Alembic commands ###
