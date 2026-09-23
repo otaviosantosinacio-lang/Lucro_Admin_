@@ -3,44 +3,12 @@ import logging
 from logging.config import dictConfig
 from pathlib import Path
 
-from lucro_admin.adapters.bling.bling_credentials import Refresh
-from lucro_admin.adapters.bling.bling_orders import CrudBling
-from lucro_admin.adapters.mercado_livre.mercado_livre_credentials import (
-    RefreshML,
-)
-from lucro_admin.adapters.mercado_livre.mercado_livre_orders import (
-    GetMercadoLivre,
-)
-from lucro_admin.adapters.tiny.tiny_credentials import RefreshTiny
 from lucro_admin.infra.logging.config import Logging_Config
 from lucro_admin.infra.logging.contexto import (
     correlation_id,
     generate_correlation_id,
 )
-from lucro_admin.services.bling.credentials.providers.bling_provider import (
-    BlingProvider,
-)
-from lucro_admin.services.bling.marketplaces.marketplaces import (
-    MarketplaceBling,
-)
-from lucro_admin.services.bling.orders.item_tax import XMLItemTax
-from lucro_admin.services.bling.orders.order_situation_bling import (
-    OrderSituationBling,
-)
-from lucro_admin.services.bling.orders.order_tax import TaxInvoicesBling
-from lucro_admin.services.bling.orders.orders import (
-    Attended,
-    OrderDetails,
-)
-from lucro_admin.services.bling.products.product import ProductsRequestBling
-from lucro_admin.services.mercado_livre.pedidos.mercadolivre_pedidos import (
-    ExtraiCustoMercadoLivre,
-)
-from lucro_admin.services.mercado_livre.tokens.ml_provider import MLProvider
-from lucro_admin.services.tiny.credentials.tiny_provider_oauth import (
-    TinyProvider,
-)
-from lucro_admin.services.token_service import TokenService
+from lucro_admin.services.orchestrator import PipelineOrchestrator
 
 
 async def main():
@@ -59,54 +27,7 @@ async def main():
     logger = logging.getLogger('lucroadmin.main')
     logger.info('Iniciando o fluxo principal da aplicação')
 
-    # Service Bling Orders
-
-    # Adapters
-    adapter_refresh_bling = Refresh()
-    adapt_pedidos_bling = CrudBling()
-    adapter_refresh_tiny = RefreshTiny()
-    adapt_refresh_ML = RefreshML()
-    adapt_pedidos_ML = GetMercadoLivre()
-
-    # Providers
-    bling_provider_credenciais = BlingProvider(
-        adapter_refresh_bling
-    )
-    mercadolivre_provider_credenciais = MLProvider(
-        adapt_refresh_ML
-    )
-
-    tiny_provider_credentials = TinyProvider(adapter_refresh_tiny)
-
-    # Token Services
-    token_service_bling = TokenService(bling_provider_credenciais)
-    token_service_ML = TokenService(mercadolivre_provider_credenciais)
-    token_service_tiny = TokenService(tiny_provider_credentials)
-    """
-        Aqui e¨ chamando o metodo valida_access que esta dentro da classe
-        TokenService, você pode observar que eu estou usando o objeto
-        token_service_bling para chamar o metodo
-    """
-    # Bling
-    access_token_bling = token_service_bling.validate_access_token()
-
-    # Mercado Livre
-    access_token_ML = token_service_ML.validate_access_token()
-
-    access_token_tiny = token_service_tiny.validate_access_token()
-
-
-    mercadolivre_pedidos = ExtraiCustoMercadoLivre(
-        access_token=access_token_ML, adapt_pedido=adapt_pedidos_ML
-    )
-
-    service_orders = Attended(access_token_bling, adapt_pedidos_bling)
-
-    orders = await service_orders.get_id_by_page()
-
-    details_orders = OrderDetails(access_token_bling, adapt_pedidos_bling)
-
-    orders_details = await details_orders.get_id_details()
+    await PipelineOrchestrator().execute()
 
     logger.info('Fluxo finalizado')
 

@@ -2,13 +2,9 @@ import logging
 from dataclasses import asdict
 
 from sqlalchemy import text
-from sqlalchemy.exc import (
-    DataError,
-    IntegrityError,
-    OperationalError,
-    SQLAlchemyError,
-)
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from lucro_admin.infra.db_error_handle import handler_db_error
 
 logger = logging.getLogger('lucroadmin.infra.repository.order_item_tax')
 
@@ -22,6 +18,7 @@ class OrderItemTax:
         #           INSERT
         # ==========================
 
+    @handler_db_error
     async def insert_tax_items(self, items_tax):
 
         query = text(
@@ -49,7 +46,12 @@ class OrderItemTax:
         values = [asdict(item_tax)for item_tax in items_tax]
 
         await self.session.execute(query, values)
+        logger.info('Lucro Admin Repository |'
+        ' New %s order item tax added.',
+        len(values)
+        )
 
+    @handler_db_error
     async def searching_xml(
             self,
             offset: int,
@@ -83,50 +85,15 @@ class OrderItemTax:
             'limit': limit
         }
 
-        try:
-            result = await self.session.execute(query, values)
-            data = result.fetchall()
-            return data
-
-        except OperationalError as conn_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Database connection error. -> Error = %s',
-            conn_error
-            )
-            raise
-
-        except IntegrityError as integ_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Data integrity violation (Duplicate record or invalid FK). '
-            '-> Error = %s',
-            integ_error
-            )
-            raise
-
-        except SQLAlchemyError as db_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Unexpected error in the database. '
-            '-> Error = %s',
-            db_error
-            )
-            raise
-
-        except Exception as unexpected_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Unmapped systemic error. '
-            '-> Error = %s',
-            unexpected_error
-            )
-            raise
+        result = await self.session.execute(query, values)
+        data = result.fetchall()
+        return data
 
         # ==========================
         #           SELECT
         # ==========================
 
+    @handler_db_error
     async def searching_order_item(self, order_id):
         query = text(
             '''
@@ -151,42 +118,6 @@ class OrderItemTax:
             'order_id': order_id
         }
 
-        try:
-            result = await self.session.execute(query, values)
-            data = result.fetchall()
-            return data
-
-        except OperationalError as conn_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Database connection error. -> Error = %s',
-            conn_error
-            )
-            raise
-
-        except DataError as data_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Type error in the data sent in the query. '
-            '-> Error = %s',
-            data_error
-            )
-            raise
-
-        except SQLAlchemyError as db_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Unexpected error in the database. '
-            '-> Error = %s',
-            db_error
-            )
-            raise
-
-        except Exception as unexpected_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Unmapped systemic error. '
-            '-> Error = %s',
-            unexpected_error
-            )
-            raise
+        result = await self.session.execute(query, values)
+        data = result.fetchall()
+        return data

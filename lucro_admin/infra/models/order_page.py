@@ -15,7 +15,7 @@ class OrderPage(BaseModel):
         primary_key=True
     )
 
-    date: Mapped[date] = mapped_column(nullable=False)
+    date_page: Mapped[date] = mapped_column(nullable=False)
 
     page: Mapped[int] = mapped_column(nullable=False)
 

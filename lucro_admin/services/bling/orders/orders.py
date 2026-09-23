@@ -125,10 +125,6 @@ class Attended:
                         marketplace_order_id=sale['numeroLoja'],
                         order_date=sale['data']
                     )
-                    logger.info(
-                    'Bling Orders get_id_por_pag | '
-                    'Order %s',
-                )
 
                     orders.append(order)
 

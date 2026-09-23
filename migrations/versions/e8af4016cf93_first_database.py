@@ -211,6 +211,13 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('order_item_tax_id', name=op.f('pk_order_item_tax')),
     sa.UniqueConstraint('order_item_id', 'tax_type', name='uq_item_pedido_imposto_tipo')
     )
+    op.create_table('order_page',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('date_page', sa.Date(), nullable=False),
+    sa.Column('page', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_order_page'))
+    )
     # ### end Alembic commands ###
 
 
@@ -230,4 +237,5 @@ def downgrade() -> None:
     op.drop_table('pipeline_stage')
     op.drop_table('integrations')
     op.drop_table('bling_orders_situation')
+    op.drop_table('order_page')
     # ### end Alembic commands ###

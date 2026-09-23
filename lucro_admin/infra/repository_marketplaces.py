@@ -2,13 +2,9 @@ import logging
 from dataclasses import asdict
 
 from sqlalchemy import text
-from sqlalchemy.exc import (
-    DataError,
-    IntegrityError,
-    OperationalError,
-    SQLAlchemyError,
-)
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from lucro_admin.infra.db_error_handle import handler_db_error
 
 logger = logging.getLogger('lucroadmin.infra.repository.marketplaces')
 
@@ -24,6 +20,7 @@ class Marketplaces():
         #           INSERT
         # ==========================
 
+    @handler_db_error
     async def insert_marketplaces(self, marketplaces):
 
         query = text(
@@ -48,53 +45,19 @@ class Marketplaces():
             '''
         )
 
-        try:
-            values = [asdict(marketplace) for marketplace in marketplaces]
-            await self.session.execute(query, values)
-            logger.info(
-                            'Lucro_Admin Marketplaces | '
-                            'New Marketplaces added'
-                        )
-
-        except OperationalError as conn_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Database connection error. -> Error = %s',
-            conn_error
-            )
-            raise
-
-        except IntegrityError as integ_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Data integrity violation (Duplicate record or invalid FK). '
-            '-> Error = %s',
-            integ_error
-            )
-            raise
-
-        except SQLAlchemyError as db_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Unexpected error in the database. '
-            '-> Error = %s',
-            db_error
-            )
-            raise
-
-        except Exception as unexpected_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Unmapped systemic error. '
-            '-> Error = %s',
-            unexpected_error
-            )
-            raise
+        values = [asdict(marketplace) for marketplace in marketplaces]
+        await self.session.execute(query, values)
+        logger.info(
+                        'Lucro_Admin Marketplaces | '
+                        'New %s Marketplaces added',
+                        len(values)
+                    )
 
         # ==========================
         #           SELECT
         # ==========================
 
+    @handler_db_error
     async def get_marketplace(self, marketplace_id):
 
         query = text(
@@ -106,42 +69,6 @@ class Marketplaces():
         )
 
         values = {'marketplace_external_id': marketplace_id}
-        try:
-            result = await self.session.execute(query, values)
-            data = result.fetchall()
-            return data
-
-        except OperationalError as conn_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Database connection error. -> Error = %s',
-            conn_error
-            )
-            raise
-
-        except DataError as data_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Type error in the data sent in the query. '
-            '-> Error = %s',
-            data_error
-            )
-            raise
-
-        except SQLAlchemyError as db_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Unexpected error in the database. '
-            '-> Error = %s',
-            db_error
-            )
-            raise
-
-        except Exception as unexpected_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Unmapped systemic error. '
-            '-> Error = %s',
-            unexpected_error
-            )
-            raise
+        result = await self.session.execute(query, values)
+        data = result.fetchall()
+        return data

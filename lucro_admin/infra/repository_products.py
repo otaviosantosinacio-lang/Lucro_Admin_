@@ -2,13 +2,9 @@ import logging
 from dataclasses import asdict
 
 from sqlalchemy import text
-from sqlalchemy.exc import (
-    DataError,
-    IntegrityError,
-    OperationalError,
-    SQLAlchemyError,
-)
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from lucro_admin.infra.db_error_handle import handler_db_error
 
 logger = logging.getLogger('lucroadmin.infra.repository.products')
 
@@ -22,6 +18,7 @@ class Products():
         #           INSERT
         # ==========================
 
+    @handler_db_error
     async def insert_products(self, products):
 
         query = text(
@@ -53,53 +50,20 @@ class Products():
                 ON CONFLICT (external_product_id) DO NOTHING;
             '''
         )
-        try:
-            values = [asdict(product) for product in products]
+        values = [asdict(product) for product in products]
 
-            await self.session.execute(query, values)
+        await self.session.execute(query, values)
 
-            logger.info('Lucro Admin Repository |'
-            ' Database transaction completed.')
-
-        except OperationalError as conn_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Database connection error. -> Error = %s',
-            conn_error
-            )
-            raise
-
-        except IntegrityError as integ_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Data integrity violation (Duplicate record or invalid FK). '
-            '-> Error = %s',
-            integ_error
-            )
-            raise
-
-        except SQLAlchemyError as db_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Unexpected error in the database. '
-            '-> Error = %s',
-            db_error
-            )
-            raise
-
-        except Exception as unexpected_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Unmapped systemic error. '
-            '-> Error = %s',
-            unexpected_error
-            )
-            raise
+        logger.info('Lucro Admin Repository |'
+        ' New %s products added.',
+        len(values)
+        )
 
         # ==========================
         #           SELECT
         # ==========================
 
+    @handler_db_error
     async def consult_product_with_full_sku(self, full_sku: str):
 
         query = text(
@@ -114,46 +78,11 @@ class Products():
 
         values = {'sku': full_sku}
 
-        try:
-            result = await self.session.execute(query, values)
-            data = result.fetchall()
-            return data
+        result = await self.session.execute(query, values)
+        data = result.fetchall()
+        return data
 
-        except OperationalError as conn_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Database connection error. -> Error = %s',
-            conn_error
-            )
-            raise
-
-        except DataError as data_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Type error in the data sent in the query. '
-            '-> Error = %s',
-            data_error
-            )
-            raise
-
-        except SQLAlchemyError as db_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Unexpected error in the database. '
-            '-> Error = %s',
-            db_error
-            )
-            raise
-
-        except Exception as unexpected_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Unmapped systemic error. '
-            '-> Error = %s',
-            unexpected_error
-            )
-            raise
-
+    @handler_db_error
     async def consult_product_with_sku(self, sku: str):
 
         query = text(
@@ -166,46 +95,11 @@ class Products():
 
         values = {'sku': sku}
 
-        try:
-            result = await self.session.execute(query, values)
-            data = result.fetchall()
-            return data
+        result = await self.session.execute(query, values)
+        data = result.fetchall()
+        return data
 
-        except OperationalError as conn_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Database connection error. -> Error = %s',
-            conn_error
-            )
-            raise
-
-        except DataError as data_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Type error in the data sent in the query. '
-            '-> Error = %s',
-            data_error
-            )
-            raise
-
-        except SQLAlchemyError as db_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Unexpected error in the database. '
-            '-> Error = %s',
-            db_error
-            )
-            raise
-
-        except Exception as unexpected_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Unmapped systemic error. '
-            '-> Error = %s',
-            unexpected_error
-            )
-            raise
-
+    @handler_db_error
     async def consult_pk_externalid_all_products(
             self,
             offset,
@@ -226,42 +120,6 @@ class Products():
             'limit': limit,
             'offset': offset
         }
-        try:
-            result = await self.session.execute(query, values)
-            data = result.fetchall()
-            return data
-
-        except OperationalError as conn_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Database connection error. -> Error = %s',
-            conn_error
-            )
-            raise
-
-        except DataError as data_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Type error in the data sent in the query. '
-            '-> Error = %s',
-            data_error
-            )
-            raise
-
-        except SQLAlchemyError as db_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Unexpected error in the database. '
-            '-> Error = %s',
-            db_error
-            )
-            raise
-
-        except Exception as unexpected_error:
-            await self.session.rollback()
-            logger.critical('Lucro Admin Repository | '
-            'Unmapped systemic error. '
-            '-> Error = %s',
-            unexpected_error
-            )
-            raise
+        result = await self.session.execute(query, values)
+        data = result.fetchall()
+        return data
