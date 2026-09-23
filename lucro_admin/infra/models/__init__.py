@@ -6,6 +6,7 @@ from lucro_admin.infra.models.marketplace import Marketplace
 from lucro_admin.infra.models.order import Order
 from lucro_admin.infra.models.order_item import OrderItem
 from lucro_admin.infra.models.order_item_tax import OrderItemTax
+from lucro_admin.infra.models.order_page import OrderPage
 from lucro_admin.infra.models.pipeline_execution import PipelineExecution
 from lucro_admin.infra.models.pipeline_stage import PipelineStage
 from lucro_admin.infra.models.pipeline_status import PipelineStatus
@@ -27,5 +28,6 @@ __all__ = [
     'PipelineStatus',
     'PipelineExecution',
     'FullProduct',
-    'Integrations'
+    'Integrations',
+    'OrderPage'
 ]

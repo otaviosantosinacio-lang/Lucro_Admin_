@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from lucro_admin.infra.models.marketplace import Marketplace
     from lucro_admin.infra.models.user import User
 
+
 @table_registry_base.mapped_as_dataclass
 class Order(BaseModel):
     __tablename__ = 'orders'

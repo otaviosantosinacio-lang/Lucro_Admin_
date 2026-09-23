@@ -28,15 +28,12 @@ from lucro_admin.services.bling.orders.order_situation_bling import (
     OrderSituationBling,
 )
 from lucro_admin.services.bling.orders.order_tax import TaxInvoicesBling
-from lucro_admin.services.bling.orders.provider.provider_pedidos import (
-    PedidosProviderBling,
-)
 from lucro_admin.services.bling.orders.orders import (
     Attended,
     OrderDetails,
 )
 from lucro_admin.services.bling.products.product import ProductsRequestBling
-from lucro_admin.services.mercado_livre.pedidos.service_mercadolivre_pedidos import (
+from lucro_admin.services.mercado_livre.pedidos.mercadolivre_pedidos import (
     ExtraiCustoMercadoLivre,
 )
 from lucro_admin.services.mercado_livre.tokens.ml_provider import MLProvider

@@ -4,6 +4,7 @@ from datetime import datetime
 from lucro_admin.services.mercado_livre.tokens.service_mercadolivre_credenciais import (
     oAuthRefreshMercadoLivre,
 )
+from lucro_admin.adapters.mercado_livre.mercado_livre_credentials import RefreshML
 from lucro_admin.services.providers.provider import TokenProvider
 from lucro_admin.settings import MeliSettings
 
@@ -11,9 +12,9 @@ logger = logging.getLogger('lucroadmin.services.provider')
 
 
 class MLProvider(TokenProvider):
-    def __init__(self, adapter_refresh):
+    def __init__(self):
         self.credentials = MeliSettings()
-        self.adapter_refresh = adapter_refresh
+        self.adapter_refresh = RefreshML()
 
     def get_access_token(self) -> str:
         logger.info(

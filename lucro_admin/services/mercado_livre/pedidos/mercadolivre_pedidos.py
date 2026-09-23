@@ -1,6 +1,9 @@
 import logging
 from typing import Any
 
+from lucro_admin.adapters.mercado_livre.mercado_livre_orders import (
+    GetMercadoLivre,
+)
 from lucro_admin.core.entities_pedidos import (
     IdsPedidoML,
     ItemComissionShip,
@@ -9,12 +12,14 @@ from lucro_admin.core.entities_pedidos import (
 )
 from lucro_admin.infra.database import SessionLocal
 from lucro_admin.infra.repository_order_item import OrderItem
+from lucro_admin.services.mercado_livre.tokens.ml_provider import MLProvider
 from lucro_admin.services.mercado_pago.service_mercadopago import (
     MercadoPagoCustos,
 )
 from lucro_admin.services.service_http_request_base import (
     BaseRequestHTTP,
 )
+from lucro_admin.services.token_service import TokenService
 
 logger = logging.getLogger('lucroadmin.services.mercadolivrepedidos')
 
@@ -31,13 +36,15 @@ def endpoint_pack(id_pack: int) -> str:
     return url
 
 
-class ExtraiCustoMercadoLivre:
+class ExtraiCustoMeli:
 
-    def __init__(self, access_token, adapt_pedido):
-        self.access_token = access_token
-        self.adapt_pedido = adapt_pedido
+    def __init__(self):
+        self.provider = MLProvider()
+        self.token_service = TokenService(self.provider)
+        self.access_token = self.token_service.validate_access_token()
+        self.adapter = GetMercadoLivre()
         self.service_base = BaseRequestHTTP(
-            self.adapt_pedido, self.access_token
+            self.adapter, self.access_token
         )
         self.mercado_pago = MercadoPagoCustos()
 
@@ -65,51 +72,50 @@ class ExtraiCustoMercadoLivre:
                 status=response.status
             )
 
-    async def get_sale_costs(self):
+    async def get_sale_costs(self, session):
 
         logger.info(
         'Mercado Livre Costs | '
         'Starting the extraction of necessary IDs from the Order.'
         )
-        async with SessionLocal() as session:
-            repository = OrderItem(session=session)
-            offset: int = 7
-            more_page: bool = True
-            item_costs = []
-            while more_page:
-                orders = await repository.item_without_commission_meli(
-                    offset=offset
+        repository = OrderItem(session=session)
+        offset: int = 7
+        more_page: bool = True
+        item_costs = []
+        while more_page:
+            orders = await repository.item_without_commission_meli(
+                offset=offset
+            )
+
+            for order in orders:
+                order_items = await repository.searching_order_item(
+                    order_id=order[0]
                 )
+                print(order)
+                print(order_items)
+                costs = self.get_commision_ship_cost(
+                    meli_order=order[1],
+                    order_id=order[0],
+                    order_items=order_items
+                )
+                if costs is None:
+                    continue
+                for item in costs:
+                    if order[2] == 'Mercado Envios Flex':
+                        shipping: float = 12.99
+                        item.item_shipping = shipping
+                        item_costs.append(item)
+                    else:
+                        item_costs.append(item)
 
-                for order in orders:
-                    order_items = await repository.searching_order_item(
-                        order_id=order[0]
-                    )
-                    print(order)
-                    print(order_items)
-                    costs = self.get_commision_ship_cost(
-                        meli_order=order[1],
-                        order_id=order[0],
-                        order_items=order_items
-                    )
-                    if costs is None:
-                        continue
-                    for item in costs:
-                        if order[2] == 'Mercado Envios Flex':
-                            shipping: float = 12.99
-                            item.item_shipping = shipping
-                            item_costs.append(item)
-                        else:
-                            item_costs.append(item)
+            if len(orders) < 100:
+                more_page = False
+            else:
+                offset += 100
 
-                if len(orders) < 100:
-                    more_page = False
-                else:
-                    offset += 100
+        await repository.update_shipping_commission(item_costs)
 
-            await repository.update_shipping_commission(item_costs)
-
-            await session.commit()
+        await session.commit()
 
     def get_commision_ship_cost(
         self,

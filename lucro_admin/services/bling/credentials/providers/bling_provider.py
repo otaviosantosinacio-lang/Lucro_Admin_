@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 
+from lucro_admin.adapters.bling.bling_credentials import Refresh
 from lucro_admin.services.bling.credentials.service_bling_credentials import (
     oAuthRefreshBling,
 )
@@ -11,9 +12,9 @@ logger = logging.getLogger('lucroadmin.services.provider')
 
 
 class BlingProvider(TokenProvider):
-    def __init__(self, adapter_refresh):
+    def __init__(self):
         self.credentials = BlingSettings()
-        self.adapter_refresh = adapter_refresh
+        self.adapter_refresh = Refresh()
 
     def get_access_token(self) -> str:
         logger.info(
