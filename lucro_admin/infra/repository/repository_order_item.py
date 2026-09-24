@@ -81,7 +81,7 @@ class OrderItem:
         # ==========================
 
     @handler_db_error
-    async def item_without_commission_meli(
+    async def select_item_without_commission_meli(
             self,
             offset,
             limit=100
@@ -116,7 +116,7 @@ class OrderItem:
         return data
 
     @handler_db_error
-    async def searching_order_item(self, order_id):
+    async def select_order_item(self, order_id):
         query = text(
             '''
                 SELECT

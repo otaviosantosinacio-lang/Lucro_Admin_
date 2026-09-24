@@ -6,7 +6,7 @@ from lucro_admin.adapters.mercado_livre.mercado_livre_credentials import Code
 from lucro_admin.core.entities_credential import Credential
 from lucro_admin.utils.code_state import code_string
 from lucro_admin.utils.cript_state import cript_state
-from lucro_admin.infra.repository_credentials import SaveCredentials
+from lucro_admin.infra.repository.repository_credentials import SaveCredentials
 from lucro_admin.settings import MeliSettings
 
 logger = logging.getLogger('lucroadmin.services.mercadolivre')

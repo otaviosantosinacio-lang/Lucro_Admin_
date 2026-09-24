@@ -5,7 +5,7 @@ from http import HTTPStatus
 
 from lucro_admin.adapters.tiny.tiny_credentials import Code
 from lucro_admin.core.entities_credential import CredentialTiny
-from lucro_admin.infra.repository_credentials import SaveCredentials
+from lucro_admin.infra.repository.repository_credentials import SaveCredentials
 from lucro_admin.settings import TinySettings
 from lucro_admin.utils.code_state import code_string_tiny
 

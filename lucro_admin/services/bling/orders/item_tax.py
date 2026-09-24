@@ -2,7 +2,7 @@ import logging
 
 from lucro_admin.adapters.bling.bling_orders import GetUrlXML
 from lucro_admin.core.imposto.entities_imposto import ErrorParse
-from lucro_admin.infra.repository_order_item_tax import OrderItemTax
+from lucro_admin.infra.repository.repository_order_item_tax import OrderItemTax
 from lucro_admin.services.bling.credentials.providers.bling_provider import (
     BlingProvider,
 )

@@ -9,10 +9,10 @@ from lucro_admin.core.entities_pedidos import (
     OrderItemInsert,
     OrderPage,
 )
-from lucro_admin.infra.repository_marketplaces import Marketplaces
-from lucro_admin.infra.repository_order_item import OrderItem
-from lucro_admin.infra.repository_orders import Orders
-from lucro_admin.infra.repository_products import Products
+from lucro_admin.infra.repository.repository_marketplaces import Marketplaces
+from lucro_admin.infra.repository.repository_order_item import OrderItem
+from lucro_admin.infra.repository.repository_orders import Orders
+from lucro_admin.infra.repository.repository_products import Products
 from lucro_admin.services.bling.credentials.providers.bling_provider import (
     BlingProvider,
 )

@@ -5,7 +5,7 @@ from typing import Any
 from lucro_admin.adapters.bling.bling_orders import CrudBling
 from lucro_admin.core.entities_pedidos import ErrorHTTP
 from lucro_admin.core.imposto.entities_imposto import InsertTaxInvoice
-from lucro_admin.infra.repository_order_tax import OrderTax
+from lucro_admin.infra.repository.repository_order_tax import OrderTax
 from lucro_admin.services.bling.credentials.providers.bling_provider import (
     BlingProvider,
 )

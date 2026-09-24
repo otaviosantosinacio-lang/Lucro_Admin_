@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from lucro_admin.infra.models.pipeline_stage import PipelineStage
     from lucro_admin.infra.models.pipeline_status import PipelineStatus
 
+
 @table_registry_base.mapped_as_dataclass
 class PipelineExecution(BaseModel):
     __tablename__ = 'pipeline_execution'
@@ -32,7 +33,7 @@ class PipelineExecution(BaseModel):
         nullable=False
     )
 
-    attempts: Mapped[str] = mapped_column(nullable=False)
+    attempts: Mapped[int] = mapped_column(nullable=False)
 
     description: Mapped[str] = mapped_column(nullable=False)
 

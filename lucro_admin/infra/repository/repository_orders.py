@@ -86,7 +86,7 @@ class Orders():
         # ==========================
 
     @handler_db_error
-    async def last_date_order(self):
+    async def select_last_date_order(self):
 
         query = text(
             '''
@@ -100,7 +100,12 @@ class Orders():
         return data
 
     @handler_db_error
-    async def orders_without_details(self, offset, situation_id, limit=100):
+    async def select_orders_without_details(
+        self,
+        offset,
+        situation_id,
+        limit=100
+    ):
 
         query = text(
             '''

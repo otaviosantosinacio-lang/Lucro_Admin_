@@ -2,7 +2,7 @@ import logging
 
 from lucro_admin.core.entities_pedidos import BlingSituation, BlingSituationDB
 from lucro_admin.infra.database import SessionLocal
-from lucro_admin.infra.repository_bling_order_situation import (
+from lucro_admin.infra.repository.repository_bling_order_situation import (
     BlingOrderSituation,
 )
 from lucro_admin.services.service_http_request_base import BaseRequestHTTP

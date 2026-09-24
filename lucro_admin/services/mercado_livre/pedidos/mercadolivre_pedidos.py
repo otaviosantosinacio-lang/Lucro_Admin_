@@ -11,7 +11,7 @@ from lucro_admin.core.entities_pedidos import (
     SaleCosts,
 )
 from lucro_admin.infra.database import SessionLocal
-from lucro_admin.infra.repository_order_item import OrderItem
+from lucro_admin.infra.repository.repository_order_item import OrderItem
 from lucro_admin.services.mercado_livre.tokens.ml_provider import MLProvider
 from lucro_admin.services.mercado_pago.service_mercadopago import (
     MercadoPagoCustos,

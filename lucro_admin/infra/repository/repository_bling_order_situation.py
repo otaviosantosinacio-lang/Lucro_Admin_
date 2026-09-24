@@ -51,7 +51,7 @@ class BlingOrderSituation():
         # ==========================
 
     @handler_db_error
-    async def extract_situation(self, situation_name):
+    async def select_situation(self, situation_name):
 
         query = text(
                 '''

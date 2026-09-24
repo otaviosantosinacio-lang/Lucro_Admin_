@@ -64,7 +64,7 @@ class Products():
         # ==========================
 
     @handler_db_error
-    async def consult_product_with_full_sku(self, full_sku: str):
+    async def select_product_with_full_sku(self, full_sku: str):
 
         query = text(
             '''
@@ -83,7 +83,7 @@ class Products():
         return data
 
     @handler_db_error
-    async def consult_product_with_sku(self, sku: str):
+    async def select_product_with_sku(self, sku: str):
 
         query = text(
             '''
@@ -100,7 +100,7 @@ class Products():
         return data
 
     @handler_db_error
-    async def consult_pk_externalid_all_products(
+    async def select_pk_externalid_all_products(
             self,
             offset,
             limit: int = 100

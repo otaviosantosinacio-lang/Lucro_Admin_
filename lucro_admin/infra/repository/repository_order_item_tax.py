@@ -52,7 +52,7 @@ class OrderItemTax:
         )
 
     @handler_db_error
-    async def searching_xml(
+    async def select_searching_xml(
             self,
             offset: int,
             integration_id: int,
@@ -94,7 +94,7 @@ class OrderItemTax:
         # ==========================
 
     @handler_db_error
-    async def searching_order_item(self, order_id):
+    async def select__order_item(self, order_id):
         query = text(
             '''
                 SELECT

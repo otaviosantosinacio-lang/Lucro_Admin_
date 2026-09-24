@@ -58,7 +58,7 @@ class Marketplaces():
         # ==========================
 
     @handler_db_error
-    async def get_marketplace(self, marketplace_id):
+    async def select_marketplace(self, marketplace_id):
 
         query = text(
             '''

@@ -12,12 +12,6 @@ from lucro_admin.services.orchestrator import PipelineOrchestrator
 
 
 async def main():
-    """
-    Iniciando a aplicação, estamos configurando os objetos
-    que serão necessário para seguir com a aplicação.
-    Esta def não solicita nenhum atributo pois é ela quem fará as requisições
-    a outros pacotes do app
-    """
 
     Path('logs').mkdir(exist_ok=True)
     cid = generate_correlation_id()

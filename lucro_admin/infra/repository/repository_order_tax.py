@@ -59,7 +59,7 @@ class OrderTax:
         # ==========================
 
     @handler_db_error
-    async def searching_invoice_ids(
+    async def select_invoice_ids(
             self,
             offset,
             situation,

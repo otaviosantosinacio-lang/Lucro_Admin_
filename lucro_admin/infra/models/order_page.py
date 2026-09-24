@@ -19,7 +19,13 @@ class OrderPage(BaseModel):
 
     page: Mapped[int] = mapped_column(nullable=False)
 
+    more_orders: Mapped[bool] = mapped_column(nullable=False)
+
     created_at: Mapped[datetime] = mapped_column(
         init=False,
         server_default=func.now()
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        init=False, server_default=func.now(), onupdate=func.now()
     )
