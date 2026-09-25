@@ -81,6 +81,7 @@ class Orders():
         ' New %s order details added.',
         len(values)
         )
+
         # ==========================
         #           SELECT
         # ==========================

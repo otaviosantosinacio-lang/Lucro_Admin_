@@ -22,12 +22,15 @@ class BlingSituation:
     situation_name: str
     situation_color: str | None = None
 
+
 @dataclass
 class BlingSituationDB:
     situation_id: int
     situation_bling_id: int
     situation_name: str
     situation_color: str | None = None
+
+
 @dataclass
 class PageResult:
     """
@@ -98,7 +101,7 @@ class GetPagesResult:
     situation: str
 
 @dataclass
-class OrderPage:
+class OrderByPage:
     external_id: int
     origin_id: int
     situation_id: int
@@ -127,11 +130,13 @@ class OrderDetail:
     uf_dest: str
     transport: str
 
+
 @dataclass
 class ItemList:
     order_id: int
     situation_id: int
     items: list[Any]
+
 
 @dataclass
 class OrderItemInsert:

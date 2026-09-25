@@ -2,15 +2,17 @@ import logging
 from datetime import date, datetime
 
 from lucro_admin.adapters.bling.bling_orders import CrudBling
+from lucro_admin.core.entities import PageOrders
 from lucro_admin.core.entities_pedidos import (
     ErrorHTTP,
     ItemList,
+    OrderByPage,
     OrderDetail,
     OrderItemInsert,
-    OrderPage,
 )
 from lucro_admin.infra.repository.repository_marketplaces import Marketplaces
 from lucro_admin.infra.repository.repository_order_item import OrderItem
+from lucro_admin.infra.repository.repository_order_page import OrderPage
 from lucro_admin.infra.repository.repository_orders import Orders
 from lucro_admin.infra.repository.repository_products import Products
 from lucro_admin.services.bling.credentials.providers.bling_provider import (
@@ -83,22 +85,26 @@ class Attended:
         limit_orders: int = 100
         sit = await self.order_situation.situation_data_base('Atendido')
         more_page: bool = True
-        page = 1
         repository = Orders(session=session)
-        repo_mkt = Marketplaces(session=session)
-        repo_initial_date = await repository.last_date_order()
+        repository_page = OrderPage(session=session)
 
-        initial_date = repo_initial_date[0][0]
-        if initial_date is None:
-            initial_date = datetime.now().date()
+        order_page = await repository_page.select_pending_order_page(
+            situation_id=sit.situation_bling_id,
+            integration_id=1
+        )
 
         end_date = datetime.now().date()
         orders = []
         error429 = []
-
+        page = order_page.page
+        order_pages_update = []
+        order_pages_insert = []
         while more_page:
             url = self.url_endpoint_pag(
-                page, sit.situation_bling_id, initial_date, end_date
+                page,
+                sit.situation_bling_id,
+                order_page.date_page,
+                end_date
             )
             logger.info(
                 'Bling Orders get_id_por_pag | '
@@ -109,36 +115,55 @@ class Attended:
             if response.status == 'ok':
                 data = response.data.get('data', [])
                 for sale in data:
-                    if sale['loja']['id'] == 0:
-                        marketplace_id = await repo_mkt.get_marketplace(
-                        1
+                    orders.append(
+                        await self.data_modeling_order(
+                            order=sale,
+                            situation_id=sit.situation_id,
+                            session=session
                         )
-                    else:
-                        marketplace_id = await repo_mkt.get_marketplace(
-                            sale['loja']['id']
-                        )
-                    order: OrderPage = OrderPage(
-                        external_id=sale['id'],
-                        origin_id=sale['numero'],
-                        situation_id=sit.situation_id,
-                        marketplace_id=marketplace_id[0][0],
-                        marketplace_order_id=sale['numeroLoja'],
-                        order_date=sale['data']
                     )
-
-                    orders.append(order)
 
                 if len(data) < limit_orders:
                     more_page = False
+                    if order_page.page != page:
+                        order_pages_insert.append(
+                            PageOrders(
+                                id=None,
+                                date_page=end_date,
+                                page=page,
+                                more_orders=True,
+                                situation_id=sit.situation_bling_id,
+                                integration_id=1
+                            )
+                        )
+                    else:
+                        ...
                 else:
                     page += 1
+                    if order_page.page != page:
+                        order_pages_insert.append(
+                            PageOrders(
+                                id=None,
+                                date_page=end_date,
+                                page=page,
+                                more_orders=False,
+                                situation_id=sit.situation_bling_id,
+                                integration_id=1
+                            )
+                        )
+                    else:
+                        order_page.more_orders = False
+                        order_pages_update.append(
+                            order_page
+                        )
 
             elif response.status == 'rated_limit':
                 logger.error(
                     'Bling Pedidos get_id_por_pag | Erro na requisição %s',
                     response.error,
                 )
-                erro = ErrorHTTP(
+                error429.append(
+                    ErrorHTTP(
                     status=response.error['status'],
                     error=response.error['body'],
                     method='get_id_by_pag',
@@ -146,8 +171,8 @@ class Attended:
                     module='service_bling_orders.py',
                     endpoint=url,
                     data=datetime.now(),
+                    )
                 )
-                error429.append(erro)
                 page += 1
 
             else:
@@ -162,6 +187,25 @@ class Attended:
         await repository.insert_order(orders=orders)
 
         await session.commit()
+
+    async def data_modeling_order(self, order, situation_id, session):
+        repo_mkt = Marketplaces(session=session)
+        if order['loja']['id'] == 0:
+            marketplace_id = await repo_mkt.select_marketplace(
+            1
+            )
+        else:
+            marketplace_id = await repo_mkt.select_marketplace(
+                order['loja']['id']
+            )
+        return OrderByPage(
+            external_id=order['id'],
+            origin_id=order['numero'],
+            situation_id=situation_id,
+            marketplace_id=marketplace_id[0][0],
+            marketplace_order_id=order['numeroLoja'],
+            order_date=order['data']
+            )
 
 
 class OrderDetails:
@@ -199,22 +243,20 @@ class OrderDetails:
     async def get_id_details(self, session):
         """
         get_id_detalhes
-
-        :param self: Objeto
         :param ids_list: Lista de ids da situação selecionada
         :type ids_list: list[int]
         """
         error429 = []
         orders_detail = []
         items = []
-        sit = await self.order_situation.situation_data_base('Atendido')
+        situation = await self.order_situation.situation_data_base('Atendido')
         repository = Orders(session=session)
         more_page: bool = True
         offset = 0
         while more_page:
             ids = await repository.orders_without_details(
                 offset=offset,
-                situation_id=sit.situation_id
+                situation_id=situation.situation_id
             )
             for id in ids:
                 url = self.url_id(id[1])
@@ -240,7 +282,7 @@ class OrderDetails:
                     items.append(
                         ItemList(
                             order_id=id[0],
-                            situation_id=sit.situation_id,
+                            situation_id=situation.situation_id,
                             items=data['itens'],
                         )
                     )
@@ -263,7 +305,8 @@ class OrderDetails:
                         'Request Error %s',
                         response.error,
                     )
-                    erro = ErrorHTTP(
+                    error429.append(
+                        ErrorHTTP(
                         status=response.error['status'],
                         error=response.error['body'],
                         method='get_id_detalhes',
@@ -271,8 +314,9 @@ class OrderDetails:
                         module='service_bling_pedidos.py',
                         endpoint=url,
                         data=datetime.now(),
+                        )
                     )
-                    error429.append(erro)
+
             if len(ids) < 100:
                 more_page = False
             else:
