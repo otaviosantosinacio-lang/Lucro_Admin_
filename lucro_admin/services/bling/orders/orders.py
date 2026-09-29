@@ -90,12 +90,11 @@ class Attended:
 
         order_page = await repository_page.select_pending_order_page(
             situation_id=sit.situation_bling_id,
-            integration_id=1
+            integraiton_id=1
         )
 
         end_date = datetime.now().date()
         orders = []
-        error429 = []
         page = order_page.page
         order_pages_update = []
         order_pages_insert = []
@@ -108,7 +107,7 @@ class Attended:
             )
             logger.info(
                 'Bling Orders get_id_por_pag | '
-                'Url montada %s', url
+                'Endpoint URL %s', url
             )
             response = self.service_base.organiza_get_request(url)
 
@@ -137,7 +136,7 @@ class Attended:
                             )
                         )
                     else:
-                        ...
+                        order_pages_update.append(order_page)
                 else:
                     page += 1
                     if order_page.page != page:
@@ -158,33 +157,27 @@ class Attended:
                         )
 
             elif response.status == 'rated_limit':
-                logger.error(
-                    'Bling Pedidos get_id_por_pag | Erro na requisição %s',
+                logger.warning(
+                    'Bling Pedidos get_id_por_pag | Rated Limit response %s',
                     response.error,
                 )
-                error429.append(
-                    ErrorHTTP(
-                    status=response.error['status'],
-                    error=response.error['body'],
-                    method='get_id_by_pag',
-                    class_name='Attended',
-                    module='service_bling_orders.py',
-                    endpoint=url,
-                    data=datetime.now(),
-                    )
-                )
-                page += 1
-
+                break
             else:
                 logger.critical(
-                    'Bling Pedidos get_id_por_pag | Erro na requisição %s',
+                    'Bling Pedidos get_id_por_pag | Request Error %s -> ',
                     response.error,
                 )
-                raise Exception(
-                f'Erro na requisição: {response.status} - {response.error}'
-                )
+                break
 
         await repository.insert_order(orders=orders)
+
+        await repository_page.insert_order_page(
+            orders_page=order_pages_insert
+        )
+
+        await repository_page.update_order_page(
+            orders_page=order_pages_update
+        )
 
         await session.commit()
 

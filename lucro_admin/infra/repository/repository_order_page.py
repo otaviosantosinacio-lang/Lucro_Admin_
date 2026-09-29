@@ -15,14 +15,72 @@ class OrderPage():
         self.session = session
 
         # ==========================
+        #           INSERT
+        # ==========================
+
+    @handler_db_error
+    async def insert_order_page(self, orders_page):
+
+        query = text(
+            '''
+                INSERT INTO order_page(
+                    date_page,
+                    page,
+                    more_orders,
+                    situation_id,
+                    integration_id
+                )
+                VALUES(
+                    :date_page,
+                    :page,
+                    :situation_id,
+                    :integration_id
+                )
+            '''
+        )
+
+        values = [asdict(page) for page in orders_page]
+
+        await self.session.execute(query, values)
+        logger.info('Lucro Admin Repository |'
+        ' New %s order page added.',
+        len(values)
+        )
+
+        # ==========================
+        #           INSERT
+        # ==========================
+
+    @handler_db_error
+    async def update_order_page(self, orders_page):
+
+        query = text(
+            '''
+                UPDATE order_page
+                    SET
+                        more_orders = :more_orders
+                WHERE id = :id
+            '''
+        )
+
+        values = [asdict(page) for page in orders_page]
+
+        await self.session.execute(query, values)
+        logger.info('Lucro Admin Repository |'
+        ' Updated %s order page.',
+        len(values)
+        )
+
+        # ==========================
         #           SELECT
         # ==========================
+
     @handler_db_error
     async def select_pending_order_page(
         self,
-        situation_id,
-        integration_id
-        ) -> PageOrders:
+        situation_id: int,
+        integration_id: int
+        ):
         query = text(
             '''
                 WITH pending_pages AS(
@@ -45,7 +103,9 @@ class OrderPage():
                             MAX(op.updated_at)::DATE, CURRENT_DATE
                             ) AS date_page,
                         1 AS page,
-                        TRUE AS more_page
+                        TRUE AS more_page.
+                        :situation_id AS situation_id,
+                        :integration_id AS integration_id
                     FROM order_page op
                     WHERE op.situation_id = :situation_id
                         AND op.integration_id = :integration_id
@@ -53,7 +113,7 @@ class OrderPage():
                 SELECT * FROM pending_pages
                 UNION ALL
                 SELECT * FROM next_start
-                WHERE NOT EXISTIS (SELECT 1 FROM pending_pages);
+                WHERE NOT EXITIS (SELECT 1 FROM pending_pages);
             '''
         )
 
