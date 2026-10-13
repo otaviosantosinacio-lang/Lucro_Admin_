@@ -43,24 +43,29 @@ class Orders():
                     1,
                     1
                 )
-                ON CONFLICT (external_id) DO NOTHING;
+                ON CONFLICT (external_id) DO NOTHING
+                RETURNING order_id;
             '''
         )
 
         values = [asdict(order) for order in orders]
-        await self.session.execute(query, values)
+        result = await self.session.execute(query, values)
         logger.info(
                         'Lucro_Admin Orders | '
                         'New %s orders added',
                         len(values)
                     )
 
+        data = result.fetchall()
+
+        return data
+
         # ==========================
         #           UPDATE
         # ==========================
 
     @handler_db_error
-    async def insert_order_details(self, order_details):
+    async def update_order_details(self, order_details):
 
         query = text(
             '''
@@ -87,44 +92,23 @@ class Orders():
         # ==========================
 
     @handler_db_error
-    async def select_last_date_order(self):
-
+    async def select_order_id(self, order_id):
         query = text(
             '''
-                SELECT MAX(order_date)::DATE as last_order
+                SELECT
+                    order_id,
+                    external_id
                 FROM orders
-
-            '''
-        )
-        result = await self.session.execute(query)
-        data = result.fetchall()
-        return data
-
-    @handler_db_error
-    async def select_orders_without_details(
-        self,
-        offset,
-        situation_id,
-        limit=100
-    ):
-
-        query = text(
-            '''
-                SELECT order_id, external_id
-                FROM orders
-                WHERE value_order is NULL and situation_id = :situation_id
-                ORDER BY order_id
-                LIMIT :limit
-                OFFSET :offset
+                WHERE order_id = :order_id
             '''
         )
 
         values = {
-            'situation_id': situation_id,
-            'offset': offset,
-            'limit': limit,
+            'order_id': order_id
         }
 
         result = await self.session.execute(query, values)
+
         data = result.fetchall()
+
         return data

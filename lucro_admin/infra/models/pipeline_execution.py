@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lucro_admin.infra.models.base import BaseModel, table_registry_base
@@ -16,6 +16,14 @@ if TYPE_CHECKING:
 @table_registry_base.mapped_as_dataclass
 class PipelineExecution(BaseModel):
     __tablename__ = 'pipeline_execution'
+
+    __table_args__ = (
+        UniqueConstraint(
+            'order_id',
+            'stage_id',
+            name='uq_order_for_stage',
+        ),
+    )
 
     pipeline_id: Mapped[int] = mapped_column(init=False, primary_key=True)
 

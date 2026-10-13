@@ -14,6 +14,9 @@ from lucro_admin.infra.repository.repository_marketplaces import Marketplaces
 from lucro_admin.infra.repository.repository_order_item import OrderItem
 from lucro_admin.infra.repository.repository_order_page import OrderPage
 from lucro_admin.infra.repository.repository_orders import Orders
+from lucro_admin.infra.repository.repository_pipeline_execution import (
+    PipelineExecution,
+)
 from lucro_admin.infra.repository.repository_products import Products
 from lucro_admin.services.bling.credentials.providers.bling_provider import (
     BlingProvider,
@@ -27,6 +30,26 @@ from lucro_admin.services.service_http_request_base import (
 from lucro_admin.services.token_service import TokenService
 
 logger = logging.getLogger('lucroadmin.services.blingpedidos')
+
+
+async def data_modeling_order(order, situation_id, session):
+    repo_mkt = Marketplaces(session=session)
+    if order['loja']['id'] == 0:
+        marketplace_id = await repo_mkt.select_marketplace(
+        1
+        )
+    else:
+        marketplace_id = await repo_mkt.select_marketplace(
+            order['loja']['id']
+        )
+    return OrderByPage(
+        external_id=order['id'],
+        origin_id=order['numero'],
+        situation_id=situation_id,
+        marketplace_id=marketplace_id[0][0],
+        marketplace_order_id=order['numeroLoja'],
+        order_date=order['data']
+        )
 
 
 class Attended:
@@ -50,7 +73,7 @@ class Attended:
         )
 
     def url_endpoint_pag(
-        self, pagina: int, sit: int, data_inicial: date, data_final: date
+        self, pagina: int, sit: int, data_inicial: date
     ) -> str:
         """
         url_endpoint_pag -> URL Assembly
@@ -70,7 +93,7 @@ class Attended:
         url: str = (
             f'{self.base_url}/pedidos/vendas?pagina={pagina}&limite=100&'
             f'idsSituacoes%5B%5D={sit}&dataInicial={data_inicial}'
-            f'&dataFinal={data_final}'
+            f'&dataFinal={datetime.now().date()}'
         )
         return url
 
@@ -87,13 +110,13 @@ class Attended:
         more_page: bool = True
         repository = Orders(session=session)
         repository_page = OrderPage(session=session)
+        repository_pipeline = PipelineExecution(session=session)
 
         order_page = await repository_page.select_pending_order_page(
             situation_id=sit.situation_bling_id,
-            integraiton_id=1
+            integraton_id=1
         )
 
-        end_date = datetime.now().date()
         orders = []
         page = order_page.page
         order_pages_update = []
@@ -103,7 +126,6 @@ class Attended:
                 page,
                 sit.situation_bling_id,
                 order_page.date_page,
-                end_date
             )
             logger.info(
                 'Bling Orders get_id_por_pag | '
@@ -115,7 +137,7 @@ class Attended:
                 data = response.data.get('data', [])
                 for sale in data:
                     orders.append(
-                        await self.data_modeling_order(
+                        await data_modeling_order(
                             order=sale,
                             situation_id=sit.situation_id,
                             session=session
@@ -128,7 +150,7 @@ class Attended:
                         order_pages_insert.append(
                             PageOrders(
                                 id=None,
-                                date_page=end_date,
+                                date_page=datetime.now().date(),
                                 page=page,
                                 more_orders=True,
                                 situation_id=sit.situation_bling_id,
@@ -138,12 +160,11 @@ class Attended:
                     else:
                         order_pages_update.append(order_page)
                 else:
-                    page += 1
                     if order_page.page != page:
                         order_pages_insert.append(
                             PageOrders(
                                 id=None,
-                                date_page=end_date,
+                                date_page=datetime.now().date(),
                                 page=page,
                                 more_orders=False,
                                 situation_id=sit.situation_bling_id,
@@ -155,6 +176,7 @@ class Attended:
                         order_pages_update.append(
                             order_page
                         )
+                    page += 1
 
             elif response.status == 'rated_limit':
                 logger.warning(
@@ -169,7 +191,7 @@ class Attended:
                 )
                 break
 
-        await repository.insert_order(orders=orders)
+        insert_orders = await repository.insert_order(orders=orders)
 
         await repository_page.insert_order_page(
             orders_page=order_pages_insert
@@ -178,27 +200,14 @@ class Attended:
         await repository_page.update_order_page(
             orders_page=order_pages_update
         )
+        if len(insert_orders) > 0:
+            await repository_pipeline.insert_pipeline_execution(
+                orders_id=insert_orders,
+                stage_id=1,
+                status_id=2
+            )
 
         await session.commit()
-
-    async def data_modeling_order(self, order, situation_id, session):
-        repo_mkt = Marketplaces(session=session)
-        if order['loja']['id'] == 0:
-            marketplace_id = await repo_mkt.select_marketplace(
-            1
-            )
-        else:
-            marketplace_id = await repo_mkt.select_marketplace(
-                order['loja']['id']
-            )
-        return OrderByPage(
-            external_id=order['id'],
-            origin_id=order['numero'],
-            situation_id=situation_id,
-            marketplace_id=marketplace_id[0][0],
-            marketplace_order_id=order['numeroLoja'],
-            order_date=order['data']
-            )
 
 
 class OrderDetails:
@@ -234,25 +243,25 @@ class OrderDetails:
         return f'{self.base_url}/pedidos/vendas/{id}'
 
     async def get_id_details(self, session):
-        """
-        get_id_detalhes
-        :param ids_list: Lista de ids da situação selecionada
-        :type ids_list: list[int]
-        """
-        error429 = []
         orders_detail = []
         items = []
         situation = await self.order_situation.situation_data_base('Atendido')
         repository = Orders(session=session)
+        repository_pipeline = PipelineExecution(session=session)
         more_page: bool = True
         offset = 0
+        pipeline_update = []
         while more_page:
-            ids = await repository.orders_without_details(
-                offset=offset,
-                situation_id=situation.situation_id
+            pipelines = await repository_pipeline.select_pipeline_execution(
+                stage_id=1,
+                status_id=2,
+                offset=offset
             )
-            for id in ids:
-                url = self.url_id(id[1])
+            for pipeline in pipelines:
+                order_data = await repository.select_order_id(
+                    order_id=pipeline[1]
+                )
+                url = self.url_id(order_data[0][1])
                 logger.info(
                 'Bling Orders get_id_details | '
                 'Url montada %s', url
@@ -263,28 +272,32 @@ class OrderDetails:
                     transporte = data.get('transporte') or {}
                     volumes = transporte.get('volumes') or []
 
-                    order: OrderDetail = OrderDetail(
-                        order_id=id[0],
-                        external_invoice_id=data['notaFiscal']['id'],
-                        value_order=data['total'],
-                        uf_dest=data['transporte']['etiqueta']['uf'],
-                        transport=volumes[0].get('servico')
-                        if volumes
-                        else 'SEM_SERVIÇO',
+                    orders_detail.append(
+                        OrderDetail(
+                            order_id=pipeline[1],
+                            external_invoice_id=data['notaFiscal']['id'],
+                            value_order=data['total'],
+                            uf_dest=data['transporte']['etiqueta']['uf'],
+                            transport=volumes[0].get('servico')
+                            if volumes
+                            else 'SEM_SERVIÇO',
+                        )
                     )
                     items.append(
                         ItemList(
-                            order_id=id[0],
+                            order_id=pipeline[1],
                             situation_id=situation.situation_id,
                             items=data['itens'],
                         )
                     )
-                    logger.info(
-                        'Bling Service Order Details | '
-                        'Order data %s',
-                        order,
+
+                    pipeline_update.append(
+                        {
+                            'pipeline_id': pipeline[0],
+                            'order_id': pipeline[1],
+                            'status_id': 1
+                        }
                     )
-                    orders_detail.append(order)
 
                     logger.info(
                         'Bling Service Order Details | '
@@ -292,32 +305,29 @@ class OrderDetails:
                         url,
                         response.data,
                     )
-                elif response.status == 'rated_limit':
+                else:
                     logger.error(
-                        'Bling Pedidos Order Detail | '
+                        'Bling Order Detail | '
                         'Request Error %s',
                         response.error,
                     )
-                    error429.append(
-                        ErrorHTTP(
-                        status=response.error['status'],
-                        error=response.error['body'],
-                        method='get_id_detalhes',
-                        class_name='ProcessaId',
-                        module='service_bling_pedidos.py',
-                        endpoint=url,
-                        data=datetime.now(),
-                        )
-                    )
 
-            if len(ids) < 100:
+            if len(pipelines) < 100:
                 more_page = False
             else:
                 offset += 100
 
-        await repository.insert_order_details(orders_detail)
+        await repository.update_order_details(orders_detail)
 
         await self.order_items(items=items, session=session)
+
+        await repository_pipeline.insert_pipeline_execution(
+            [(order['order_id']) for order in pipeline_update],
+            2,
+            2
+        )
+
+        await repository_pipeline.update_pipeline_execution(pipeline_update)
 
         await session.commit()
 

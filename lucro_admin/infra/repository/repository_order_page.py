@@ -33,6 +33,7 @@ class OrderPage():
                 VALUES(
                     :date_page,
                     :page,
+                    :more_orders,
                     :situation_id,
                     :integration_id
                 )

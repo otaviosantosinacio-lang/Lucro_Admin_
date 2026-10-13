@@ -7,9 +7,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from lucro_admin.infra.models.base import BaseModel, table_registry_base
 
 if TYPE_CHECKING:
-    from lucro_admin.infra.models.bling_order_situation import (
-        BlingOrderSituation,
-    )
     from lucro_admin.infra.models.integration import Integrations
 
 
