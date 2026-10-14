@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey, func
@@ -19,11 +19,7 @@ class OrderPage(BaseModel):
         primary_key=True
     )
 
-    date_page: Mapped[date] = mapped_column(nullable=False)
-
-    page: Mapped[int] = mapped_column(nullable=False)
-
-    more_orders: Mapped[bool] = mapped_column(nullable=False)
+    date_page: Mapped[datetime] = mapped_column(nullable=False)
 
     situation_id: Mapped[int] = mapped_column(
         nullable=False

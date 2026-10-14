@@ -105,7 +105,6 @@ class Attended:
         :return: Ids das vendas
         :rtype: ResultadoGetPaginas
         """
-        limit_orders: int = 100
         sit = await self.order_situation.situation_data_base('Atendido')
         more_page: bool = True
         repository = Orders(session=session)
@@ -114,11 +113,12 @@ class Attended:
 
         order_page = await repository_page.select_pending_order_page(
             situation_id=sit.situation_bling_id,
-            integraton_id=1
+            integration_id=1
         )
-
+        if order_page == False:
+            
         orders = []
-        page = order_page.page
+        page = 1
         order_pages_update = []
         order_pages_insert = []
         while more_page:
@@ -144,7 +144,7 @@ class Attended:
                         )
                     )
 
-                if len(data) < limit_orders:
+                if len(data) < 100:
                     more_page = False
                     if order_page.page != page:
                         order_pages_insert.append(
