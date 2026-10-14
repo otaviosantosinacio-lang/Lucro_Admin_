@@ -40,7 +40,7 @@ class PipelineExecution:
                     :stage_id,
                     :status_id,
                     0,
-                    'First Insert Order Detail in order'
+                    'PipeLine'
                 )
                 ON CONFLICT (uq_order_for_stage) DO NOTHING
                 RETURNING pipeline_id
@@ -49,7 +49,7 @@ class PipelineExecution:
 
         values = [
             {
-                'order_id': order[0],
+                'order_id': order,
                 'stage_id': stage_id,
                 'status_id': status_id}
             for order in orders_id

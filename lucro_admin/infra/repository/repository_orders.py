@@ -109,6 +109,6 @@ class Orders():
 
         result = await self.session.execute(query, values)
 
-        data = result.fetchall()
+        data = result.fetchone()
 
         return data

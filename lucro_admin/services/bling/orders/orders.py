@@ -1,10 +1,10 @@
 import logging
-from datetime import date, datetime
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from lucro_admin.adapters.bling.bling_orders import CrudBling
 from lucro_admin.core.entities import PageOrders
 from lucro_admin.core.entities_pedidos import (
-    ErrorHTTP,
     ItemList,
     OrderByPage,
     OrderDetail,
@@ -30,6 +30,37 @@ from lucro_admin.services.service_http_request_base import (
 from lucro_admin.services.token_service import TokenService
 
 logger = logging.getLogger('lucroadmin.services.blingpedidos')
+
+
+async def order_items(self, items, session):
+    repository = OrderItem(session)
+    product_repo = Products(session)
+    order_items_insert = []
+    for item_list in items:
+        for item in item_list.items:
+            product = await product_repo.consult_product_with_sku(
+                sku=item['codigo']
+            )
+            if product == []:
+                product = await product_repo.consult_product_with_full_sku(
+                    full_sku=item['codigo']
+                )
+            order_items_insert.append(
+                OrderItemInsert(
+                    order_id=item_list.order_id,
+                    situation_id=item_list.situation_id,
+                    product_id=product[0][0],
+                    quantity=item['quantidade'],
+                    cost_price=product[0][2],
+                    unit_selling_price=item['valor']
+                )
+            )
+    logger.info(
+        'Bling Orders Order Item | '
+        'Order Items added %s',
+        len(order_items_insert),
+    )
+    await repository.insert_ordem_item(order_items_insert)
 
 
 async def data_modeling_order(order, situation_id, session):
@@ -73,7 +104,11 @@ class Attended:
         )
 
     def url_endpoint_pag(
-        self, pagina: int, sit: int, data_inicial: date
+        self,
+        page: int,
+        situation: int,
+        initical_date: datetime,
+        final_date: datetime
     ) -> str:
         """
         url_endpoint_pag -> URL Assembly
@@ -91,9 +126,9 @@ class Attended:
         :rtype: str
         """
         url: str = (
-            f'{self.base_url}/pedidos/vendas?pagina={pagina}&limite=100&'
-            f'idsSituacoes%5B%5D={sit}&dataInicial={data_inicial}'
-            f'&dataFinal={datetime.now().date()}'
+            f'{self.base_url}/pedidos/vendas?pagina={page}&limite=100&'
+            f'idsSituacoes%5B%5D={situation}&dataAlteracaoInicial={initical_date}'
+            f'&dataAlteracaoFinal={final_date}'
         )
         return url
 
@@ -115,17 +150,15 @@ class Attended:
             situation_id=sit.situation_bling_id,
             integration_id=1
         )
-        if order_page == False:
-            
+        end_date = datetime.now(ZoneInfo('America/Sao_Paulo'))
         orders = []
         page = 1
-        order_pages_update = []
-        order_pages_insert = []
         while more_page:
             url = self.url_endpoint_pag(
-                page,
-                sit.situation_bling_id,
-                order_page.date_page,
+                page=page,
+                situation=sit.situation_bling_id,
+                initical_date=order_page.date_page,
+                final_date=end_date
             )
             logger.info(
                 'Bling Orders get_id_por_pag | '
@@ -146,63 +179,33 @@ class Attended:
 
                 if len(data) < 100:
                     more_page = False
-                    if order_page.page != page:
-                        order_pages_insert.append(
-                            PageOrders(
+                    order_page_insert = PageOrders(
                                 id=None,
-                                date_page=datetime.now().date(),
-                                page=page,
-                                more_orders=True,
-                                situation_id=sit.situation_bling_id,
-                                integration_id=1
-                            )
-                        )
-                    else:
-                        order_pages_update.append(order_page)
-                else:
-                    if order_page.page != page:
-                        order_pages_insert.append(
-                            PageOrders(
-                                id=None,
-                                date_page=datetime.now().date(),
+                                date_page=end_date,
                                 page=page,
                                 more_orders=False,
                                 situation_id=sit.situation_bling_id,
                                 integration_id=1
                             )
-                        )
-                    else:
-                        order_page.more_orders = False
-                        order_pages_update.append(
-                            order_page
-                        )
+                else:
                     page += 1
 
-            elif response.status == 'rated_limit':
-                logger.warning(
-                    'Bling Pedidos get_id_por_pag | Rated Limit response %s',
-                    response.error,
-                )
-                break
             else:
                 logger.critical(
                     'Bling Pedidos get_id_por_pag | Request Error %s -> ',
                     response.error,
                 )
-                break
+                return
 
         insert_orders = await repository.insert_order(orders=orders)
 
         await repository_page.insert_order_page(
-            orders_page=order_pages_insert
+            orders_page=order_page_insert
         )
 
-        await repository_page.update_order_page(
-            orders_page=order_pages_update
-        )
         if len(insert_orders) > 0:
             await repository_pipeline.insert_pipeline_execution(
-                orders_id=insert_orders,
+                orders_id=[order[0] for order in insert_orders],
                 stage_id=1,
                 status_id=2
             )
@@ -261,7 +264,7 @@ class OrderDetails:
                 order_data = await repository.select_order_id(
                     order_id=pipeline[1]
                 )
-                url = self.url_id(order_data[0][1])
+                url = self.url_id(order_data[1])
                 logger.info(
                 'Bling Orders get_id_details | '
                 'Url montada %s', url
@@ -319,7 +322,7 @@ class OrderDetails:
 
         await repository.update_order_details(orders_detail)
 
-        await self.order_items(items=items, session=session)
+        await order_items(items=items, session=session)
 
         await repository_pipeline.insert_pipeline_execution(
             [(order['order_id']) for order in pipeline_update],
@@ -330,33 +333,3 @@ class OrderDetails:
         await repository_pipeline.update_pipeline_execution(pipeline_update)
 
         await session.commit()
-
-    async def order_items(self, items, session):
-        repository = OrderItem(session)
-        product_repo = Products(session)
-        order_items_insert = []
-        for item_list in items:
-            for item in item_list.items:
-                product = await product_repo.consult_product_with_sku(
-                    sku=item['codigo']
-                )
-                if product == []:
-                    product = await product_repo.consult_product_with_full_sku(
-                        full_sku=item['codigo']
-                    )
-                order_items_insert.append(
-                    OrderItemInsert(
-                        order_id=item_list.order_id,
-                        situation_id=item_list.situation_id,
-                        product_id=product[0][0],
-                        quantity=item['quantidade'],
-                        cost_price=product[0][2],
-                        unit_selling_price=item['valor']
-                    )
-                )
-        logger.info(
-            'Bling Orders Order Item | '
-            'Order Items added %s',
-            len(order_items_insert),
-        )
-        await repository.insert_ordem_item(order_items_insert)

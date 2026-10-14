@@ -1,5 +1,6 @@
 import logging
 from dataclasses import asdict
+from datetime import datetime, time
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,14 +27,12 @@ class OrderPage():
                 INSERT INTO order_page(
                     date_page,
                     page,
-                    more_orders,
                     situation_id,
                     integration_id
                 )
                 VALUES(
                     :date_page,
                     :page,
-                    :more_orders,
                     :situation_id,
                     :integration_id
                 )
@@ -45,30 +44,6 @@ class OrderPage():
         await self.session.execute(query, values)
         logger.info('Lucro Admin Repository |'
         ' New %s order page added.',
-        len(values)
-        )
-
-        # ==========================
-        #           INSERT
-        # ==========================
-
-    @handler_db_error
-    async def update_order_page(self, orders_page):
-
-        query = text(
-            '''
-                UPDATE order_page
-                    SET
-                        more_orders = :more_orders
-                WHERE id = :id
-            '''
-        )
-
-        values = [asdict(page) for page in orders_page]
-
-        await self.session.execute(query, values)
-        logger.info('Lucro Admin Repository |'
-        ' Updated %s order page.',
         len(values)
         )
 
@@ -90,7 +65,10 @@ class OrderPage():
                     op.situation_id,
                     op.integration_id
                 FROM order_page op
+                WHERE op.situation_id = :situation_id
+                    AND op.integration_id = :integration_id
                 ORDER BY id DESC
+                LIMIT 1
             '''
         )
 
@@ -102,13 +80,15 @@ class OrderPage():
         data = result.fetchone()
         if data is not None:
             return PageOrders(
-                        id=data[0][0],
-                        date_page=data[0][1],
-                        situation_id=data[0][2],
-                        integration_id=data[0][3]
+                        id=data[0],
+                        date_page=data[1],
+                        situation_id=data[2],
+                        integration_id=data[3]
                     )
         else:
             return PageOrders(
                 id=0,
-                date_page=
+                date_page=datetime.combine(datetime.today(), time.min),
+                situation_id=situation_id,
+                integration_id=integration_id
             )
