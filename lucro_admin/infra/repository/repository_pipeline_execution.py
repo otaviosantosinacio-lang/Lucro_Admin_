@@ -90,6 +90,7 @@ class PipelineExecution:
         self,
         stage_id,
         status_id,
+        integration_id,
         offset,
         limit=100
     ):
@@ -104,6 +105,7 @@ class PipelineExecution:
                 FROM pipeline_execution
                 WHERE stage_id = :stage_id
                     AND status_id = :status_id
+
                 LIMIT :limit
                 OFFSET :offset
                 ORDER BY pipeline_id

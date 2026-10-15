@@ -8,10 +8,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from lucro_admin.infra.models.base import BaseModel, table_registry_base
 
 if TYPE_CHECKING:
+    from lucro_admin.infra.models.integration import Integrations
     from lucro_admin.infra.models.order import Order
     from lucro_admin.infra.models.pipeline_stage import PipelineStage
     from lucro_admin.infra.models.pipeline_status import PipelineStatus
-
 
 @table_registry_base.mapped_as_dataclass
 class PipelineExecution(BaseModel):
@@ -40,6 +40,8 @@ class PipelineExecution(BaseModel):
         ForeignKey('pipeline_status.status_id'),
         nullable=False
     )
+
+    
 
     attempts: Mapped[int] = mapped_column(nullable=False)
 

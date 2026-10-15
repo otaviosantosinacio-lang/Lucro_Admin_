@@ -61,9 +61,8 @@ class OrderTax:
     @handler_db_error
     async def select_invoice_ids(
             self,
-            offset,
-            situation,
-            limit=100,
+            orders_id,
+            integration_id,
     ):
 
         query = text(
@@ -72,19 +71,15 @@ class OrderTax:
                     o.order_id,
                     o.external_invoice_id
                 FROM orders o
-                LEFT JOIN tax_invoice ti
-                    ON o.order_id = ti.order_id
-                WHERE o.integration_invoice_id = 1
-                    AND ti.order_id IS NULL
+                WHERE o.order_id = ANY(:orders_id)
+                    AND o.integration_id = :integration_order_id
                 ORDER BY o.order_id
-                OFFSET :offset
-                LIMIT :limit
             '''
         )
 
         values = {
-            'offset': offset,
-            'limit': limit
+            'orders_id': orders_id,
+            'integration_id': integration_id
         }
 
         result = await self.session.execute(query, values)

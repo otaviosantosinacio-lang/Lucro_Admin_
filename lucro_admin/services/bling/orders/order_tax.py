@@ -6,6 +6,9 @@ from lucro_admin.adapters.bling.bling_orders import CrudBling
 from lucro_admin.core.entities_pedidos import ErrorHTTP
 from lucro_admin.core.imposto.entities_imposto import InsertTaxInvoice
 from lucro_admin.infra.repository.repository_order_tax import OrderTax
+from lucro_admin.infra.repository.repository_pipeline_execution import (
+    PipelineExecution,
+)
 from lucro_admin.services.bling.credentials.providers.bling_provider import (
     BlingProvider,
 )
@@ -60,6 +63,7 @@ class TaxInvoicesBling:
         """
 
         repository = OrderTax(session=session)
+        repository_pipeline = PipelineExecution(session=session)
         sit = await self.order_situation.situation_data_base(
             situation='Atendido'
         )
@@ -69,6 +73,12 @@ class TaxInvoicesBling:
         tax_invoices = []
 
         while more_page:
+            pipeline_id = await repository_pipeline.select_pipeline_execution(
+                stage_id=2,
+                status_id=2,
+                offset=offset
+            )
+
             invoice_ids = await repository.searching_invoice_ids(
                 offset=offset,
                 situation=sit.situation_bling_id,

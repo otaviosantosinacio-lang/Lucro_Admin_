@@ -1,10 +1,12 @@
 import logging
 from datetime import datetime
 
+from lucro_admin.adapters.mercado_livre.mercado_livre_credentials import (
+    RefreshML,
+)
 from lucro_admin.services.mercado_livre.tokens.service_mercadolivre_credenciais import (
     oAuthRefreshMercadoLivre,
 )
-from lucro_admin.adapters.mercado_livre.mercado_livre_credentials import RefreshML
 from lucro_admin.services.providers.provider import TokenProvider
 from lucro_admin.settings import MeliSettings
 
