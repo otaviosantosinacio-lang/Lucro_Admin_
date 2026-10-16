@@ -52,41 +52,27 @@ class OrderItemTax:
         )
 
     @handler_db_error
-    async def select_searching_xml(
+    async def select_xml_url(
             self,
-            offset: int,
-            integration_id: int,
-            limit=100
+            order_id
     ):
 
         query = text(
             '''
-                SELECT DISTINCT
+                SELECT
                     ti.order_id,
                     ti.url_xml
                 FROM tax_invoice ti
-                INNER JOIN order_item oi
-                    ON ti.order_id = oi.order_id
-                LEFT JOIN order_item_tax oit
-                    ON oi.order_item_id = oit.order_item_id
-                INNER JOIN orders o
-                    ON ti.order_id = o.order_id
-                WHERE oit.order_item_id IS NULL
-                    AND o.integration_invoice_id = :integration
-                ORDER BY ti.order_id
-                OFFSET :offset
-                LIMIT :limit
+                WHERE ti.order_id = :order_id
             '''
         )
 
         values = {
-            'integration': integration_id,
-            'offset': offset,
-            'limit': limit
+            'order_id': order_id
         }
 
         result = await self.session.execute(query, values)
-        data = result.fetchall()
+        data = result.fetchone()
         return data
 
         # ==========================
@@ -94,7 +80,7 @@ class OrderItemTax:
         # ==========================
 
     @handler_db_error
-    async def select__order_item(self, order_id):
+    async def select_order_item(self, order_id):
         query = text(
             '''
                 SELECT

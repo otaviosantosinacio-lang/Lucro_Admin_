@@ -43,6 +43,7 @@ class OrderTax:
                     1,
                     1
                 )
+                ON CONFLICT (uq_order_for_invoice) DO NOTHING
             '''
         )
 
@@ -61,8 +62,7 @@ class OrderTax:
     @handler_db_error
     async def select_invoice_ids(
             self,
-            orders_id,
-            integration_id,
+            order_id,
     ):
 
         query = text(
@@ -71,17 +71,15 @@ class OrderTax:
                     o.order_id,
                     o.external_invoice_id
                 FROM orders o
-                WHERE o.order_id = ANY(:orders_id)
-                    AND o.integration_id = :integration_order_id
-                ORDER BY o.order_id
+                WHERE o.order_id = :order_id
+                LIMIT 1
             '''
         )
 
         values = {
-            'orders_id': orders_id,
-            'integration_id': integration_id
+            'order_id': order_id,
         }
 
         result = await self.session.execute(query, values)
-        data = result.fetchall()
+        data = result.fetchone()
         return data

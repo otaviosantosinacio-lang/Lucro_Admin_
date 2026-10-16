@@ -1,9 +1,7 @@
 import logging
-from datetime import datetime
 from typing import Any
 
 from lucro_admin.adapters.bling.bling_orders import CrudBling
-from lucro_admin.core.entities_pedidos import ErrorHTTP
 from lucro_admin.core.imposto.entities_imposto import InsertTaxInvoice
 from lucro_admin.infra.repository.repository_order_tax import OrderTax
 from lucro_admin.infra.repository.repository_pipeline_execution import (
@@ -20,7 +18,7 @@ from lucro_admin.services.service_http_request_base import (
 )
 from lucro_admin.services.token_service import TokenService
 
-logger = logging.getLogger('lucroadmin.services.blingpedidos')
+logger = logging.getLogger('lucroadmin.services.ordertax')
 
 
 class TaxInvoicesBling:
@@ -52,49 +50,42 @@ class TaxInvoicesBling:
 
     async def get_invoice_bling(self, session) -> Any:
         """
-        get_xml -> Get do XML por endpoint Bling
+        get_invoice_blin -> Get invoice details bling endpoint
 
-        :param self: Objeto
-        :param pedido: Pedido completo de onde será feito a extração dos
-        impostos
-        :param situacao: Situação do pedido dentro do Bling (Ex: Atendido)
-        :return: Impostos por produtos e imposto total da venda
-        :rtype: RetornoImpostos | Any
+        This pipeline stage insert in database invoice tax details.
+
+        :param session: Database Session
         """
 
         repository = OrderTax(session=session)
         repository_pipeline = PipelineExecution(session=session)
-        sit = await self.order_situation.situation_data_base(
-            situation='Atendido'
-        )
 
         offset: int = 0
         more_page: bool = True
         tax_invoices = []
+        pipeline_update = []
 
         while more_page:
             pipeline_id = await repository_pipeline.select_pipeline_execution(
                 stage_id=2,
                 status_id=2,
-                offset=offset
-            )
-
-            invoice_ids = await repository.searching_invoice_ids(
                 offset=offset,
-                situation=sit.situation_bling_id,
-                limit=100
+                integration_id=1
             )
 
-            if len(invoice_ids) > 0:
-                for invoice in invoice_ids:
-                    url: str = self.url_nf(invoice[1])
+            for pipeline in pipeline_id:
+                invoice_id = await repository.select_invoice_ids(
+                    order_id=pipeline[1]
+                )
+                if invoice_id != 0:
+                    url: str = self.url_nf(invoice_id[1])
                     response = self.service_base.organiza_get_request(url)
 
                     if response.status == 'ok':
                         data = response.data.get('data', [])
                         tax_invoices.append(
                             InsertTaxInvoice(
-                                order_id=invoice[0],
+                                order_id=invoice_id[0],
                                 url_xml=data['xml'],
                                 serie=data['serie'],
                                 key_access=data['chaveAcesso'],
@@ -102,28 +93,38 @@ class TaxInvoicesBling:
                                 tax_invoice_value=data['valorNota'],
                             )
                         )
-                    if response.status == 'rated_limit':
-                        erro = ErrorHTTP(
-                            status=response.error['status'],
-                            error=response.error['body'],
-                            method='get_xml',
-                            class_name='ParseXML',
-                            module='parse_xml.py',
-                            endpoint=url,
-                            data=datetime.now(),
+                        pipeline_update.append(
+                            {
+                                'pipeline_id': pipeline[0],
+                                'order_id': pipeline[1],
+                                'status_id': 1
+                            }
                         )
+                    else:
                         logger.error(
                             'Bling get_xml |'
-                        ' Erro ao buscar informações na endpoint %s -> %s',
+                        ' Error request %s -> %s',
                             url,
-                            erro.status,
+                            response.error,
                         )
-            if len(invoice_ids) < 100:
+            if len(pipeline_id) < 100:
                 more_page = False
             else:
                 offset += 100
                 continue
         await repository.insert_tax_invoice(invoices=tax_invoices)
+
+        await repository_pipeline.update_pipeline_execution(
+            pipeline_ids=pipeline_update
+        )
+        await repository_pipeline.insert_pipeline_execution(
+            orders_id=[(order['order_id']) for order in pipeline_update],
+            stage_id=3,
+            status_id=2,
+            integration_id=1
+        )
+
+        await repository_pipeline.update_pipeline_execution(pipeline_update)
 
         await session.commit()
 

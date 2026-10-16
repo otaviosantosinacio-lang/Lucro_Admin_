@@ -3,6 +3,9 @@ import logging
 from lucro_admin.adapters.bling.bling_orders import GetUrlXML
 from lucro_admin.core.imposto.entities_imposto import ErrorParse
 from lucro_admin.infra.repository.repository_order_item_tax import OrderItemTax
+from lucro_admin.infra.repository.repository_pipeline_execution import (
+    PipelineExecution,
+)
 from lucro_admin.services.bling.credentials.providers.bling_provider import (
     BlingProvider,
 )
@@ -26,21 +29,26 @@ class XMLItemTax:
         return response
 
     async def order_item_tax(self, session):
-        repository = OrderItemTax(session=session)
+        repository_tax_item = OrderItemTax(session=session)
+        repository_pipeline = PipelineExecution(session=session)
         offset = 0
         more_page = True
         items_taxes = []
+        pipeline_update = []
         while more_page:
-            orders_xml = await repository.searching_xml(
-                offset=offset,
-                integration_id=1
+            pipeline_ids = await repository_pipeline.select_pipeline_execution(
+                stage_id=3,
+                status_id=2,
+                integration_id=1,
+                offset=offset
             )
 
-            for order_xml in orders_xml:
-                url_xml = order_xml[1]
+            for pipeline in pipeline_ids:
+                invoice = await repository_tax_item.select_xml_url(pipeline[1])
+                url_xml = invoice[1]
                 xml = self.adapter.request_xml(url=url_xml)
-                order_items = await repository.searching_order_item(
-                    order_id=order_xml[0]
+                order_items = await repository_tax_item.select_order_item(
+                    order_id=pipeline[1]
                 )
                 taxes = self.parse_xml.parse_xml(
                     xml=xml, order_items=order_items
@@ -51,11 +59,29 @@ class XMLItemTax:
                 else:
                     for tax in taxes:
                         items_taxes.append(tax)
-            if len(orders_xml) < 100:
+                    pipeline_update.append(
+                        {
+                            'pipeline_id': pipeline[0],
+                            'order_id': pipeline[1],
+                            'status_id': 1
+                        }
+                    )
+            if len(pipeline_ids) < 100:
                 more_page = False
             else:
                 offset += 100
 
-        await repository.insert_tax_items(items_tax=items_taxes)
+        await repository_tax_item.insert_tax_items(items_tax=items_taxes)
+
+        await repository_pipeline.update_pipeline_execution(
+            pipeline_ids=pipeline_update
+        )
+
+        await repository_pipeline.insert_pipeline_execution(
+            orders_id=[(order['order_id']) for order in pipeline_update],
+            stage_id=4,
+            status_id=2,
+            integration_id=2
+        )
 
         await session.commit()

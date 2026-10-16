@@ -61,3 +61,4 @@ def handler_db_error(func):
             func.__name__, unexpected_error
             )
             raise
+    return wrapper

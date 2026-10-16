@@ -10,12 +10,10 @@ from lucro_admin.core.entities_pedidos import (
     PageResult,
     SaleCosts,
 )
-from lucro_admin.infra.database import SessionLocal
 from lucro_admin.infra.repository.repository_order_item import OrderItem
+from lucro_admin.infra.repository.repository_pipeline_execution import (
+    PipelineExecution)
 from lucro_admin.services.mercado_livre.tokens.ml_provider import MLProvider
-from lucro_admin.services.mercado_pago.service_mercadopago import (
-    MercadoPagoCustos,
-)
 from lucro_admin.services.service_http_request_base import (
     BaseRequestHTTP,
 )
@@ -46,7 +44,6 @@ class ExtraiCustoMeli:
         self.service_base = BaseRequestHTTP(
             self.adapter, self.access_token
         )
-        self.mercado_pago = MercadoPagoCustos()
 
     def extraindo_packid_payid(self, url: str) -> IdsPedidoML:
 
@@ -79,7 +76,8 @@ class ExtraiCustoMeli:
         'Starting the extraction of necessary IDs from the Order.'
         )
         repository = OrderItem(session=session)
-        offset: int = 7
+        repository_pipeline = 
+        offset: int = 0
         more_page: bool = True
         item_costs = []
         while more_page:

@@ -1,10 +1,10 @@
 from dataclasses import dataclass
-from datetime import date
+from datetime import datetime
 
 
 @dataclass
 class PageOrders:
     id: int | None
-    date_page: date
+    date_page: datetime
     situation_id: int
     integration_id: int

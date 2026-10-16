@@ -4,7 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, func
+from sqlalchemy import ForeignKey, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lucro_admin.infra.models.base import BaseModel, table_registry_base
@@ -13,9 +13,18 @@ if TYPE_CHECKING:
     from lucro_admin.infra.models.order import Order
     from lucro_admin.infra.models.user import User
 
+
 @table_registry_base.mapped_as_dataclass
 class TaxInvoice(BaseModel):
     __tablename__ = 'tax_invoice'
+
+    __table_args__ = (
+        UniqueConstraint(
+            'order_id',
+            'key_access',
+            name='uq_order_for_invoice',
+        ),
+    )
 
     tax_invoice_id: Mapped[int] = mapped_column(
         init=False,

@@ -32,17 +32,17 @@ from lucro_admin.services.token_service import TokenService
 logger = logging.getLogger('lucroadmin.services.blingpedidos')
 
 
-async def order_items(self, items, session):
+async def order_items(items, session):
     repository = OrderItem(session)
     product_repo = Products(session)
     order_items_insert = []
     for item_list in items:
         for item in item_list.items:
-            product = await product_repo.consult_product_with_sku(
+            product = await product_repo.select_product_with_sku(
                 sku=item['codigo']
             )
             if product == []:
-                product = await product_repo.consult_product_with_full_sku(
+                product = await product_repo.select_product_with_full_sku(
                     full_sku=item['codigo']
                 )
             order_items_insert.append(
@@ -182,8 +182,6 @@ class Attended:
                     order_page_insert = PageOrders(
                                 id=None,
                                 date_page=end_date,
-                                page=page,
-                                more_orders=False,
                                 situation_id=sit.situation_bling_id,
                                 integration_id=1
                             )
@@ -207,7 +205,8 @@ class Attended:
             await repository_pipeline.insert_pipeline_execution(
                 orders_id=[order[0] for order in insert_orders],
                 stage_id=1,
-                status_id=2
+                status_id=2,
+                integration_id=1
             )
 
         await session.commit()
@@ -258,7 +257,8 @@ class OrderDetails:
             pipelines = await repository_pipeline.select_pipeline_execution(
                 stage_id=1,
                 status_id=2,
-                offset=offset
+                offset=offset,
+                integration_id=1
             )
             for pipeline in pipelines:
                 order_data = await repository.select_order_id(
@@ -325,9 +325,10 @@ class OrderDetails:
         await order_items(items=items, session=session)
 
         await repository_pipeline.insert_pipeline_execution(
-            [(order['order_id']) for order in pipeline_update],
-            2,
-            2
+            orders_id=[(order['order_id']) for order in pipeline_update],
+            stage_id=2,
+            status_id=2,
+            integration_id=1
         )
 
         await repository_pipeline.update_pipeline_execution(pipeline_update)

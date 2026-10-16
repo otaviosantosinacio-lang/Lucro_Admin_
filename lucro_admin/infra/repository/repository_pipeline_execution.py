@@ -24,6 +24,7 @@ class PipelineExecution:
         orders_id,
         stage_id,
         status_id,
+        integration_id
     ):
 
         query = text(
@@ -32,6 +33,7 @@ class PipelineExecution:
                     order_id,
                     stage_id,
                     status_id,
+                    integration_ind
                     attempts,
                     description
                 )
@@ -39,6 +41,7 @@ class PipelineExecution:
                     :order_id,
                     :stage_id,
                     :status_id,
+                    :integration_id
                     0,
                     'PipeLine'
                 )
@@ -51,7 +54,8 @@ class PipelineExecution:
             {
                 'order_id': order,
                 'stage_id': stage_id,
-                'status_id': status_id}
+                'status_id': status_id,
+                'integration_id': integration_id}
             for order in orders_id
             ]
 
@@ -105,6 +109,7 @@ class PipelineExecution:
                 FROM pipeline_execution
                 WHERE stage_id = :stage_id
                     AND status_id = :status_id
+                    AND integration_id = :integration_id
 
                 LIMIT :limit
                 OFFSET :offset
@@ -116,7 +121,8 @@ class PipelineExecution:
             'stage_id': stage_id,
             'status_id': status_id,
             'limit': limit,
-            'offset': offset
+            'offset': offset,
+            'integration_id': integration_id
         }
 
         result = await self.session.execute(query, values)

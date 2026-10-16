@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from lucro_admin.infra.models.pipeline_stage import PipelineStage
     from lucro_admin.infra.models.pipeline_status import PipelineStatus
 
+
 @table_registry_base.mapped_as_dataclass
 class PipelineExecution(BaseModel):
     __tablename__ = 'pipeline_execution'
@@ -41,23 +42,30 @@ class PipelineExecution(BaseModel):
         nullable=False
     )
 
-    
+    integration_id: Mapped[int] = mapped_column(
+        ForeignKey('integrations.integration_id'),
+        nullable=False
+    )
 
     attempts: Mapped[int] = mapped_column(nullable=False)
 
     description: Mapped[str] = mapped_column(nullable=False)
 
-    order: Mapped[Order] = relationship(
-        foreign_keys=[order_id],
+    integration_pipeline: Mapped[Integrations] = relationship(
+        foreign_keys=[integration_id],
         init=False
     )
 
-    status: Mapped[PipelineStatus] = relationship(
+    order: Mapped['Order'] = relationship(
+        foreign_keys=[order_id],
+        init=False
+    )
+    status: Mapped['PipelineStatus'] = relationship(
         foreign_keys=[status_id],
         init=False
     )
 
-    stage: Mapped[PipelineStage] = relationship(
+    stage: Mapped['PipelineStage'] = relationship(
         foreign_keys=[stage_id],
         init=False
     )
