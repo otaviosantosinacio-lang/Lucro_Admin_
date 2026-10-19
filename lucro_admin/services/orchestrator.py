@@ -2,8 +2,8 @@ from lucro_admin.infra.database import SessionLocal
 from lucro_admin.services.bling.orders.item_tax import XMLItemTax
 from lucro_admin.services.bling.orders.order_tax import TaxInvoicesBling
 from lucro_admin.services.bling.orders.orders import Attended, OrderDetails
-from lucro_admin.services.mercado_livre.pedidos.mercadolivre_pedidos import (
-    ExtraiCustoMeli,
+from lucro_admin.services.mercado_livre.orders.mercadolivre_orders import (
+    MeliCosts,
 )
 
 
@@ -14,7 +14,7 @@ class PipelineOrchestrator:
         self.order_details = OrderDetails()
         self.order_tax = TaxInvoicesBling()
         self.item_tax = XMLItemTax()
-        self.costs = ExtraiCustoMeli()
+        self.costs = MeliCosts()
 
     async def execute(self):
         async with SessionLocal() as session:

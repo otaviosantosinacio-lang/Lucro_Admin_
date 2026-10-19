@@ -10,9 +10,12 @@ from lucro_admin.core.entities_pedidos import (
     PageResult,
     SaleCosts,
 )
+from lucro_admin.core.order_item import OrderItemDB
+from lucro_admin.core.pipelines import PipelinesExecution
 from lucro_admin.infra.repository.repository_order_item import OrderItem
 from lucro_admin.infra.repository.repository_pipeline_execution import (
-    PipelineExecution)
+    PipelineExecution,
+)
 from lucro_admin.services.mercado_livre.tokens.ml_provider import MLProvider
 from lucro_admin.services.service_http_request_base import (
     BaseRequestHTTP,
@@ -34,7 +37,7 @@ def endpoint_pack(id_pack: int) -> str:
     return url
 
 
-class ExtraiCustoMeli:
+class MeliCosts:
 
     def __init__(self):
         self.provider = MLProvider()
@@ -45,7 +48,7 @@ class ExtraiCustoMeli:
             self.adapter, self.access_token
         )
 
-    def extraindo_packid_payid(self, url: str) -> IdsPedidoML:
+    def extract_packid_payid(self, url: str) -> IdsPedidoML:
 
         response: PageResult = self.service_base.organiza_get_request(
             url=url
@@ -76,21 +79,23 @@ class ExtraiCustoMeli:
         'Starting the extraction of necessary IDs from the Order.'
         )
         repository = OrderItem(session=session)
-        repository_pipeline = 
+        repository_pipeline = PipelineExecution(session=session)
         offset: int = 0
         more_page: bool = True
         item_costs = []
         while more_page:
-            orders = await repository.item_without_commission_meli(
-                offset=offset
+            pipelines_id: PipelinesExecution = (
+                await repository_pipeline.select_pipeline_execution(
+                stage_id=4,
+                status_id=2,
+                integration_id=2
+                )
             )
 
-            for order in orders:
-                order_items = await repository.searching_order_item(
-                    order_id=order[0]
-                )
-                print(order)
-                print(order_items)
+            orders_items: OrderItemDB = await repository.select_order_item(
+                pipelines=pipelines_id
+            )
+            for order_item in orders_items:
                 costs = self.get_commision_ship_cost(
                     meli_order=order[1],
                     order_id=order[0],
@@ -126,7 +131,7 @@ class ExtraiCustoMeli:
 
         logger.info('Mercado Livre Costs | EndPoint order %s', url)
 
-        response: IdsPedidoML = self.extraindo_packid_payid(url=url)
+        response: IdsPedidoML = self.extract_packid_payid(url=url)
 
         logger.info('Mercado Livre Costs | Return -> %s', response)
         commission_ship_cost: SaleCosts | Any = []

@@ -4,6 +4,7 @@ from dataclasses import asdict
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from lucro_admin.core.pipelines import PipelinesExecution
 from lucro_admin.infra.db_error_handle import handler_db_error
 
 logger = logging.getLogger('lucroadmin.infra.repository.pipelineex')
@@ -68,6 +69,55 @@ class PipelineExecution:
             len(data)
         )
 
+    @handler_db_error
+    async def insert_pipeline_execution_marketplace_cost(
+        self,
+        orders_integration,
+        stage_id,
+        status_id,
+    ):
+
+        query = text(
+            '''
+                INSERT INTO pipeline_execution(
+                    order_id,
+                    stage_id,
+                    status_id,
+                    integration_ind
+                    attempts,
+                    description
+                )
+                VALUES(
+                    :order_id,
+                    :stage_id,
+                    :status_id,
+                    :integration_id
+                    0,
+                    'PipeLine'
+                )
+                ON CONFLICT (uq_order_for_stage) DO NOTHING
+                RETURNING pipeline_id
+            '''
+        )
+
+        values = [
+            {
+                **asdict(order_integration),
+                'stage_id': stage_id,
+                'status_id': status_id
+            }
+            for order_integration in orders_integration
+        ]
+
+        result = await self.session.execute(query, values)
+
+        data = result.fetchall()
+        logger.info(
+            'Lucro Admin Repository | '
+            'Insert %s new pipeline execution',
+            len(data)
+        )
+
         # ==========================
         #           UPDATE
         # ==========================
@@ -110,10 +160,9 @@ class PipelineExecution:
                 WHERE stage_id = :stage_id
                     AND status_id = :status_id
                     AND integration_id = :integration_id
-
+                ORDER BY pipeline_id
                 LIMIT :limit
                 OFFSET :offset
-                ORDER BY pipeline_id
             '''
         )
 
@@ -127,6 +176,7 @@ class PipelineExecution:
 
         result = await self.session.execute(query, values)
 
-        data = result.fetchall()
-
-        return data
+        return [
+            PipelinesExecution(**row)
+            for row in result.mappings().fetchall()
+        ]

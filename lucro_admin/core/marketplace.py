@@ -20,15 +20,6 @@ slug_marketplace_ = {
 
 
 def slug_marketplace(external_type: int) -> str:
-    """
-        nome_marketplace -> O bling nos retorna a loja como um código, por isso
-    devemos trata-la para visualizarmos por nome.
-
-        :param id_loja: Id da loja gerado pelo Bling
-        :type id_loja: int
-        :return: Nome da loja (Ex: Mercado Livre).
-        :rtype: str
-    """
     return slug_marketplace_.get(external_type, 'Loja não identificada')
 
 
@@ -39,3 +30,11 @@ class Marketplace:
     marketplace_name: str
     status: bool
     slug: str
+    integration_erp: int
+    integration_marketplace: int | None
+
+
+@dataclass
+class MarketplaceIntegration:
+    order_id: int
+    integration_id: int

@@ -51,6 +51,11 @@ class Order(BaseModel):
         ForeignKey('marketplaces.marketplace_id'), nullable=True
     )
 
+    marketplace_integration_id: Mapped[int] = mapped_column(
+        ForeignKey('integrations.integration_id'),
+        nullable=True
+    )
+
     marketplace_order_id: Mapped[str] = mapped_column(nullable=False)
 
     uf_dest: Mapped[str] = mapped_column(nullable=True)

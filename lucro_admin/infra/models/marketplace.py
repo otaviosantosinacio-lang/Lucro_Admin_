@@ -9,6 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from lucro_admin.infra.models.base import BaseModel, table_registry_base
 
 if TYPE_CHECKING:
+    from lucro_admin.infra.models.integration import Integrations
     from lucro_admin.infra.models.user import User
 
 
@@ -39,6 +40,16 @@ class Marketplace(BaseModel):
         default=True,
         server_default='true',
     )
+
+    integration_erp: Mapped[int] = mapped_column(
+        ForeignKey('integrations.integration_id'),
+        nullable=False
+    )
+
+    integration_marketplace: Mapped[int] = mapped_column(
+        ForeignKey('integrations.integration_id'),
+        nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         init=False, server_default=func.now()
     )
@@ -53,6 +64,16 @@ class Marketplace(BaseModel):
 
     updated_user_id: Mapped[int] = mapped_column(
         ForeignKey('users.user_id'), nullable=False
+    )
+
+    intregation_erp_id: Mapped['Integrations'] = mapped_column(
+        foreign_keys=[integration_erp],
+        init=False
+    )
+
+    intregation_marketplace_id: Mapped['Integrations'] = mapped_column(
+        foreign_keys=[integration_marketplace],
+        init=False
     )
 
     created_user: Mapped['User'] = relationship(

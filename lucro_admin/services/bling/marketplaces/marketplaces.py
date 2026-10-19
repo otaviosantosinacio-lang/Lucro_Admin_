@@ -1,7 +1,10 @@
 import logging
 
 from lucro_admin.core.entities_pedidos import PageResult
-from lucro_admin.core.marketplace import Marketplace, slug_marketplace
+from lucro_admin.core.marketplace import (
+    Marketplace,
+    slug_marketplace,
+)
 from lucro_admin.infra.database import SessionLocal
 from lucro_admin.infra.repository.repository_marketplaces import Marketplaces
 from lucro_admin.services.service_http_request_base import BaseRequestHTTP
@@ -29,63 +32,65 @@ class MarketplaceBling:
         page: int = 1
         more_page: bool = True
         marketplaces = []
-        while more_page:
-            url: str = f'{self.base_url}/canais-venda?pagina{page}=&limite=100'
-            logger.info(
-                'Bling Marketplaces |'
-                'Send request get marketplaces to endpoint %s',
-                url
-            )
-
-            response: PageResult = self.base_request.organiza_get_request(
-                url
-            )
-            if response.status == 'ok':
-                data = response.data.get('data', [])
-                logger.info(
-                    'Bling Marketplaces |'
-                    'Returned marketplaces %s',
-                    data
-                )
-                for mkt in data:
-                    if mkt['situacao'] == 1:
-                        status: bool = True
-
-                    else:
-                        status: bool = False
-
-                    slug = slug_marketplace(mkt['tipo'])
-                    marketplaces.append(
-                        Marketplace(
-                            marketplace_external_id=mkt['id'],
-                            external_type=mkt['tipo'],
-                            marketplace_name=mkt['descricao'],
-                            status=status,
-                            slug=slug
-                        )
-                    )
-
-                if len(data) < 100:
-                    more_page = False
-
-            elif response.status == 'rated_limit':
-                logger.warning(
-                    'Bling Marketplaces | '
-                    'The request marketplaces return %s status code',
-                    response.status
-                )
-                continue
-
-            else:
-                logger.critical(
-                    'Bling Marketplaces | '
-                    'Response request returning critical status ->'
-                    f'{response.status}',
-                )
-                return None
-
         async with SessionLocal() as session:
             repository = Marketplaces(session=session)
+            integrations_marketplace = (
+                await repository.select_integration_marketplace()
+                        )
+            while more_page:
+                url: str = (f'{self.base_url}/canais-venda?pagina={page}'
+                            '&limite=100'
+                            )
+                logger.info(
+                    'Bling Marketplaces |'
+                    'Send request get marketplaces to endpoint %s',
+                    url
+                )
+
+                response: PageResult = self.base_request.organiza_get_request(
+                    url
+                )
+                if response.status == 'ok':
+                    data = response.data.get('data', [])
+                    logger.info(
+                        'Bling Marketplaces |'
+                        'Returned marketplaces %s',
+                        data
+                    )
+                    for mkt in data:
+                        if mkt['situacao'] == 1:
+                            status: bool = True
+
+                        else:
+                            status: bool = False
+
+                        slug = slug_marketplace(mkt['tipo'])
+
+                        marketplaces.append(
+                            Marketplace(
+                                marketplace_external_id=mkt['id'],
+                                external_type=mkt['tipo'],
+                                marketplace_name=mkt['descricao'],
+                                status=status,
+                                slug=slug,
+                                integration_erp=1,
+                                integration_marketplace=integrations_marketplace.get(slug)
+                            )
+                        )
+
+                    if len(data) < 100:
+                        more_page = False
+
+                    else:
+                        page += 1
+
+                elif response.status == 'rated_limit':
+                    logger.warning(
+                        'Bling Marketplaces | '
+                        'The request marketplaces return %s status code',
+                        response.status
+                    )
+                    continue
 
             await repository.insert_marketplaces(
                 marketplaces=marketplaces
@@ -93,8 +98,8 @@ class MarketplaceBling:
 
             await session.commit()
 
-        logger.info(
-                    'Bling Marketplaces | '
-                    'Returned marketplaces %s',
-                    marketplaces
-                )
+            logger.info(
+                        'Bling Marketplaces | '
+                        'Returned marketplaces %s',
+                        marketplaces
+                    )

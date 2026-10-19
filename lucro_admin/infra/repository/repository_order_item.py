@@ -4,6 +4,7 @@ from dataclasses import asdict
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from lucro_admin.core.order_item import OrderItemDB
 from lucro_admin.infra.db_error_handle import handler_db_error
 
 logger = logging.getLogger('lucroadmin.infra.repository.order_item')
@@ -81,47 +82,13 @@ class OrderItem:
         # ==========================
 
     @handler_db_error
-    async def select_item_without_commission_meli(
-            self,
-            offset,
-            limit=100
-            ):
-        query = text(
-            '''
-                SELECT
-                    o.order_id,
-                    o.marketplace_order_id,
-                    o.transport,
-                    mkt.slug
-                FROM orders o
-                INNER JOIN marketplaces mkt
-                    ON o.marketplace_id = mkt.marketplace_id
-                LEFT JOIN order_item oi
-                    ON o.order_id = oi.order_id
-                WHERE oi.item_commission IS NULL
-                    AND mkt.slug = 'mercado_livre'
-                ORDER BY o.order_id
-                OFFSET :offset
-                LIMIT :limit
-            '''
-        )
-
-        values = {
-            'offset': offset,
-            'limit': limit
-        }
-
-        result = await self.session.execute(query, values)
-        data = result.fetchall()
-        return data
-
-    @handler_db_error
-    async def select_order_item(self, order_id):
+    async def select_order_item(self, pipelines):
         query = text(
             '''
                 SELECT
                     oi.order_item_id,
                     oi.order_id,
+                    o.marketplace_order_id
                     p.sku,
                     fp.fulfillment_sku
                 FROM order_item oi
@@ -133,15 +100,15 @@ class OrderItem:
                     ON p.product_id = fp.product_id
                     AND o.marketplace_id = fp.marketplace_id
                 WHERE oi.order_id = :order_id
+                ORDER BY oi.order_item_id
             '''
         )
 
-        values = {
-            'order_id': order_id
-        }
+        values = [asdict(pipeline) for pipeline in pipelines]
 
         result = await self.session.execute(query, values)
 
-        data = result.fetchall()
-
-        return data
+        return [
+            OrderItemDB(**row)
+            for row in result.mappings().fetchall()
+        ]

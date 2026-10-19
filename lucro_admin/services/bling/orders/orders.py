@@ -32,6 +32,20 @@ from lucro_admin.services.token_service import TokenService
 logger = logging.getLogger('lucroadmin.services.blingpedidos')
 
 
+async def insert_pipeline_costs(repository, pipelines, session):
+
+    repository_marketplace = Marketplaces(session=session)
+    orders_id = [(order['order_id']) for order in pipelines]
+    pipline_insert = repository_marketplace.select_integration_cost(
+        orders_id=orders_id
+    )
+    await repository.insert_pipeline_execution_marketplace_cost(
+        orders_integration=pipline_insert,
+        stage_id=4,
+        status_id=2,
+    )
+
+
 async def order_items(items, session):
     repository = OrderItem(session)
     product_repo = Products(session)
@@ -331,6 +345,11 @@ class OrderDetails:
             integration_id=1
         )
 
+        await insert_pipeline_costs(
+            repository=repository_pipeline,
+            pipelines=pipeline_update,
+            session=session
+        )
         await repository_pipeline.update_pipeline_execution(pipeline_update)
 
         await session.commit()

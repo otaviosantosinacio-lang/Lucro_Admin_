@@ -2,6 +2,7 @@ import logging
 
 from lucro_admin.adapters.bling.bling_orders import GetUrlXML
 from lucro_admin.core.imposto.entities_imposto import ErrorParse
+from lucro_admin.infra.repository.repository_marketplaces import Marketplaces
 from lucro_admin.infra.repository.repository_order_item_tax import OrderItemTax
 from lucro_admin.infra.repository.repository_pipeline_execution import (
     PipelineExecution,
@@ -75,13 +76,6 @@ class XMLItemTax:
 
         await repository_pipeline.update_pipeline_execution(
             pipeline_ids=pipeline_update
-        )
-
-        await repository_pipeline.insert_pipeline_execution(
-            orders_id=[(order['order_id']) for order in pipeline_update],
-            stage_id=4,
-            status_id=2,
-            integration_id=2
         )
 
         await session.commit()
