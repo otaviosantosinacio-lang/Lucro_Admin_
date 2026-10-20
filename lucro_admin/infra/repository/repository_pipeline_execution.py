@@ -34,7 +34,7 @@ class PipelineExecution:
                     order_id,
                     stage_id,
                     status_id,
-                    integration_ind
+                    integration_id,
                     attempts,
                     description
                 )
@@ -42,11 +42,11 @@ class PipelineExecution:
                     :order_id,
                     :stage_id,
                     :status_id,
-                    :integration_id
+                    :integration_id,
                     0,
                     'PipeLine'
                 )
-                ON CONFLICT (uq_order_for_stage) DO NOTHING
+                ON CONFLICT ON CONSTRAINT uq_order_for_stage DO NOTHING
                 RETURNING pipeline_id
             '''
         )
@@ -83,7 +83,7 @@ class PipelineExecution:
                     order_id,
                     stage_id,
                     status_id,
-                    integration_ind
+                    integration_id,
                     attempts,
                     description
                 )
@@ -91,11 +91,11 @@ class PipelineExecution:
                     :order_id,
                     :stage_id,
                     :status_id,
-                    :integration_id
+                    :integration_id,
                     0,
                     'PipeLine'
                 )
-                ON CONFLICT (uq_order_for_stage) DO NOTHING
+                ON CONFLICT ON CONSTRAINT uq_order_for_stage DO NOTHING
                 RETURNING pipeline_id
             '''
         )

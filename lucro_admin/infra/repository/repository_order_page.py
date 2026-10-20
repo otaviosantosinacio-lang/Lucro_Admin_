@@ -26,13 +26,11 @@ class OrderPage():
             '''
                 INSERT INTO order_page(
                     date_page,
-                    page,
                     situation_id,
                     integration_id
                 )
                 VALUES(
                     :date_page,
-                    :page,
                     :situation_id,
                     :integration_id
                 )

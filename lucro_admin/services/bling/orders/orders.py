@@ -10,6 +10,7 @@ from lucro_admin.core.entities_pedidos import (
     OrderDetail,
     OrderItemInsert,
 )
+from lucro_admin.core.pipelines import PipelinesExecution
 from lucro_admin.infra.repository.repository_marketplaces import Marketplaces
 from lucro_admin.infra.repository.repository_order_item import OrderItem
 from lucro_admin.infra.repository.repository_order_page import OrderPage
@@ -36,7 +37,7 @@ async def insert_pipeline_costs(repository, pipelines, session):
 
     repository_marketplace = Marketplaces(session=session)
     orders_id = [(order['order_id']) for order in pipelines]
-    pipline_insert = repository_marketplace.select_integration_cost(
+    pipline_insert = await repository_marketplace.select_integration_cost(
         orders_id=orders_id
     )
     await repository.insert_pipeline_execution_marketplace_cost(
@@ -268,15 +269,17 @@ class OrderDetails:
         offset = 0
         pipeline_update = []
         while more_page:
-            pipelines = await repository_pipeline.select_pipeline_execution(
+            pipelines: list[PipelinesExecution] = (
+                await repository_pipeline.select_pipeline_execution(
                 stage_id=1,
                 status_id=2,
                 offset=offset,
                 integration_id=1
+                )
             )
             for pipeline in pipelines:
                 order_data = await repository.select_order_id(
-                    order_id=pipeline[1]
+                    order_id=pipeline.order_id
                 )
                 url = self.url_id(order_data[1])
                 logger.info(
@@ -291,7 +294,7 @@ class OrderDetails:
 
                     orders_detail.append(
                         OrderDetail(
-                            order_id=pipeline[1],
+                            order_id=pipeline.order_id,
                             external_invoice_id=data['notaFiscal']['id'],
                             value_order=data['total'],
                             uf_dest=data['transporte']['etiqueta']['uf'],
@@ -302,7 +305,7 @@ class OrderDetails:
                     )
                     items.append(
                         ItemList(
-                            order_id=pipeline[1],
+                            order_id=pipeline.order_id,
                             situation_id=situation.situation_id,
                             items=data['itens'],
                         )
@@ -310,8 +313,8 @@ class OrderDetails:
 
                     pipeline_update.append(
                         {
-                            'pipeline_id': pipeline[0],
-                            'order_id': pipeline[1],
+                            'pipeline_id': pipeline.pipeline_id,
+                            'order_id': pipeline.order_id,
                             'status_id': 1
                         }
                     )

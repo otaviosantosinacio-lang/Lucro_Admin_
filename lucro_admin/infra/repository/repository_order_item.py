@@ -91,12 +91,15 @@ class OrderItem:
                     o.marketplace_order_id,
                     o.transport,
                     p.sku,
-                    fp.fulfillment_sku
+                    fp.fulfillment_sku,
+                    pe.pipeline_id
                 FROM order_item oi
                 INNER JOIN orders o
                     ON oi.order_id = o.order_id
                 INNER JOIN products p
                     ON oi.product_id = p.product_id
+                INNER JOIN pipeline_execution pe
+                    ON pe.order_id = o.order_id
                 LEFT JOIN fulfillment_product fp
                     ON p.product_id = fp.product_id
                     AND o.marketplace_id = fp.marketplace_id

@@ -49,7 +49,7 @@ class XMLItemTax:
                 url_xml = invoice[1]
                 xml = self.adapter.request_xml(url=url_xml)
                 order_items = await repository_tax_item.select_order_item(
-                    order_id=pipeline[1]
+                    order_id=pipeline.order_id
                 )
                 taxes = self.parse_xml.parse_xml(
                     xml=xml, order_items=order_items
@@ -62,8 +62,8 @@ class XMLItemTax:
                         items_taxes.append(tax)
                     pipeline_update.append(
                         {
-                            'pipeline_id': pipeline[0],
-                            'order_id': pipeline[1],
+                            'pipeline_id': pipeline.pipeline_id,
+                            'order_id': pipeline.order_id,
                             'status_id': 1
                         }
                     )

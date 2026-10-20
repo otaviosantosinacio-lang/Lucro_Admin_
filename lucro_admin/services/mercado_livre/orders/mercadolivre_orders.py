@@ -11,7 +11,7 @@ from lucro_admin.core.entities_pedidos import (
     PageResult,
     SaleCosts,
 )
-from lucro_admin.core.order_item import OrderItemDB
+from lucro_admin.core.order_item import OrderItemPipeline
 from lucro_admin.core.pipelines import PipelinesExecution
 from lucro_admin.infra.repository.repository_order_item import OrderItem
 from lucro_admin.infra.repository.repository_pipeline_execution import (
@@ -95,6 +95,7 @@ class MeliCosts:
         offset: int = 0
         more_page: bool = True
         item_costs = []
+        pipeline_update = []
         while more_page:
             pipelines_id: list[PipelinesExecution] = (
                 await repository_pipeline.select_pipeline_execution(
@@ -105,7 +106,7 @@ class MeliCosts:
                 )
             )
 
-            order_items_pipeline: list[OrderItemDB] = (
+            order_items_pipeline: list[OrderItemPipeline] = (
                 await repository.select_order_item(
                 pipelines=pipelines_id
                 )
@@ -122,19 +123,30 @@ class MeliCosts:
                 if costs is None:
                     continue
                 for item in costs:
-                    if order_items == 'Mercado Envios Flex':
+                    if order_items[0].transport == 'Mercado Envios Flex':
                         shipping: float = 12.99
                         item.item_shipping = shipping
                         item_costs.append(item)
                     else:
                         item_costs.append(item)
+                    pipeline_update.append(
+                        {
+                            'pipeline_id': order_items[0].pipeline_id,
+                            'order_id': order_items[0].order_id,
+                            'status_id': 1
+                        }
+                    )
 
-            if len(order_items_pipeline) < 100:
+            if len(pipelines_id) < 100:
                 more_page = False
             else:
                 offset += 100
 
         await repository.update_shipping_commission(item_costs)
+
+        await repository_pipeline.update_pipeline_execution(
+            pipeline_ids=pipeline_update
+        )
 
         await session.commit()
 
@@ -220,3 +232,5 @@ class MeliCosts:
         if response.status == 'ok':
             ids_venda = response.data['orders']
             return {'status': 'ok', 'ids': ids_venda}
+        else:
+            return {'status': response.status, 'ids': ids_venda}

@@ -75,7 +75,7 @@ class TaxInvoicesBling:
 
             for pipeline in pipeline_id:
                 invoice_id = await repository.select_invoice_ids(
-                    order_id=pipeline[1]
+                    order_id=pipeline.order_id
                 )
                 if invoice_id != 0:
                     url: str = self.url_nf(invoice_id[1])
@@ -95,8 +95,8 @@ class TaxInvoicesBling:
                         )
                         pipeline_update.append(
                             {
-                                'pipeline_id': pipeline[0],
-                                'order_id': pipeline[1],
+                                'pipeline_id': pipeline.pipeline_id,
+                                'order_id': pipeline.order_id,
                                 'status_id': 1
                             }
                         )
@@ -123,8 +123,6 @@ class TaxInvoicesBling:
             status_id=2,
             integration_id=1
         )
-
-        await repository_pipeline.update_pipeline_execution(pipeline_update)
 
         await session.commit()
 
