@@ -88,7 +88,8 @@ class OrderItem:
                 SELECT
                     oi.order_item_id,
                     oi.order_id,
-                    o.marketplace_order_id
+                    o.marketplace_order_id,
+                    o.transport,
                     p.sku,
                     fp.fulfillment_sku
                 FROM order_item oi
